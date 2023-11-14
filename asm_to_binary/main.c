@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "opcode.h"
+#include "parse.h" //Incluera data_parse.h et code_parse.h
+#include "compile.h" //Incluera header_compile.h et code_compile.h
+
 //Booleans define to make the code more readable
 #define bool int
 #define TRUE 1
@@ -61,6 +65,7 @@ bool file_verification(int argc, char** argv)
 }
 
 
+
 /// @brief Main function, used to launch big part of the asm to binary traduction
 /// @param argc Number of arguments in the command line
 /// @param argv Values of arguments in the command line
@@ -96,4 +101,5 @@ int main(int argc, char** argv)
  *      --> Montrer la structure de donnée choisie
  *      --> Demander s'il n'y a bien que 3 programmes à faire : assembleur, déassembleur et vm
  *      --> Demander si le langage C est bien le plus approprié pour realiser ces 3 fichiers
+ *      --> Demander comment gérer la partie data (et quels sont les données que l'on passe dedans)
  */
