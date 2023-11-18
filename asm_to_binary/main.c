@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "opcode.h"
 #include "parse.h" //Incluera data_parse.h et code_parse.h
 #include "compile.h" //Incluera header_compile.h et code_compile.h
 
@@ -11,37 +10,10 @@
 #define TRUE 1
 #define FALSE 0
 
-//Operand's code
-#define NBR_OP 2 //Total number of operand
-#define ADD 0
-#define SUB 1
-
-typedef struct
-{
-    int arg_count;
-    bool parenthesis;
-} op_data_t;
-
-//Operand data will be stored here
-op_data_t op_data[NBR_OP];
-
-
-
-/// @brief Function used to init op_data array so we will now how to act when reading a specific operand
-void arg_count_init()
-{
-    //ADD
-    op_data[ADD].arg_count = 2;
-    op_data[ADD].parenthesis = FALSE;
-
-    //SUB
-    op_data[SUB].arg_count = 2;
-    op_data[SUB].parenthesis = FALSE; 
-
-    //...
-}
-
-
+//Data readed from the op data file
+char** op_name;
+int* arg_count;
+//bool* parenthesis;
 
 /// @brief Function used to verify if argc >= 2 (i.e. their is a filename in argv[1]) and to test if the file does exist.
 /// @param argc Number of args passed in command line
@@ -92,14 +64,28 @@ int main(int argc, char** argv)
 }
 
 /*
- *  À demander à YASPR :
- *
- *      --> Demander une explication détaillé sur load (notamment l'offset)
- *      --> Dans storeu c'est une erreur le fait de mettre u0 alors que c'est censé etre u2 ?
- *      --> Pourquoi dans l'example 3 on a storeu avec des parenthèse à droite ?
- *      --> parenthèses et crochets (pour load et indirection) 
- *      --> Montrer la structure de donnée choisie
- *      --> Demander s'il n'y a bien que 3 programmes à faire : assembleur, déassembleur et vm
- *      --> Demander si le langage C est bien le plus approprié pour realiser ces 3 fichiers
- *      --> Demander comment gérer la partie data (et quels sont les données que l'on passe dedans)
- */
+LISTE DES FONC :
+
+1) load_file(str) : charge en mémoire l'intégralité du fichier
+2) load_op_code() : charge en mémoire les données des op code 
+
+3) char* add_comma(str) = ajoute une virgule après le premier "mots"
+4) char* remove_space(str) = supprime l'intrégalité des espaces
+5) char** retreive_token(str,char) = découpe la chaine en token avec , comme séparateur
+
+    = donne quelque chose comme token["add","U1","U2",NULL]; (ne pas oublier le NULL qui indique la fin des tokens)
+
+6) bool detect_alias(char**) = vérifie s'il y a un token qui termine par :
+7) bool correct_alias(char**) = vérifie s'il l'alias est correct (aka présent à l'indice 0 et pas d'autres tokens)
+
+8) bool detect_op_code(char*) = vérifie que token[0] correspond au nom d'un op code
+9) bool correct_op_code(char**) = vérifie le bon nombre d'arguments ainsi que le bon nom des registres
+
+    10) bool correct_register_name(char**) = verifie que les noms de registres existent
+
+11) char** parse(str) : s'occupe de vérifie l'intrégité de la ligne (partie code pas data pour l'instant).
+        
+        parse appelera parse_data puis parse_code
+        parse_code contiendra les fonctions de 3 à 10 et parse_data en réutilisera certaines
+
+*/
