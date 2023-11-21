@@ -1,42 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
-#include "parse.h" //Incluera data_parse.h et code_parse.h
-#include "compile.h" //Incluera header_compile.h et code_compile.h
-
-//Booleans define to make the code more readable
-#define bool int
-#define TRUE 1
-#define FALSE 0
-
-//Data readed from the op data file
-char** op_name;
-int* arg_count;
-//bool* parenthesis;
-
-/// @brief Function used to verify if argc >= 2 (i.e. their is a filename in argv[1]) and to test if the file does exist.
-/// @param argc Number of args passed in command line
-/// @param argv Values of args
-/// @return True if everything is correct, false if argv < 2 OR argv[1] file does not exist
-bool file_verification(int argc, char** argv)
-{
-    //Is their a file name as argument ?
-    if(argc < 2)
-    {
-        fprintf(stderr,"USAGE : ./asm [FILENAME]\n");
-        return FALSE;
-    }
-
-    //Does the file in argv[1] exist ?
-    if(access(argv[1],F_OK) != 0)
-    {
-        fprintf(stderr,"Error : the file %s does not exist.\n", argv[1]);
-        return FALSE;
-    }
-}
-
-
+#include "tools/tools.h"
 
 /// @brief Main function, used to launch big part of the asm to binary traduction
 /// @param argc Number of arguments in the command line
@@ -50,15 +17,30 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    //Initialization of operand code behaviour
-    arg_count_init();
-
-    if(parse() == FALSE)
+    //We load the op codes
+    //To do so, we first need to create what will store the op code data
+    char* op_name = (char*)malloc(sizeof(char)*128*8); //Name of the op code
+    int* arg_count = (int*)malloc(sizeof(int)*128); //Number of arguments the op code can take
+    if(load_op_code(op_name,arg_count)==FALSE)
     {
         return EXIT_FAILURE;
     }
 
-    compile();
+    //We load the file to assemble in memory
+    char* file = load_file(argv[1]);
+
+    print_file(file);
+
+    //Initialization of operand code behaviour
+    // if(parse() == FALSE)
+    // {
+    //     return EXIT_FAILURE;
+    // }
+
+    // compile();
+
+    //We dont need the file loaded in memory anymore
+    free(file);
 
     return EXIT_SUCCESS;
 }
@@ -66,7 +48,7 @@ int main(int argc, char** argv)
 /*
 LISTE DES FONC :
 
-1) load_file(str) : charge en mémoire l'intégralité du fichier
+1) load_file(str) : charge en mémoire l'intégralité du fichier OK
 2) load_op_code() : charge en mémoire les données des op code 
 
 3) char* add_comma(str) = ajoute une virgule après le premier "mots"
