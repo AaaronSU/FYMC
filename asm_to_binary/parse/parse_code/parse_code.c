@@ -9,7 +9,7 @@
 #define TRUE 1
 #define FALSE 0
 
-bool is_a_letter_or_number(int str)
+bool alphanumeric(int str)
 {
   // Check is ASCII code of character corresponds to a letter.
   return ((str >= 65 && str <= 90) || (str >= 97 && str <= 122) || (str >= 48 && str <=57));
@@ -27,14 +27,14 @@ void add_comma(const char* str_in, char* str_out)
     //~ printf("%d %d %d\n", str_in[i], i, have_read_a_letter);
     // Detect the beginning of first word
     if (have_read_a_letter == FALSE &&
-        is_a_letter_or_number(str_in[i]) == TRUE)
+        alphanumeric(str_in[i]) == TRUE)
     {
       have_read_a_letter = TRUE;
     }
 
     // Add a comma if first word ends
     if (have_read_a_letter == TRUE &&
-        is_a_letter_or_number(str_in[i]) == FALSE)
+        alphanumeric(str_in[i]) == FALSE)
       {
         char* str_tmp = (char*)malloc(taille + sizeof(char));
         strcpy(str_tmp, str_in);

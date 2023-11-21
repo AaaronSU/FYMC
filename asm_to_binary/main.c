@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
 
 #include "tools/tools.h"
+#include "parse/parse.h"
+#include "assembly/assembly.h"
 
 /// @brief Main function, used to launch big part of the asm to binary traduction
 /// @param argc Number of arguments in the command line
@@ -37,7 +38,7 @@ int main(int argc, char** argv)
     //     return EXIT_FAILURE;
     // }
 
-    // compile();
+    // assembly();
 
     //We dont need the file loaded in memory anymore
     free(file);
@@ -49,10 +50,10 @@ int main(int argc, char** argv)
 LISTE DES FONC :
 
 1) load_file(str) : charge en mémoire l'intégralité du fichier OK
-2) load_op_code() : charge en mémoire les données des op code 
+2) load_op_code() : charge en mémoire les données des op code OK
 
 3) char* add_comma(str) = ajoute une virgule après le premier "mots"
-4) char* remove_space(str) = supprime l'intrégalité des espaces
+4) char* remove_space(str) = supprime l'intégralité des espaces
 5) char** retreive_token(str,char) = découpe la chaine en token avec , comme séparateur
 
     = donne quelque chose comme token["add","U1","U2",NULL]; (ne pas oublier le NULL qui indique la fin des tokens)
