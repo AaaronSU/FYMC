@@ -60,3 +60,48 @@ void add_comma(const char* str_in, char* str_out)
   // No word -> No modification
   return;
 }
+
+
+
+int size_without_spaces(const char* str, int const taille)
+{
+  int taille_out = taille;
+  for (int i = 0; i < taille; ++i)
+  {
+    if (str[i] == 32)
+      taille_out -= sizeof(char);
+  }
+  return taille_out;
+}
+
+
+
+
+void remove_space(const char* str_in, char* str_out)
+{
+  int taille_in = (sizeof(char) * ((strlen(str_in)))) + sizeof(char);
+  int taille_out = (sizeof(char) * ((strlen(str_out)))) + sizeof(char);
+  //~ printf("%d\n", taille_out);
+  char* str_tmp = (char*)malloc(taille_out);
+  
+  int i = 0;
+  int j = 0;
+  
+  while (i < taille_in)
+  {
+    // 32 is space's ASCII code
+    if (str_in[i] != 32)
+    {
+      str_tmp[j] = str_in[i];
+      ++j;
+    }
+    ++i;
+  }
+  
+  strcpy(str_out, str_tmp);
+  free(str_tmp);
+  
+  return;
+}
+
+

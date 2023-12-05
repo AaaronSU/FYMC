@@ -6,4 +6,9 @@
 // define it with char str_out[sizeof(char) * ((strlen(str_in) + 2))]
 void add_comma(const char* str_in, char* str_out);
 
+// str_out is a buffer of size strlen(str_in) + sizeof(char)
+// define it with char str_out [size_without_spaces(str_in, (strlen(str_in) + sizeof(char)))]
+int size_without_spaces(const char* str, int const taille);
+void remove_space(const char* str_in, char* str_out);
+
 #endif
