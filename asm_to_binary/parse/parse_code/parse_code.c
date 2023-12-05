@@ -63,12 +63,14 @@ void add_comma(const char* str_in, char* str_out)
 
 
 
-int size_without_spaces(const char* str, int const taille)
+int size_without_chara(const char* str,
+                        int const taille,
+                        int const chara)
 {
   int taille_out = taille;
   for (int i = 0; i < taille; ++i)
   {
-    if (str[i] == 32)
+    if (str[i] == chara)
       taille_out -= sizeof(char);
   }
   return taille_out;
@@ -103,5 +105,4 @@ void remove_space(const char* str_in, char* str_out)
   
   return;
 }
-
 
