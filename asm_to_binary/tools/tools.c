@@ -99,3 +99,22 @@ void print_file(char* file)
         i++;
     }
 }
+
+
+
+/// @brief print tokens list (print each char* until NULL is read, will also print the separators)
+/// @param tokens List of tokens
+/// @param separator separator used to retreive tokens, will also be printed back
+void print_tokens(char** const tokens, char const separator)
+{
+    int i = 0;
+    while(tokens[i] != NULL)
+    {
+        printf("%s",tokens[i++]);
+        if(tokens[i] != NULL)
+        {
+            printf("%c", separator);
+        }
+    }
+    printf("\n");
+}
