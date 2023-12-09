@@ -9,6 +9,7 @@
 #define TRUE 1
 #define FALSE 0
 
+//
 bool alphanumeric(int str)
 {
   // Check is ASCII code of character corresponds to a letter.
@@ -62,11 +63,12 @@ void add_comma(const char* str_in, char* str_out)
 }
 
 
-
+//
 int size_without_chara(const char* str,
                         int const taille,
                         int const chara)
 {
+  // Utiliser des pointeurs pour éviter les copies ? À voir
   int taille_out = taille;
   for (int i = 0; i < taille; ++i)
   {
@@ -78,9 +80,10 @@ int size_without_chara(const char* str,
 
 
 
-
+//
 void remove_space(const char* str_in, char* str_out)
 {
+  // Allocating memory and initialiazin looping elements
   int taille_in = (sizeof(char) * ((strlen(str_in)))) + sizeof(char);
   int taille_out = (sizeof(char) * ((strlen(str_out)))) + sizeof(char);
   //~ printf("%d\n", taille_out);
@@ -104,5 +107,22 @@ void remove_space(const char* str_in, char* str_out)
   free(str_tmp);
   
   return;
+}
+
+
+//
+bool detect_alias(char** array)
+{
+  int i = 0;
+  while (array[i] != NULL)
+    {
+      //~ printf("in the loop, i = %d\n", i);
+      // 58 is ASCII code for ':'
+      if (array[i][strlen(array[i]) - 1] == 58)
+        return TRUE;
+      ++i;
+    }
+    //~ printf("fin fonction\n");
+  return FALSE;
 }
 

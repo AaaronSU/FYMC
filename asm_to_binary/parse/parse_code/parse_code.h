@@ -2,6 +2,8 @@
 
 #define _PARSE_CODE_H_
 
+#define bool int
+
 // str_out is a buffer of size sizeof(char) * ((strlen(str_in) + 2))
 // define it with char str_out[sizeof(char) * ((strlen(str_in) + 2))]
 void add_comma(const char* str_in, char* str_out);
@@ -15,5 +17,8 @@ void remove_space(const char* str_in, char* str_out);
 
 
 char** retreive_token(const char* str, char const separator);
+
+// Last element of array must be NULL !!!
+bool detect_alias(char** array);
 
 #endif
