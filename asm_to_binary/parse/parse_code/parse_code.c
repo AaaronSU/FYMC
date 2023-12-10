@@ -109,6 +109,23 @@ void remove_space(const char* str_in, char* str_out)
   return;
 }
 
+//Retreiving token list from a string
+char** retreive_token(char* line, char* const separator)
+{
+    char** tokens = (char**)malloc(sizeof(char*)*128); //MAX 128 elements per line
+	int i = 0; //Used to count tokens
+	tokens[i] = strtok(line,separator); //Retreiving first token
+	while(tokens[i] != NULL) //As long as we still have tokens
+	{
+		i = i + 1; //Next token count
+		tokens[i] = strtok(NULL,separator); //Reading next token
+	}
+
+    //Returning token list ended by NULL value
+    return tokens;
+}
+
+
 
 //
 bool detect_alias(char** array)
@@ -127,18 +144,26 @@ bool detect_alias(char** array)
 }
 
 
-//Retreiving token list from a string
-char** retreive_token(char* line, char* const separator)
+//
+// Check if alias is in first position and is the only alias in array
+bool correct_alias(char** array)
 {
-    char** tokens = (char**)malloc(sizeof(char*)*128); //MAX 128 elements per line
-	int i = 0; //Used to count tokens
-	tokens[i] = strtok(line,separator); //Retreiving first token
-	while(tokens[i] != NULL) //As long as we still have tokens
-	{
-		i = i + 1; //Next token count
-		tokens[i] = strtok(NULL,separator); //Reading next token
-	}
+  int i = 0;
+  
+  // If token is in first position
+  if (array[i][strlen(array[i]) - 1] != 58)
+    return FALSE;
+  
+  ++i;
+  
+  while (array[i] != NULL)
+    {
+      // 58 is ASCII code for ':'
+      if (array[i][strlen(array[i]) - 1] == 58)
+        return FALSE;
 
-    //Returning token list ended by NULL value
-    return tokens;
+      ++i;
+    }
+  return TRUE;
 }
+
