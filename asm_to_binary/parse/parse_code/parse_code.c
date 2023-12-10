@@ -126,3 +126,19 @@ bool detect_alias(char** array)
   return FALSE;
 }
 
+
+//Retreiving token list from a string
+char** retreive_token(char* line, char* const separator)
+{
+    char** tokens = (char**)malloc(sizeof(char*)*128); //MAX 128 elements per line
+	int i = 0; //Used to count tokens
+	tokens[i] = strtok(line,separator); //Retreiving first token
+	while(tokens[i] != NULL) //As long as we still have tokens
+	{
+		i = i + 1; //Next token count
+		tokens[i] = strtok(NULL,separator); //Reading next token
+	}
+
+    //Returning token list ended by NULL value
+    return tokens;
+}

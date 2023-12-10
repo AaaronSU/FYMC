@@ -16,7 +16,7 @@ int size_without_chara(const char* str,
 void remove_space(const char* str_in, char* str_out);
 
 
-char** retreive_token(const char* str, char const separator);
+char** retreive_token(char* const line, char* const separator);
 
 // Last element of array must be NULL !!!
 bool detect_alias(char** array);
