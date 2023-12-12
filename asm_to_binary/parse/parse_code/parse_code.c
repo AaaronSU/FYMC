@@ -167,3 +167,69 @@ bool correct_alias(char** array)
   return TRUE;
 }
 
+
+/// @brief function that detect if a readen op code does exist
+/// @param op_name name of the op code we want to verify
+/// @param op_name_list list of all op codes name
+/// @return return the place in the list of op code args where the number of args of our op code reside, else -1 if the op code does not exist
+int detect_op_code(char* op_name, char* op_name_list)
+{
+	int i = 0; //Where is the number of args of the op code in the list of args
+	char* token = strtok(op_name_list,";");
+	while(token != NULL)
+	{
+		if(strcmp(token,op_name) == 0)
+		{
+			return i;
+		}
+		else
+		{
+			token = strtok(NULL,";");
+			i = i + 1; //Next arg count in list
+		}
+	}
+
+	//No op code with the same name found, returning false
+	return -1; //-1 means not a valid op code
+}
+
+
+
+//verifie que les noms de registres existent
+bool correct_register_name(char* tokens, char* register_list)
+{
+	return TRUE;
+}
+
+
+
+/// @brief Verify if the number of args our op code as is correct
+/// @param tokens list of the tokens
+/// @param number_of_args number of args the op code take
+/// @return TRUE if the number is correct and the name of the registers are okay, else FALSE
+bool correct_op_code(char** tokens, int number_of_args, char* register_list)
+{
+	for(int i = 1; i < number_of_args; i++)
+	{
+		if(tokens[i] == NULL)
+		{
+			return FALSE; //i.e. not enough args
+		}
+
+		//We need to verify if the name of the register is correct
+		if(!correct_register_name(tokens[i],register_list))
+		{
+			return FALSE; //i.e. the register name is not correct
+		}
+
+		//Next token
+		i++;
+	}
+
+	if(tokens[number_of_args] != NULL)
+	{
+		return FALSE; //i.e. to many args
+	}
+
+	return TRUE;
+}

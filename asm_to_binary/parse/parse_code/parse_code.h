@@ -22,4 +22,9 @@ char** retreive_token(char* const line, char* const separator);
 bool detect_alias(char** array);
 bool correct_alias(char** array);
 
+//Detect if a line is correctly writed
+int detect_op_code(char*,char*);
+bool correct_op_code(char**,int,char*);
+bool correct_register_name(char*,char*);
+
 #endif
