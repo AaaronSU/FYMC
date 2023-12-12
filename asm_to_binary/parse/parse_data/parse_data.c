@@ -6,14 +6,6 @@
 
 // Here we might want to load types from a file
 
-/* 1) Vérifier synthaxe (nb args, séparateurs etc)
- *
- * 2) Vérifier que le type existe (dans 1 ?)
- *
- * 3à Vérifier que le nombre est bon
- *
- */
-
 
 // Check if first two elements only contain letters / numbers / @
 bool has_only_valid_characters(char** array)
@@ -93,6 +85,83 @@ bool name_is_valid(char* str)
   for (size_t i = 1; i < sizeof(str); ++i)
   {
     if (str[i] == 64)
+      return FALSE;
+  }
+
+  return TRUE;
+}
+
+
+
+bool wrong_signing_symbol(char* str)
+{
+  return ((str[0] < 48 || str[0] > 57)  // pas un nombre
+        && (str[0] != 43 && str[0] != 45)); // pas + ou -;
+}
+
+
+//
+bool good_integer(char* str, bool is_signed)
+{
+  size_t i = 0;
+  if (is_signed)
+  {
+    if (wrong_signing_symbol(str))
+      return FALSE;
+    i = 1;
+  }
+
+  for (; i < strlen(str); ++i)
+  {
+    if (str[i] < 48 || str[i] > 57)
+      return FALSE;
+  }
+  return TRUE;
+}
+
+
+//
+bool good_float(char* str)
+{
+  size_t i = 0;
+    if (wrong_signing_symbol(str))
+      return FALSE;
+    i = 1;
+
+  bool has_a_point = FALSE;
+
+  for (; i < strlen(str); ++i)
+  {
+    if ((str[i] < 48 || str[i] > 57))
+    {
+      if (str[i] == 46)
+      {
+        if (!has_a_point)
+          has_a_point = TRUE;
+        else
+          return FALSE;
+      }
+      else
+        return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+
+//
+// ASCII variables must start and end with " and not have any inbetween
+bool good_ascii(char* str)
+{
+  size_t i = 1;
+  size_t taille = strlen(str);
+  if (str[0] != 34 || str[taille] != 34)
+    return FALSE;
+  ++taille;
+
+  for (; i < taille; ++i)
+  {
+    if (str[i] == 34)
       return FALSE;
   }
 
