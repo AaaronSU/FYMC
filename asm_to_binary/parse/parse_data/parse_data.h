@@ -10,5 +10,7 @@
 
 
 bool seems_valid(char** array);
+bool type_exists(char* str);
+bool name_is_valid(char* str);
 
 #endif

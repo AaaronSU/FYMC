@@ -15,12 +15,12 @@
  */
 
 
-//
+// Check if first two elements only contain letters / numbers / @
 bool has_only_valid_characters(char** array)
 {
   int i = 0;
   size_t j = 0;
-  while (array[i] != NULL)
+  while (i < 2)
     {
       for (j = 0; j < strlen(array[i]); ++j)
       {
@@ -49,4 +49,52 @@ bool seems_valid(char** array)
       ++i;
 
   return i == 3;
+}
+
+
+// Check if a alt of a is in b
+bool is_in_list(char* str, char** array)
+{
+  int i = 0;
+
+  while (array[i] != NULL)
+  {
+    if (strcmp(str, array[i]) == 0)
+      return TRUE;
+    ++i;
+  }
+  return FALSE;
+}
+
+
+//
+bool type_exists(char* str)
+{
+  // This array shall not be created in the function !
+  char* types_array[5] = {"u64", "i64", "f64", "ascii", NULL};
+
+  // Checks if element is a valid type
+  return is_in_list(str, types_array);
+}
+
+
+//
+bool name_is_valid(char* str)
+{
+  // This array shall not be created in the function !
+  char* types_array[5] = {"u64", "i64", "f64", "ascii", NULL};
+
+  // Check if element is not a type
+  if (is_in_list(str, types_array))
+    return FALSE;
+
+  // There should only be letters, numbers or @ at this point
+  // thus we just check if there's no weirdly placed @
+  for (size_t i = 1; i < sizeof(str); ++i)
+  {
+    if (str[i] == 64)
+      return FALSE;
+  }
+
+  return TRUE;
 }
