@@ -10,5 +10,10 @@
 
 
 bool seems_valid(char** array);
+bool type_exists(char* str);
+bool name_is_valid(char* str);
+
+bool good_integer(char* str, bool is_signed);
+bool good_float(char* str);
 
 #endif
