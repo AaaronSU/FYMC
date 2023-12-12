@@ -67,7 +67,7 @@ LISTE DES FONC :
     10) bool correct_register_name(char**) = verifie que les noms de registres existent
 
 11) char** parse(str) : s'occupe de vérifie l'intrégité de la ligne (partie code pas data pour l'instant).
-        
+
         parse appelera parse_data puis parse_code
         parse_code contiendra les fonctions de 3 à 10 et parse_data en réutilisera certaines
 
