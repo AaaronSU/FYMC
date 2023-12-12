@@ -5,7 +5,8 @@
 // fonction qui verifie le header
 // 8 bytes => 64 bits * 6 lines
 
-void check(); // vérifie chaque line 
+int read();
 
+void check(); // vérifie chaque line
 
 #endif
