@@ -6,99 +6,6 @@
 #include "parse/parse.h"
 #include "assembly/assembly.h"
 
-
-
-
-
-
-
-#include <string.h>
-/// @brief function that detect if a readen op code does exist
-/// @param op_name name of the op code we want to verify
-/// @param op_name_list list of all op codes name
-/// @return return the place in the list of op code args where the number of args of our op code reside, else -1 if the op code does not exist
-int detect_op_code(char* op_name, char* op_name_list)
-{
-	int i = 0; //Where is the number of args of the op code in the list of args
-	char* token = strtok(op_name_list,";");
-	while(token != NULL)
-	{
-		if(strcmp(token,op_name) == 0)
-		{
-			return i;
-		}
-		else
-		{
-			token = strtok(NULL,";");
-			i = i + 1; //Next arg count in list
-		}
-	}
-
-	//No op code with the same name found, returning false
-	return -1; //-1 means not a valid op code
-}
-
-//verifie que les noms de registres existent
-bool correct_register_name(char* tokens, char* register_list)
-{
-	return TRUE;
-}
-
-/// @brief Verify if the number of args our op code as is correct
-/// @param tokens list of the tokens
-/// @param number_of_args number of args the op code take
-/// @return TRUE if the number is correct and the name of the registers are okay, else FALSE
-bool correct_op_code(char** tokens, int number_of_args, char* register_list)
-{
-	for(int i = 0; i <= number_of_args; i++)
-	{
-		if(tokens[i] == NULL)
-		{
-			return FALSE; //i.e. not enough args
-		}
-
-		//We need to verify if the name of the register is correct
-		if(!correct_register_name(tokens[i],register_list))
-		{
-			return FALSE; //i.e. the register name is not correct
-		}
-
-		//Next token
-		i++;
-	}
-
-	if(tokens[number_of_args+1] != NULL)
-	{
-		return FALSE; //i.e. to many args
-	}
-
-	return TRUE;
-}
-
-//Retreiving token list from a string
-char** retreive_token(char* line, char* const separator)
-{
-    char** tokens = (char**)malloc(sizeof(char*)*128); //MAX 128 elements per line
-	int i = 0; //Used to count tokens
-	tokens[i] = strtok(line,separator); //Retreiving first token
-	while(tokens[i] != NULL) //As long as we still have tokens
-	{
-		i = i + 1; //Next token count
-		tokens[i] = strtok(NULL,separator); //Reading next token
-	}
-
-    //Returning token list ended by NULL value
-    return tokens;
-}
-
-
-
-
-
-
-
-
-
 /// @brief Main function, used to launch big part of the asm to binary traduction
 /// @param argc Number of arguments in the command line
 /// @param argv Values of arguments in the command line
@@ -111,29 +18,31 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    //We load the op codes
-    //To do so, we first need to create what will store the op code data
-    char* op_name_list = (char*)malloc(sizeof(char)*128*8); //Name of the op code
-    int* op_arg_count = (int*)malloc(sizeof(int)*128); //Number of arguments the op code can take
-    if(load_op_code(op_name_list,op_arg_count)==FALSE)
-    {
-        return EXIT_FAILURE;
-    }
+    char*** op_name_list; //Where the op name and specification are stored
+    op_name_list = tokenize("op_codes");
+    print_tokens_list(op_name_list,';');
+    printf("\n");
 
-
+    char*** register_list; //Where the registers infos are stored
+    register_list = tokenize("register_list");
+    print_tokens_list(register_list,';');
 
     int place;
     char str[] = "add;U1;U2";
     char** tokens = retreive_token(str,";");
 
-    if((place = detect_op_code(tokens[0],op_name_list)) == -1)
+    //Ici boucle for qui vérifie chaque ligne
     {
-        printf("ERROR %s DOES NOT EXIST\n",tokens[0]);
-    }
+        if((place = detect_op_code(tokens[0],op_name_list)) == -1)
+        {
+            fprintf(stderr,"Error : the op code %s does not exist.\n",tokens[0]);
+            return EXIT_FAILURE;
+        }
 
-    if(!correct_op_code(tokens,op_arg_count[place],"TEMP"))
-    {
-        printf("Error : args not correct\n");
+        if(!correct_op_code(tokens,op_name_list[place],register_list))
+        {
+            printf("Error : args not correct\n");
+        }
     }
 
 
