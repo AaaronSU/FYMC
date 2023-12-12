@@ -2,8 +2,7 @@
 
 #define _PARSE_H_
 
-#define bool int
-
-
+#include "parse_code/parse_code.h"
+#include "parse_data/parse_data.h"
 
 #endif
