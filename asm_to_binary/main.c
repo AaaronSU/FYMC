@@ -20,30 +20,51 @@ int main(int argc, char** argv)
 
     char*** op_name_list; //Where the op name and specification are stored
     op_name_list = tokenize("op_codes");
-    print_tokens_list(op_name_list,';');
-    printf("\n");
 
     char*** register_list; //Where the registers infos are stored
     register_list = tokenize("register_list");
-    print_tokens_list(register_list,';');
 
-    int place;
-    char str[] = "add;U1;U2";
-    char** tokens = retreive_token(str,";");
+    //Loading the code in memory for faster accesses
+    char* loaded_file = load_file(argv[1]);
 
-    //Ici boucle for qui vérifie chaque ligne
+    //We now read how many lines we have in data and how many lines we have in code
+    int data_lines, code_lines;
+    if((data_lines = data_infos(loaded_file)) == -1)
     {
-        if((place = detect_op_code(tokens[0],op_name_list)) == -1)
-        {
-            fprintf(stderr,"Error : the op code %s does not exist.\n",tokens[0]);
-            return EXIT_FAILURE;
-        }
-
-        if(!correct_op_code(tokens,op_name_list[place],register_list))
-        {
-            printf("Error : args not correct\n");
-        }
+        fprintf(stderr,"Error : missing data label.\n");
+        return EXIT_FAILURE;
     }
+
+    if((code_lines = code_infos(loaded_file)) == -1)
+    {
+        fprintf(stderr,"Error : missing code label.\n");
+        return EXIT_FAILURE;
+    }
+
+
+
+
+
+
+
+
+    // int place;
+    // char str[] = "add;U1;U2";
+    // char** tokens = retreive_token(str,";");
+
+    // //Ici boucle for qui vérifie chaque ligne
+    // {
+    //     if((place = detect_op_code(tokens[0],op_name_list)) == -1)
+    //     {
+    //         fprintf(stderr,"Error : the op code %s does not exist.\n",tokens[0]);
+    //         return EXIT_FAILURE;
+    //     }
+
+    //     if(!correct_op_code(tokens,op_name_list[place],register_list))
+    //     {
+    //         printf("Error : args not correct\n");
+    //     }
+    // }
 
 
 
@@ -73,6 +94,12 @@ int main(int argc, char** argv)
 
     return EXIT_SUCCESS;
 }
+
+
+
+
+
+
 
 /*
 LISTE DES FONC :

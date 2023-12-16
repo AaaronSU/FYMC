@@ -149,20 +149,27 @@ bool good_float(char* str)
 }
 
 
-//
-// ASCII variables must start and end with " and not have any inbetween
+//ASCII variables must start and end with " and not have any inbetween
 bool good_ascii(char* str)
 {
-  size_t i = 1;
-  size_t taille = strlen(str);
-  if (str[0] != 34 || str[taille] != 34)
-    return FALSE;
-  ++taille;
-
-  for (; i < taille; ++i)
+  if(str[0] != '\"')
   {
-    if (str[i] == 34)
-      return FALSE;
+    fprintf(stderr,"Error : the string does not begin with the caracter \".\n");
+    return FALSE;
+  }
+
+  char* next_quote = strchr(&str[1],'\"'); //Skipping first "
+
+  if(next_quote == NULL)
+  {
+    fprintf(stderr,"Error : no \" detected to end the string.\n");
+    return FALSE;
+  }
+
+  if(next_quote[1] != '\0')
+  {
+    fprintf(stderr,"Error : \" detected which is not the quote that close the string.\n");
+    return FALSE;
   }
 
   return TRUE;

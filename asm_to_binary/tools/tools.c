@@ -73,18 +73,19 @@ void print_file(char* const file)
 /// @brief print tokens list (print each char* until NULL is read, will also print the separators)
 /// @param tokens List of tokens
 /// @param separator separator used to retreive tokens, will also be printed back
-void print_tokens_line(char** const tokens, char const separator)
+void print_tokens_line(char** const tokens)
 {
     int i = 0;
+    printf("LINE : [");
     while(tokens[i] != NULL)
     {
         printf("%s",tokens[i++]);
         if(tokens[i] != NULL)
         {
-            printf("%c", separator);
+            printf(",");
         }
     }
-    printf("\n");
+    printf(",NULL]\n");
 }
 
 
@@ -134,22 +135,23 @@ char*** tokenize(char* const fileName)
 
 
 
-void print_tokens_list(char*** const token_list, char const original_separator)
+void print_tokens_list(char*** const token_list)
 {
     //When we find an empty line we stop
     for(int i = 0; token_list[i][0] != NULL; i++)
     {
+        printf("LINE %d : [",i);
         int y = 0;
         while(token_list[i][y] != NULL)
         {
             printf("%s",token_list[i][y]);
             if(token_list[i][y + 1] != NULL)
             {
-                printf("%c",original_separator);
+                printf(",");
             }
             else
             {
-                printf("\n");
+                printf(",NULL]\n");
             }
             y++;
         }
