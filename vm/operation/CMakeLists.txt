@@ -4,9 +4,11 @@ project(OperationLibrary)
 # Liste des fichiers source pour la bibliothèque operation
 set(HEADER_FILES
     include/load.h
-    include/mov.h
+    include/move.h
     include/store.h
     include/conversion.h
+    include/u_arithmetic_logic.h
+    include/s_arithmetic_logic.h
     include/cpu.h
     include/tools.h
     include/type.h
@@ -15,9 +17,11 @@ set(HEADER_FILES
 
 set(SOURCE_FILES
     src/load.c
-    src/mov.c
+    src/move.c
     src/store.c
     src/conversion.c
+    src/u_arithmetic_logic.c
+    src/s_arithmetic_logic.c
     src/tools.c
 )
 

@@ -9,12 +9,24 @@
 #include "cpu.h"
 #include "load.h"
 #include "conversion.h"
+#include "store.h"
+#include "move.h"
 
-
-void execute_instruction(void (*fonction_instruction)(CPU *, u32), CPU *cpu, u32 instruction) 
-{
-    fonction_instruction(cpu, instruction);
-}
+void (*opcode_functions[])(CPU*, u32) = {
+    loadu, loads, loadf,        // 0, 1, 2
+    loadv, loadt, loadg,        // 3, 4, 5
+    storeu, stores, storef,     // 6, 7, 8
+    storev, storet, storeg,     // 9, 10, 11
+    movu, movs, movf, movv, movt, movg,   // 12, 13, 14, 15, 16, 17, 18
+    //movui, movsi, movfi, movvi, movti, movgi,   // 19, 20, 21, 22, 23, 24
+    cvtus, cvtsu, cvtuf, cvtfu, cvtsf, cvtfs,  // 25, 26, 27, 28, 29, 30
+    //addu, subu, mulu, divu, modu, fmau, sqrtu, logu, incu, decu, andu, oru, xoru, shlu, shru, rolu, roru, popcntu, lmbu, // 31-50
+    //adds, subs, muls, divs, mods, fmas, sqrts, logs, ands, ors, xors, shls, shrs, rols, rors, popcnts, lmbs,  // 51-69
+    //addf, subf, mulf, divf, fmaf, sqrtf, logf,   // 70-76
+    //cmpu, cmps, cmpf, je, jne, jge, jl, jle, jz, jnz,  // 77-86
+    //outu, outs, outf, outa, outb, outx,   // 87-92
+    //hlt   // 93
+};
 
 int main()
 {

@@ -1,4 +1,4 @@
-#include "mov.h"
+#include "move.h"
 #include "tools.h"
 
 void mov(CPU *cpu, u32 instruction);
@@ -58,30 +58,34 @@ void movg(CPU *cpu, u32 instruction)
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movui(CPU *cpu, u32 instruction, u64 immediat) 
+void movui(CPU *cpu, u32 instruction) 
 {
     Instruction inst = parse_instruction(instruction);
+    u64 immediat = 0;
     cpu->U[inst.destination] = immediat;
     cpu->IP += SIZE_INSTRUCTION + 64;
 }
 
-void movsi(CPU *cpu, u32 instruction, i64 immediat) 
+void movsi(CPU *cpu, u32 instruction) 
 {
     Instruction inst = parse_instruction(instruction);
+    u64 immediat = (i64)0;
     cpu->S[inst.destination] = immediat;
     cpu->IP += SIZE_INSTRUCTION + 64;
 }
 
-void movfi(CPU *cpu, u32 instruction, f64 immediat) 
+void movfi(CPU *cpu, u32 instruction) 
 {
     Instruction inst = parse_instruction(instruction);
+    u64 immediat = (f64)0;
     cpu->F[inst.destination] = immediat;
     cpu->IP += SIZE_INSTRUCTION + 64;
 }
 
-void movvi(CPU *cpu, u32 instruction, u64 immediat[]) 
+void movvi(CPU *cpu, u32 instruction) 
 {
     Instruction inst = parse_instruction(instruction);
+    u64 immediat[8]; // pour l'instant
 
     for(int i = 0; i < SIZE_VECTOR; ++i) 
     {
@@ -90,24 +94,26 @@ void movvi(CPU *cpu, u32 instruction, u64 immediat[])
     cpu->IP += SIZE_INSTRUCTION + 64 * 8;
 }
 
-void movti(CPU *cpu, u32 instruction, i64 immediat[])
+void movti(CPU *cpu, u32 instruction)
 {
     Instruction inst = parse_instruction(instruction);
+    u64 immediat[8]; // pour l'instant
 
     for(int i = 0; i < SIZE_VECTOR; ++i) 
     {
-        cpu->T[inst.destination][i] = immediat[i];
+        cpu->T[inst.destination][i] = (i64)immediat[i];
     }
     cpu->IP += SIZE_INSTRUCTION + 64 * 8;
 }
 
-void movgi(CPU *cpu, u32 instruction, f64 immediat[])
+void movgi(CPU *cpu, u32 instruction)
 {
     Instruction inst = parse_instruction(instruction);
+    u64 immediat[8]; // pour l'instant
 
     for(int i = 0; i < SIZE_VECTOR; ++i) 
     {
-        cpu->G[inst.destination][i] = immediat[i];
+        cpu->G[inst.destination][i] = (f64)immediat[i];
     }
     cpu->IP += SIZE_INSTRUCTION + 64 * 8;
 }
