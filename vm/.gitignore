@@ -1,9 +1,0 @@
-brouillon.c
-*.o
-opcode.h
-build/
-.vscode/
-.test
-header.c
-header.h
-.gitgnore
