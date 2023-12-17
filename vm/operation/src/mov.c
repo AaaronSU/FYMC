@@ -1,5 +1,3 @@
-#include <limits.h>
-
 #include "mov.h"
 #include "tools.h"
 
@@ -8,15 +6,7 @@ void mov(CPU *cpu, u32 instruction);
 void movu(CPU *cpu, u32 instruction)
 {
     Instruction inst = parse_instruction(instruction);
-
-    if (cpu->U[inst.source_1] <= LLONG_MAX) 
-    {
-        cpu->S[inst.destination] = (i64)cpu->U[inst.source_1];
-    } 
-    else 
-    {
-        // faut que je gère l'erreur : maybe erno  ou jsp
-    }
+    cpu->U[inst.destination] = cpu->U[inst.source_1];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
