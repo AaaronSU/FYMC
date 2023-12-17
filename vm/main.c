@@ -8,13 +8,13 @@
 #include "tools.h"
 #include "cpu.h"
 #include "load.h"
+#include "conversion.h"
 
 
 void execute_instruction(void (*fonction_instruction)(CPU *, u32), CPU *cpu, u32 instruction) 
 {
     fonction_instruction(cpu, instruction);
 }
-
 
 int main()
 {
@@ -42,13 +42,19 @@ int main()
     printf("source_1: %u\n", instruction.source_1);
     printf("source_2: %u\n", instruction.source_2);
 
+    cpu.S[1] = -1;
+    cpu.U[3] = 1ULL << 62;
+    cvtus(&cpu, test[0]);
+
     
-    printf("Memory à 7 : %llu, U[3] : %llu, U[0] : %llu\n", cpu.Memory[7], cpu.U[3], cpu.U[0]);
+
+    printf("U[3] : %llu, S[1] : %lld\n", cpu.U[3], cpu.S[1]);
+    /* printf("Memory à 7 : %llu, U[3] : %llu, U[0] : %llu\n", cpu.Memory[7], cpu.U[3], cpu.U[0]);
     for(int i = 0; i < 8; i++) 
     {
          printf("Destination : %llu\n", cpu.V[1][i]);
     }
-   
+    */
 
     /* // Décomposition de l'instruction
     for (int i = 0; i < 2; i++)

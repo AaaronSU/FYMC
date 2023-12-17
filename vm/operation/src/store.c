@@ -2,7 +2,7 @@
 #include "tools.h"
 
 
-// stores a scalar unsigned value (or 8 ASCII characters) in U0 into the memory located at U0 + U1 + OFFSET.
+// stores a scalar unsigned value (orSIZE_VECTOR ASCII characters) in U0 into the memory located at U0 + U1 + OFFSET.
 void storeu(CPU *cpu, u32 instruction)
 {
     // ça doit donc enregistre la valeur de u2 dans la mémoire à l'adresse u0 + u1 + offset
@@ -47,7 +47,7 @@ void storev(CPU *cpu, u32 instruction)
     u8 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.destination] + cpu->U[inst.source_1] + offset;
 
-    for(int i = 0; i < 8; ++i) 
+    for(int i = 0; i <SIZE_VECTOR; ++i) 
     {
         cpu->Memory[addr + i] = cpu->V[inst.destination][i];
     }
@@ -59,7 +59,7 @@ void storet(CPU *cpu, u32 instruction)
     u8 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.destination] + cpu->U[inst.source_1] + offset;
 
-    for(int i = 0; i < 8; ++i) 
+    for(int i = 0; i <SIZE_VECTOR; ++i) 
     {
         cpu->Memory[addr + i] = cpu->T[inst.destination][i];
     }
@@ -71,7 +71,7 @@ void storeg(CPU *cpu, u32 instruction)
     u8 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.destination] + cpu->U[inst.source_1] + offset;
 
-    for(int i = 0; i < 8; ++i) 
+    for(int i = 0; i <SIZE_VECTOR; ++i) 
     {
         cpu->Memory[addr + i] = cpu->G[inst.destination][i];
     }

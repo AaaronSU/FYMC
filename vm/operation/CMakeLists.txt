@@ -6,15 +6,18 @@ set(HEADER_FILES
     include/load.h
     include/mov.h
     include/store.h
+    include/conversion.h
     include/cpu.h
     include/tools.h
     include/type.h
+
 )
 
 set(SOURCE_FILES
     src/load.c
     src/mov.c
     src/store.c
+    src/conversion.c
     src/tools.c
 )
 
