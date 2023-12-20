@@ -1,11 +1,13 @@
 #include "move.h"
 #include "tools.h"
 
-void mov(CPU *cpu, Instruction instruction);
+void mov(CPU *cpu, Instruction instruction)
+{
+    
+}
 
 void movu(CPU *cpu, Instruction instruction)
 {
-    
     cpu->U[instruction.destination] = cpu->U[instruction.source_1];
     cpu->IP += SIZE_INSTRUCTION;
 }
