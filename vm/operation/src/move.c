@@ -1,119 +1,119 @@
 #include "move.h"
 #include "tools.h"
 
-void mov(CPU *cpu, u32 instruction);
+void mov(CPU *cpu, Instruction instruction);
 
-void movu(CPU *cpu, u32 instruction)
+void movu(CPU *cpu, Instruction instruction)
 {
-    Instruction inst = parse_instruction(instruction);
-    cpu->U[inst.destination] = cpu->U[inst.source_1];
+    
+    cpu->U[instruction.destination] = cpu->U[instruction.source_1];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movs(CPU *cpu, u32 instruction)
+void movs(CPU *cpu, Instruction instruction)
 {
-    Instruction inst = parse_instruction(instruction);
-    cpu->S[inst.destination] = cpu->S[inst.source_1];
+    
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movf(CPU *cpu, u32 instruction)
+void movf(CPU *cpu, Instruction instruction)
 {
-    Instruction inst = parse_instruction(instruction);
-    cpu->F[inst.destination] = cpu->F[inst.source_1];
+    
+    cpu->F[instruction.destination] = cpu->F[instruction.source_1];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movv(CPU *cpu, u32 instruction)
+void movv(CPU *cpu, Instruction instruction)
 {
-    Instruction inst = parse_instruction(instruction);
+    
 
     for(int i = 0; i < SIZE_VECTOR; ++i) 
     {
-        cpu->V[inst.destination][i] = cpu->V[inst.source_1][i];
+        cpu->V[instruction.destination][i] = cpu->V[instruction.source_1][i];
     }
     
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movt(CPU *cpu, u32 instruction)
+void movt(CPU *cpu, Instruction instruction)
 {
-    Instruction inst = parse_instruction(instruction);
+    
     
     for(int i = 0; i < SIZE_VECTOR; ++i) 
     {
-        cpu->T[inst.destination][i] = cpu->T[inst.source_1][i];
+        cpu->T[instruction.destination][i] = cpu->T[instruction.source_1][i];
     }
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movg(CPU *cpu, u32 instruction) 
+void movg(CPU *cpu, Instruction instruction) 
 {
-    Instruction inst = parse_instruction(instruction);
+    
     
     for(int i = 0; i < SIZE_VECTOR; ++i) 
     {
-        cpu->G[inst.destination][i] = cpu->G[inst.source_1][i];
+        cpu->G[instruction.destination][i] = cpu->G[instruction.source_1][i];
     }
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movui(CPU *cpu, u32 instruction) 
+void movui(CPU *cpu, Instruction instruction) 
 {
-    Instruction inst = parse_instruction(instruction);
+    
     u64 immediat = 0;
-    cpu->U[inst.destination] = immediat;
+    cpu->U[instruction.destination] = immediat;
     cpu->IP += SIZE_INSTRUCTION + 64;
 }
 
-void movsi(CPU *cpu, u32 instruction) 
+void movsi(CPU *cpu, Instruction instruction) 
 {
-    Instruction inst = parse_instruction(instruction);
+    
     u64 immediat = (i64)0;
-    cpu->S[inst.destination] = immediat;
+    cpu->S[instruction.destination] = immediat;
     cpu->IP += SIZE_INSTRUCTION + 64;
 }
 
-void movfi(CPU *cpu, u32 instruction) 
+void movfi(CPU *cpu, Instruction instruction) 
 {
-    Instruction inst = parse_instruction(instruction);
+    
     u64 immediat = (f64)0;
-    cpu->F[inst.destination] = immediat;
+    cpu->F[instruction.destination] = immediat;
     cpu->IP += SIZE_INSTRUCTION + 64;
 }
 
-void movvi(CPU *cpu, u32 instruction) 
+void movvi(CPU *cpu, Instruction instruction) 
 {
-    Instruction inst = parse_instruction(instruction);
+    
     u64 immediat[8]; // pour l'instant
 
     for(int i = 0; i < SIZE_VECTOR; ++i) 
     {
-        cpu->V[inst.destination][i] = immediat[i];
+        cpu->V[instruction.destination][i] = immediat[i];
     }
     cpu->IP += SIZE_INSTRUCTION + 64 * 8;
 }
 
-void movti(CPU *cpu, u32 instruction)
+void movti(CPU *cpu, Instruction instruction)
 {
-    Instruction inst = parse_instruction(instruction);
+    
     u64 immediat[8]; // pour l'instant
 
     for(int i = 0; i < SIZE_VECTOR; ++i) 
     {
-        cpu->T[inst.destination][i] = (i64)immediat[i];
+        cpu->T[instruction.destination][i] = (i64)immediat[i];
     }
     cpu->IP += SIZE_INSTRUCTION + 64 * 8;
 }
 
-void movgi(CPU *cpu, u32 instruction)
+void movgi(CPU *cpu, Instruction instruction)
 {
-    Instruction inst = parse_instruction(instruction);
+    
     u64 immediat[8]; // pour l'instant
 
     for(int i = 0; i < SIZE_VECTOR; ++i) 
     {
-        cpu->G[inst.destination][i] = (f64)immediat[i];
+        cpu->G[instruction.destination][i] = (f64)immediat[i];
     }
     cpu->IP += SIZE_INSTRUCTION + 64 * 8;
 }

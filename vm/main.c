@@ -12,7 +12,8 @@
 #include "store.h"
 #include "move.h"
 
-void (*opcode_functions[])(CPU*, u32) = {
+
+void (*opcode_functions[])(CPU*, Instruction) = {
     loadu, loads, loadf,        // 0, 1, 2
     loadv, loadt, loadg,        // 3, 4, 5
     storeu, stores, storef,     // 6, 7, 8
@@ -28,6 +29,14 @@ void (*opcode_functions[])(CPU*, u32) = {
     //hlt   // 93
 };
 
+void run_instruction(CPU *cpu, Instruction instruction, u32 instr, void (*opcode_functions[])(CPU*, Instruction)) {
+
+    // 1 - décoder les 32 bits et voir quel opérand
+    instruction = parse_instruction(instr); // 
+    (*opcode_functions[instruction.opcode])(cpu, instruction);
+}
+
+
 int main()
 {
     CPU cpu;
@@ -36,8 +45,10 @@ int main()
 
     // Initialisation de test pour l'instruction
 
+
     //
     u32 test[] = {0b00000000000000000000010001100000, 0b00000001000000000000000111100000};
+    Instruction instruction = parse_instruction(test[0]);
 
     for(int i = 7; i < 15; i++) 
     {
@@ -46,8 +57,8 @@ int main()
 
     cpu.U[3] = 2;
     cpu.U[0] = 5;
-    loadv(&cpu, test[0]);
-    Instruction instruction = parse_instruction(test[0]);
+    loadv(&cpu, instruction);
+    
     printf("opcode: %u\n", instruction.opcode);
     printf("unused: %u\n", instruction.unused);
     printf("destination: %u\n", instruction.destination);
@@ -56,7 +67,7 @@ int main()
 
     cpu.S[1] = -1;
     cpu.U[3] = 1ULL << 62;
-    cvtus(&cpu, test[0]);
+    cvtus(&cpu, instruction);
 
     
 

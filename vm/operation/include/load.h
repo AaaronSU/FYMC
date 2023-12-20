@@ -3,11 +3,11 @@
 
 #include "cpu.h"
 
-void loadu(CPU *cpu, u32 instruction);
-void loads(CPU *cpu, u32 instruction);
-void loadf(CPU *cpu, u32 instruction);
-void loadv(CPU *cpu, u32 instruction);
-void loadt(CPU *cpu, u32 instruction);
-void loadg(CPU *cpu, u32 instruction);
+void loadu(CPU *cpu, Instruction instruction);
+void loads(CPU *cpu, Instruction instruction);
+void loadf(CPU *cpu, Instruction instruction);
+void loadv(CPU *cpu, Instruction instruction);
+void loadt(CPU *cpu, Instruction instruction);
+void loadg(CPU *cpu, Instruction instruction);
 
 #endif

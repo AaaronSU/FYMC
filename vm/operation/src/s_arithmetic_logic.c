@@ -4,126 +4,126 @@
 #include "cpu.h"
 #include "tools.h"
 
-void adds(CPU *cpu, u32 instruction) {
+void adds(CPU *cpu, Instruction instruction) {
     // TODO : gestion de l'overflow
-    Instruction inst = parse_instruction(instruction);
-    cpu->S[inst.destination] = cpu->S[inst.source_1] + cpu->S[inst.source_2];
+    
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] + cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void subs(CPU *cpu, u32 instruction) {
+void subs(CPU *cpu, Instruction instruction) {
     // TODO : gestion de l'overflow
-    Instruction inst = parse_instruction(instruction);
-    cpu->S[inst.destination] = cpu->S[inst.source_1] - cpu->S[inst.source_2];
+    
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] - cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void muls(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
+void muls(CPU *cpu, Instruction instruction) {
+    
     // TODO : gestion de l'overflow
-    cpu->S[inst.destination] = cpu->S[inst.source_1] * cpu->S[inst.source_2];
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] * cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void divs(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
-    if (cpu->S[inst.source_2] == 0) {
+void divs(CPU *cpu, Instruction instruction) {
+    
+    if (cpu->S[instruction.source_2] == 0) {
         cpu->CF += 1; // Erreur : division par zéro
         exit(EXIT_FAILURE);
     }
-    cpu->S[inst.destination] = cpu->S[inst.source_1] / cpu->S[inst.source_2];
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] / cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void mods(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
-    if (cpu->S[inst.source_2] == 0) {
+void mods(CPU *cpu, Instruction instruction) {
+    
+    if (cpu->S[instruction.source_2] == 0) {
         cpu->CF += 1; // Erreur : modulo par zéro
         exit(EXIT_FAILURE);
     }
-    cpu->S[inst.destination] = cpu->S[inst.source_1] % cpu->S[inst.source_2];
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] % cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void fmas(CPU *cpu, u32 instruction) {
+void fmas(CPU *cpu, Instruction instruction) {
     // TODO : gestion de l'overflow
-    Instruction inst = parse_instruction(instruction);
-    cpu->S[inst.destination] += cpu->S[inst.source_1] * cpu->S[inst.source_2];
+    
+    cpu->S[instruction.destination] += cpu->S[instruction.source_1] * cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void sqrts(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
-    if (cpu->S[inst.source_1] < 0) 
+void sqrts(CPU *cpu, Instruction instruction) {
+    
+    if (cpu->S[instruction.source_1] < 0) 
     {
         exit(EXIT_FAILURE);
     }
-    cpu->S[inst.destination] = sqrt(cpu->S[inst.source_1]);
+    cpu->S[instruction.destination] = sqrt(cpu->S[instruction.source_1]);
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void logs(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
-    if (cpu->S[inst.source_1] <= 0) 
+void logs(CPU *cpu, Instruction instruction) {
+    
+    if (cpu->S[instruction.source_1] <= 0) 
     {
         exit(EXIT_FAILURE);
     }
-    cpu->S[inst.destination] = log(cpu->S[inst.source_1]);
+    cpu->S[instruction.destination] = log(cpu->S[instruction.source_1]);
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void ands(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
-    cpu->S[inst.destination] = cpu->S[inst.source_1] & cpu->S[inst.source_2];
+void ands(CPU *cpu, Instruction instruction) {
+    
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] & cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void ors(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
-    cpu->S[inst.destination] = cpu->S[inst.source_1] | cpu->S[inst.source_2];
+void ors(CPU *cpu, Instruction instruction) {
+    
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] | cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void xors(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
-    cpu->S[inst.destination] = cpu->S[inst.source_1] ^ cpu->S[inst.source_2];
+void xors(CPU *cpu, Instruction instruction) {
+    
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] ^ cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void shls(CPU *cpu, u32 instruction) {
+void shls(CPU *cpu, Instruction instruction) {
     // TODO : gestion de l'overflow
-    Instruction inst = parse_instruction(instruction);
-    cpu->S[inst.destination] = cpu->S[inst.source_1] << cpu->S[inst.source_2];
+    
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] << cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void shrs(CPU *cpu, u32 instruction) {
+void shrs(CPU *cpu, Instruction instruction) {
     // TODO : gestion de l'overflow
-    Instruction inst = parse_instruction(instruction);
-    cpu->S[inst.destination] = cpu->S[inst.source_1] >> cpu->S[inst.source_2];
+    
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] >> cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void rols(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
-    cpu->S[inst.destination] = cpu->S[inst.source_1] << ~cpu->S[inst.source_2];
+void rols(CPU *cpu, Instruction instruction) {
+    
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] << ~cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void rors(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
-    cpu->S[inst.destination] = cpu->S[inst.source_1] >> ~cpu->S[inst.source_2];
+void rors(CPU *cpu, Instruction instruction) {
+    
+    cpu->S[instruction.destination] = cpu->S[instruction.source_1] >> ~cpu->S[instruction.source_2];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void popcnts(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
-    cpu->U[inst.destination] = __builtin_popcountll(cpu->U[inst.source_1]);
+void popcnts(CPU *cpu, Instruction instruction) {
+    
+    cpu->U[instruction.destination] = __builtin_popcountll(cpu->U[instruction.source_1]);
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void lmbs(CPU *cpu, u32 instruction) {
-    Instruction inst = parse_instruction(instruction);
+void lmbs(CPU *cpu, Instruction instruction) {
+    
     //TODO
     cpu->IP += SIZE_INSTRUCTION;
 }

@@ -4,20 +4,20 @@
 #include "cpu.h"
 #include "type.h"
 
-void mov(CPU *cpu, u32 instruction);
-void movu(CPU *cpu, u32 instruction);
-void movs(CPU *cpu, u32 instruction);
-void movf(CPU *cpu, u32 instruction);
-void movv(CPU *cpu, u32 instruction);
-void movt(CPU *cpu, u32 instruction);
-void movg(CPU *cpu, u32 instruction);
+void mov(CPU *cpu, Instruction instruction);
+void movu(CPU *cpu, Instruction instruction);
+void movs(CPU *cpu, Instruction instruction);
+void movf(CPU *cpu, Instruction instruction);
+void movv(CPU *cpu, Instruction instruction);
+void movt(CPU *cpu, Instruction instruction);
+void movg(CPU *cpu, Instruction instruction);
 
-void movui(CPU *cpu, u32 instruction);
-void movsi(CPU *cpu, u32 instruction);
-void movfi(CPU *cpu, u32 instruction);
+void movui(CPU *cpu, Instruction instruction);
+void movsi(CPU *cpu, Instruction instruction);
+void movfi(CPU *cpu, Instruction instruction);
 
-void movvi(CPU *cpu, u32 instruction);
-void movti(CPU *cpu, u32 instruction);
-void movgi(CPU *cpu, u32 instruction);
+void movvi(CPU *cpu, Instruction instruction);
+void movti(CPU *cpu, Instruction instruction);
+void movgi(CPU *cpu, Instruction instruction);
 
 #endif
