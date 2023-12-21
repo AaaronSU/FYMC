@@ -34,13 +34,13 @@ bool detect_alias(char** array)
 bool correct_alias(char** array)
 {
   int i = 0;
-  
+
   // If token is in first position
   if (array[i][strlen(array[i]) - 1] != 58)
     return FALSE;
-  
+
   ++i;
-  
+
   while (array[i] != NULL)
     {
       // 58 is ASCII code for ':'
@@ -73,12 +73,12 @@ int detect_op_code(char* op_name, char*** op_name_list)
 
 
 
-// /// @brief function that tell if the register are correct
-// /// @param tokens list of all the register and the op code
-// /// @param register_list list of all the possible register and their data type associated
-// /// @return return true if everything is good, else return false
+/// @brief function that tell if the register are correct
+/// @param tokens list of all the register and the op code
+/// @param register_list list of all the possible register and their data type associated
+/// @return return true if everything is good, else return false
 bool correct_register_name(char* reg, char** types, char*** register_list)
-{	
+{
 	//We have the name of the register, the type(s) the register can take,
 	//now we need to check if they match
 
@@ -190,3 +190,23 @@ bool correct_op_code(char** tokens, char** op_code_datas, char*** register_list)
 
 	return TRUE;
 }
+
+
+bool correct_line(char** line, char*** op_name_list, char*** register_list)
+{
+	// Vérifie les alias
+	if (detect_alias(line) == TRUE && correct_alias(line) == FALSE)
+		return FALSE;
+
+	// Vérifie op_code et registres
+	int position = 0;
+	position = detect_op_code(line[0], op_name_list);
+	if (position == -1)
+		return FALSE;
+	return correct_op_code(line, op_name_list[position], register_list);
+}
+
+
+
+
+

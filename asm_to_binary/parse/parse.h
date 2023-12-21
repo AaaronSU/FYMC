@@ -18,4 +18,12 @@ char** retreive_token(char* const line, char const separator);
 
 bool alphanumeric(int);
 
+
+void nb_ligne_section(char* const nom, long long int* nb_data, long long int* nb_code);
+
+// TODO: test function (normal cases, empty sections, secctions of size 1 and other weird cases)
+bool parse(char* const nom, char*** data_array, char*** code_array,
+           long long int* const nb_data, long long int* const nb_code,
+           char*** const op_name_list, char*** const register_list);
+
 #endif

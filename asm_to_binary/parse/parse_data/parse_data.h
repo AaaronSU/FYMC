@@ -15,5 +15,9 @@ bool name_is_valid(char* str);
 
 bool good_integer(char* str, bool is_signed);
 bool good_float(char* str);
+bool good_ascii(char* str);
+
+// NOTE: We may want to comment the above
+bool is_valid(char** array);
 
 #endif

@@ -321,7 +321,7 @@ long long int compter(char* buffer, FILE *in, bool has_data, bool has_code)
 
 
 // Count the number of lines in the sections so that we can tokenize them
-void nb_ligne_section(char* nom, long long int* nb_data, long long int* nb_code) {
+void nb_ligne_section(char* const nom, long long int* nb_data, long long int* nb_code) {
     FILE *in = fopen(nom, "r");
 
     // Si impossible d'ouvrir le fichier
@@ -355,11 +355,94 @@ void nb_ligne_section(char* nom, long long int* nb_data, long long int* nb_code)
             return; // NOTE: Crash here?
     }
     else // Ni data ni code en premier ?
-        return;  // NOTE: Crash here?
+        {
+            // Set to avoid problems
+            *nb_code = -1;
+            *nb_data = -1;
+            return;  // NOTE: Crash here?
+        }
 
     (void)fclose(in);
     return;
 }
+
+
+
+
+// Devrait parser le code
+// nom -> nom du fichier à parser
+// data_array et code_array sont le retour de la fonction (les malloc/calloc de nb_data/nb_code)
+// nb_data et nb_code construits via nb_ligne_section
+// op_name_list et register_list => voir main.c
+bool parse(char* const nom, char*** data_array, char*** code_array,
+           long long int* const nb_data, long long int* const nb_code,
+           char*** const op_name_list, char*** const register_list)
+{
+    FILE *file = fopen(nom, "r");
+
+    // Si impossible d'ouvrir le fichier
+    if (!file) {
+        perror("fopen");
+        return FALSE; // NOTE: crash here?
+    }
+
+
+    long long int indice_data = 0;
+    long long int indice_code = 0;
+    char ligne[1024];
+    char** token_thing;
+    nb_ligne_section(nom, nb_data, nb_code);
+    if (*nb_data == -1 || *nb_code == -1)
+        return FALSE;  // code and / or data sections not placed correctly
+
+    // Handling data section
+    if (nb_data != 0)
+    {
+        fgets(ligne, 1024, file); // Having fgets skip data: line
+        for (size_t i = 0; i < *nb_data; ++i)
+        {
+            add_semicolon(fgets(ligne, 1024, file));
+            token_thing = retreive_token(ligne, ';');
+            if (is_valid(token_thing) == FALSE)
+                return FALSE;
+            // WARNING: Pas trop le temps de test si ce genre de carabistouille fonctionne
+            // Si ça se trouve faut utiliser une fonction de copy ou quoi jsp
+            data_array[indice_data] = token_thing;
+            ++indice_data;
+        }
+    }
+
+    // Handling code section
+    fgets(ligne, 1024, file); // Having fgets skip code: line
+        for (size_t i = 0; i < *nb_code; ++i)
+        {
+            add_semicolon(fgets(ligne, 1024, file));
+            token_thing = retreive_token(ligne, ';');
+            if (correct_line(token_thing, op_name_list, register_list) == FALSE)
+                return FALSE;
+            // WARNING
+            code_array[indice_code] = token_thing;
+            ++indice_code;
+        }
+
+    (void)fclose(file);
+
+    return TRUE;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

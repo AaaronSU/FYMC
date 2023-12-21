@@ -25,21 +25,43 @@ int main(int argc, char** argv)
     register_list = tokenize("register_list");
 
     //Loading the code in memory for faster accesses
-    char* loaded_file = load_file(argv[1]);
+    // NOTE: Yeah we might do that, but right now no
+    // char* loaded_file = load_file(argv[1]);
 
-    //We now read how many lines we have in data and how many lines we have in code
-    int data_lines, code_lines;
-    if((data_lines = data_infos(loaded_file)) == -1)
-    {
-        fprintf(stderr,"Error : missing data label.\n");
-        return EXIT_FAILURE;
-    }
 
-    if((code_lines = code_infos(loaded_file)) == -1)
-    {
-        fprintf(stderr,"Error : missing code label.\n");
-        return EXIT_FAILURE;
-    }
+    long long int nb_code = 0;
+    long long int nb_data = 0;
+
+    nb_ligne_section(argv[1], &nb_data, &nb_code);
+
+    char*** data_array = malloc(nb_data);
+    char*** code_array = malloc(nb_code);
+
+    // NOTE: Maybe something will go wrong with pointers, const and stuff idk
+    // TODO: test parse (normal cases, empty sections, secctions of size 1 and other weird cases)
+    bool parsing_went_alright = parse(argv[1], data_array, code_array,
+                                        &nb_data, &nb_code,
+                                        op_name_list, register_list);
+
+    printf("%d\n", parsing_went_alright);
+    free(data_array);
+    free(code_array);
+
+
+
+    // //We now read how many lines we have in data and how many lines we have in code
+    // int data_lines, code_lines;
+    // if((data_lines = data_infos(loaded_file)) == -1)
+    // {
+    //     fprintf(stderr,"Error : missing data label.\n");
+    //     return EXIT_FAILURE;
+    // }
+    //
+    // if((code_lines = code_infos(loaded_file)) == -1)
+    // {
+    //     fprintf(stderr,"Error : missing code label.\n");
+    //     return EXIT_FAILURE;
+    // }
 
 
 
@@ -50,7 +72,7 @@ int main(int argc, char** argv)
     // remove_space(str,temp);
     // char** tokens = retreive_token(temp,';');
     // print_tokens_line(tokens);
-    
+
 
 
 

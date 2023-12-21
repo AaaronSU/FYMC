@@ -174,3 +174,40 @@ bool good_ascii(char* str)
 
   return TRUE;
 }
+
+
+
+
+//
+bool is_valid(char** array)
+{
+  char* types_array[5] = {"u64", "i64", "f64", "ascii", NULL};
+
+  if (seems_valid(array))
+  {
+    if (type_exists(array[0]))
+    {
+        if (name_is_valid(array[1]))
+        {
+          if (strcmp(array[0], "u64"))
+            return good_integer(array[2], FALSE);
+          if (strcmp(array[0], "i64"))
+            return good_integer(array[2], FALSE);
+          if (strcmp(array[0], "f64"))
+            return good_float(array[2]);
+          if (strcmp(array[0], "ascii"))
+            return good_ascii(array[2]);
+        }
+    }
+  }
+
+  return FALSE;
+}
+
+
+
+
+
+
+
+
