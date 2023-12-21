@@ -37,3 +37,7 @@ add_library(operation STATIC ${SOURCE_FILES})
 target_link_libraries(operation m)
 
 target_include_directories(operation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
+
+######################### test cmocka ############################
+
