@@ -43,10 +43,10 @@ void remove_space(char const *str_in, char *str_out)
     int taille_out = (sizeof(char) * ((strlen(str_out)))) + sizeof(char);
     //~ printf("%d\n", taille_out);
     char* str_tmp = (char*)malloc(taille_out);
-    
+
     int i = 0;
     int j = 0;
-    
+
     int quote_flag = FALSE;
 
     while (i < taille_in)
@@ -109,7 +109,7 @@ bool add_semicolon(char* str)
                 }
                 i++;
             }
-            
+
             //We replace the " " with ; and go to the next char
             str[i++] = ';';
             continue;
@@ -146,9 +146,9 @@ bool add_semicolon(char* str)
         {
             str[i] = '\0';
             return TRUE;
-        } 
+        }
     }
-    
+
     return TRUE;
 }
 
@@ -230,3 +230,141 @@ char** retreive_token(char* line, char const separator)
     //Returning token list ended by NULL value
     return tokens;
 }
+
+
+
+
+// ------------ Handling parsing and stuf idk ---------------
+
+
+
+// Detects if arg is in string AND before any ""
+bool is_in_string(char* string, char* arg)
+{
+    int taille_arg = strlen(arg);
+    int taille_string = strlen(string);  // To not get out of range
+    bool im_readin_it = FALSE;
+    size_t j = 0;
+    if (strstr(string, arg))
+    {
+        if (strchr(string, '"'))
+        {
+            for (size_t i = 0; i < taille_string; ++i)
+            {
+                if (im_readin_it)
+                {
+                    if (string[i] == arg[j])
+                    {
+                        ++j;
+                        if (j == taille_arg) {
+                            return TRUE;
+                        }
+                    }
+                    im_readin_it = FALSE;
+                    j = 0;
+                }
+                else if (string[i] == arg[j])
+                {
+                    im_readin_it = TRUE;
+                    ++j;
+                }
+                else if (string[i] == '"')
+                    break;
+            }
+        }
+        else
+            return TRUE;
+    }
+    return FALSE;
+}
+
+
+
+
+// Compte le nombre de lignes "utiles" avant la fin du fichier / prochaine section
+long long int compter(char* buffer, FILE *in, bool has_data, bool has_code)
+{
+    // buffer pour lire lignes
+    long long int retour = 0;
+    while (fgets(buffer, 1024, in)) {  // Tant qu'il y a qq chose dans le fichier
+
+        // Vérifie qu'on ne change pas de section
+        if (is_in_string(buffer, "data:"))
+        {
+            // Pas le droit à deux sections data ni à data après code
+            if (has_data || has_code)
+                return -1;
+            has_data = TRUE;
+            return retour;
+        }
+        if (is_in_string(buffer, "code:"))
+        {
+            // Pas le droit à deux sections code
+            if (has_code)
+                return -1;
+            has_code = TRUE;
+            return retour;
+        }
+
+        // Vérifier que la ligne est "utile"
+        char* ligne = strtok(buffer, " \t");
+        if (ligne)
+        {
+            if (ligne[0] == '#')
+                {continue;}
+            else
+                {++retour;}
+        }
+    }
+    return retour;
+}
+
+
+// Count the number of lines in the sections so that we can tokenize them
+void nb_ligne_section(char* nom, long long int* nb_data, long long int* nb_code) {
+    FILE *in = fopen(nom, "r");
+
+    // Si impossible d'ouvrir le fichier
+    if (!in) {
+        perror("fopen");
+        return; // NOTE: crash here?
+    }
+
+    // NOTE: On pourrait mettre ce buffer moins gros (une ligne devrait pas faire plus de 100 je pense)
+    char buffer[1024];
+    bool has_data = FALSE;
+    bool has_code = FALSE;
+    *nb_data = 0;
+    *nb_code = 0;
+
+    if (is_in_string(buffer, "data:"))  // Si data en premier
+    {
+        has_data = TRUE;
+        *nb_data = compter(buffer, in, has_data, has_code);
+        if (*nb_data == -1)
+            return; // NOTE: Crash here?
+        *nb_code = compter(buffer, in, has_data, has_code);
+        if (*nb_code == -1)
+            return; // NOTE: Crash here?
+    }
+    else if (is_in_string(buffer, "code:"))  // Si code en premier
+    {
+        has_code = TRUE;
+        *nb_code = compter(buffer, in, has_data, has_code);
+        if (*nb_code == -1)
+            return; // NOTE: Crash here?
+    }
+    else // Ni data ni code en premier ?
+        return;  // NOTE: Crash here?
+
+    (void)fclose(in);
+    return;
+}
+
+
+
+
+
+
+
+
