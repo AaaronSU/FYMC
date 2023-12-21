@@ -6,134 +6,141 @@
 
 /**
  * Loads a value from memory into an unsigned register.
- * 
+ *
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loadu(CPU *cpu, Instruction instruction) 
+void loadu(CPU *cpu, u32 instruction)
 {
-    u8 offset = get_offset(instruction.unused);
-    u64 addr = cpu->U[instruction.source_1] + cpu->U[instruction.source_2] + offset;
-    if (addr >= MEMORY_SIZE) 
-    { 
+    // TODO : overflow
+    Instruction inst = parse_instruction(instruction);
+    u8 offset = get_offset(inst.unused);
+    u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
+    if (addr >= MEMORY_SIZE)
+    {
         printf("Dépassement de mémoire\n");
         exit(EXIT_FAILURE);
     }
 
-    cpu->U[instruction.destination] = cpu->Memory[addr];
+    cpu->U[inst.destination] = cpu->Memory[addr];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
 /**
  * Loads a value from memory into a signed register.
- * 
+ *
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loads(CPU *cpu, Instruction instruction)
+void loads(CPU *cpu, u32 instruction)
 {
-    u8 offset = get_offset(instruction.unused);
-    u64 addr = cpu->U[instruction.source_1] + cpu->U[instruction.source_2] + offset;
+    Instruction inst = parse_instruction(instruction);
+    u8 offset = get_offset(inst.unused);
+    u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
-    if (addr >= MEMORY_SIZE) 
-    { 
+    if (addr >= MEMORY_SIZE)
+    {
         printf("Dépassement de mémoire\n");
         exit(EXIT_FAILURE);
     }
 
-    cpu->S[instruction.destination] = cpu->Memory[addr];
+    cpu->S[inst.destination] = cpu->Memory[addr];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
 /**
  * Loads a value from memory into a floating-point register.
- * 
+ *
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loadf(CPU *cpu, Instruction instruction) 
+void loadf(CPU *cpu, u32 instruction)
 {
-    u8 offset = get_offset(instruction.unused);
-    u64 addr = cpu->U[instruction.source_1] + cpu->U[instruction.source_2] + offset;
+    Instruction inst = parse_instruction(instruction);
+    u8 offset = get_offset(inst.unused);
+    u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
-    if (addr >= MEMORY_SIZE) 
-    { 
+    if (addr >= MEMORY_SIZE)
+    {
         printf("Dépassement de mémoire\n");
         exit(EXIT_FAILURE);
     }
 
-    cpu->F[instruction.destination] = cpu->Memory[addr];
+    cpu->F[inst.destination] = cpu->Memory[addr];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
 /**
  * Loads a value from memory into an unsigned vector register.
- * 
+ *
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loadv(CPU *cpu, Instruction instruction) 
+void loadv(CPU *cpu, u32 instruction)
 {
-    u8 offset = get_offset(instruction.unused);
-    u64 addr = cpu->U[instruction.source_1] + cpu->U[instruction.source_2] + offset;
+    Instruction inst = parse_instruction(instruction);
+    u8 offset = get_offset(inst.unused);
+    u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
-    if (addr >= MEMORY_SIZE) 
-    { 
+    if (addr >= MEMORY_SIZE)
+    {
         printf("Dépassement de mémoire\n");
         exit(EXIT_FAILURE);
     }
 
-    for(int i = 0; i <SIZE_VECTOR; ++i) 
+    for (int i = 0; i < SIZE_VECTOR; ++i)
     {
-        cpu->V[instruction.destination][i] = cpu->Memory[addr + i];
+        cpu->V[inst.destination][i] = cpu->Memory[addr + i];
     }
     cpu->IP += SIZE_INSTRUCTION;
 }
 
 /**
  * Loads a value from memory into an signed vector register.
- * 
+ *
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loadt(CPU *cpu, Instruction instruction) 
-{ 
-    u8 offset = get_offset(instruction.unused);
-    u64 addr = cpu->U[instruction.source_1] + cpu->U[instruction.source_2] + offset;
+void loadt(CPU *cpu, u32 instruction)
+{
+    Instruction inst = parse_instruction(instruction);
+    u8 offset = get_offset(inst.unused);
+    u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
-    if (addr >= MEMORY_SIZE) 
-    { 
+    if (addr >= MEMORY_SIZE)
+    {
         printf("Dépassement de mémoire\n");
         exit(EXIT_FAILURE);
     }
 
-    for(int i = 0; i <SIZE_VECTOR; ++i) 
+    for (int i = 0; i < SIZE_VECTOR; ++i)
     {
-        cpu->T[instruction.destination][i] = cpu->Memory[addr + i];
+        cpu->T[inst.destination][i] = cpu->Memory[addr + i];
     }
     cpu->IP += SIZE_INSTRUCTION;
 }
 
 /**
  * Loads a value from memory into an floating-point vector register.
- * 
+ *
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loadg(CPU *cpu, Instruction instruction)
+void loadg(CPU *cpu, u32 instruction)
 {
-    u8 offset = get_offset(instruction.unused);
-    u64 addr = cpu->U[instruction.source_1] + cpu->U[instruction.source_2] + offset;
+    Instruction inst = parse_instruction(instruction);
+    u8 offset = get_offset(inst.unused);
+    u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
-    if (addr >= MEMORY_SIZE) 
-    { 
+    if (addr >= MEMORY_SIZE)
+    {
         printf("Dépassement de mémoire\n");
         exit(EXIT_FAILURE);
     }
 
-    for(int i = 0; i <SIZE_VECTOR; ++i) 
+    for (int i = 0; i < SIZE_VECTOR; ++i)
     {
-        cpu->G[instruction.destination][i] = cpu->Memory[addr + i];
+        cpu->G[inst.destination][i] = cpu->Memory[addr + i];
     }
     cpu->IP += SIZE_INSTRUCTION;
 }

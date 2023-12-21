@@ -4,7 +4,6 @@
 #include "type.h"
 #include "cpu.h"
 
-
 Instruction parse_instruction(u32 instruction);
 u8 get_offset(u16 unused);
 

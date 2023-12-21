@@ -4,11 +4,11 @@
 #include "cpu.h"
 #include "type.h"
 
-void storeu(CPU *cpu, Instruction instruction);
-void stores(CPU *cpu, Instruction instruction);
-void storef(CPU *cpu, Instruction instruction);
-void storev(CPU *cpu, Instruction instruction);
-void storet(CPU *cpu, Instruction instruction);
-void storeg(CPU *cpu, Instruction instruction);
+void storeu(CPU *cpu, u32 instruction);
+void stores(CPU *cpu, u32 instruction);
+void storef(CPU *cpu, u32 instruction);
+void storev(CPU *cpu, u32 instruction);
+void storet(CPU *cpu, u32 instruction);
+void storeg(CPU *cpu, u32 instruction);
 
 #endif

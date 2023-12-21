@@ -1,121 +1,142 @@
 #include "move.h"
 #include "tools.h"
+#include <stdio.h>
 
-void mov(CPU *cpu, Instruction instruction)
-{
-    
-}
+void mov(CPU *cpu, u32 instruction) {}
 
-void movu(CPU *cpu, Instruction instruction)
+void movu(CPU *cpu, u32 instruction)
 {
-    cpu->U[instruction.destination] = cpu->U[instruction.source_1];
+    Instruction inst = parse_instruction(instruction);
+
+    cpu->U[inst.destination] = cpu->U[inst.source_1];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movs(CPU *cpu, Instruction instruction)
+void movs(CPU *cpu, u32 instruction)
 {
-    
-    cpu->S[instruction.destination] = cpu->S[instruction.source_1];
+    Instruction inst = parse_instruction(instruction);
+
+    cpu->S[inst.destination] = cpu->S[inst.source_1];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movf(CPU *cpu, Instruction instruction)
+void movf(CPU *cpu, u32 instruction)
 {
-    
-    cpu->F[instruction.destination] = cpu->F[instruction.source_1];
+    Instruction inst = parse_instruction(instruction);
+
+    cpu->F[inst.destination] = cpu->F[inst.source_1];
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movv(CPU *cpu, Instruction instruction)
+void movv(CPU *cpu, u32 instruction)
 {
-    
+    Instruction inst = parse_instruction(instruction);
 
-    for(int i = 0; i < SIZE_VECTOR; ++i) 
+    for (int i = 0; i < SIZE_VECTOR; ++i)
     {
-        cpu->V[instruction.destination][i] = cpu->V[instruction.source_1][i];
+        cpu->V[inst.destination][i] = cpu->V[inst.source_1][i];
     }
-    
+
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movt(CPU *cpu, Instruction instruction)
+void movt(CPU *cpu, u32 instruction)
 {
-    
-    
-    for(int i = 0; i < SIZE_VECTOR; ++i) 
-    {
-        cpu->T[instruction.destination][i] = cpu->T[instruction.source_1][i];
-    }
-    cpu->IP += SIZE_INSTRUCTION;
-}
+    Instruction inst = parse_instruction(instruction);
 
-void movg(CPU *cpu, Instruction instruction) 
-{
-    
-    
-    for(int i = 0; i < SIZE_VECTOR; ++i) 
+    for (int i = 0; i < SIZE_VECTOR; ++i)
     {
-        cpu->G[instruction.destination][i] = cpu->G[instruction.source_1][i];
+        cpu->T[inst.destination][i] = cpu->T[inst.source_1][i];
     }
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movui(CPU *cpu, Instruction instruction) 
+void movg(CPU *cpu, u32 instruction)
 {
-    
-    u64 immediat = 0;
-    cpu->U[instruction.destination] = immediat;
-    cpu->IP += SIZE_INSTRUCTION + 64;
+    Instruction inst = parse_instruction(instruction);
+
+    for (int i = 0; i < SIZE_VECTOR; ++i)
+    {
+        cpu->G[inst.destination][i] = cpu->G[inst.source_1][i];
+    }
+    cpu->IP += SIZE_INSTRUCTION;
 }
 
-void movsi(CPU *cpu, Instruction instruction) 
+void movui(CPU *cpu, u32 instruction)
 {
-    
+    Instruction inst = parse_instruction(instruction);
+    cpu->IP += 4;
+
+    int i = 0;
+    int immediat = 0;
+    while (i < 8)
+    {
+        char *value_adress = &(cpu->BinaryFile[cpu->IP]);
+        int value = (int)*value_adress;
+        immediat += value << (8 - 1);
+        printf("value: %d, immediat= %d\n", value, immediat);
+        i++;
+        cpu->IP += 1;
+    }
+
+    // cpu->IP += 8;
+    cpu->U[inst.destination] = immediat;
+    printf("mov %d dans U[%d]", immediat, inst.destination);
+}
+
+void movsi(CPU *cpu, u32 instruction)
+{
+    Instruction inst = parse_instruction(instruction);
+
     u64 immediat = (i64)0;
-    cpu->S[instruction.destination] = immediat;
+    cpu->S[inst.destination] = immediat;
     cpu->IP += SIZE_INSTRUCTION + 64;
 }
 
-void movfi(CPU *cpu, Instruction instruction) 
+void movfi(CPU *cpu, u32 instruction)
 {
-    
+    Instruction inst = parse_instruction(instruction);
+
     u64 immediat = (f64)0;
-    cpu->F[instruction.destination] = immediat;
+    cpu->F[inst.destination] = immediat;
     cpu->IP += SIZE_INSTRUCTION + 64;
 }
 
-void movvi(CPU *cpu, Instruction instruction) 
+void movvi(CPU *cpu, u32 instruction)
 {
-    
+    Instruction inst = parse_instruction(instruction);
+
     u64 immediat[8]; // pour l'instant
 
-    for(int i = 0; i < SIZE_VECTOR; ++i) 
+    for (int i = 0; i < SIZE_VECTOR; ++i)
     {
-        cpu->V[instruction.destination][i] = immediat[i];
+        cpu->V[inst.destination][i] = immediat[i];
     }
     cpu->IP += SIZE_INSTRUCTION + 64 * 8;
 }
 
-void movti(CPU *cpu, Instruction instruction)
+void movti(CPU *cpu, u32 instruction)
 {
-    
+    Instruction inst = parse_instruction(instruction);
+
     u64 immediat[8]; // pour l'instant
 
-    for(int i = 0; i < SIZE_VECTOR; ++i) 
+    for (int i = 0; i < SIZE_VECTOR; ++i)
     {
-        cpu->T[instruction.destination][i] = (i64)immediat[i];
+        cpu->T[inst.destination][i] = (i64)immediat[i];
     }
     cpu->IP += SIZE_INSTRUCTION + 64 * 8;
 }
 
-void movgi(CPU *cpu, Instruction instruction)
+void movgi(CPU *cpu, u32 instruction)
 {
-    
+    Instruction inst = parse_instruction(instruction);
+
     u64 immediat[8]; // pour l'instant
 
-    for(int i = 0; i < SIZE_VECTOR; ++i) 
+    for (int i = 0; i < SIZE_VECTOR; ++i)
     {
-        cpu->G[instruction.destination][i] = (f64)immediat[i];
+        cpu->G[inst.destination][i] = (f64)immediat[i];
     }
     cpu->IP += SIZE_INSTRUCTION + 64 * 8;
 }

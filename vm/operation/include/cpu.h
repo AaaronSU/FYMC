@@ -29,24 +29,22 @@ typedef struct
     i64 T[NUMBER_VECTOR_REGISTER][SIZE_VECTOR];
     f64 G[NUMBER_VECTOR_REGISTER][SIZE_VECTOR];
 
-    // principal memory : memory data 
+    // principal memory : memory data
     u64 Memory[MEMORY_SIZE];
 
     // code memory
-    u64* BinaryFile;
+    char *BinaryFile;
 } CPU;
 
-
-typedef struct {
-
+typedef struct
+{
     u8 opcode : 8;
     u16 unused : 9;
     u8 destination : 5;
     u8 source_1 : 5;
     u8 source_2 : 5;
-    
+
 } Instruction;
 #endif
 
-
-// memory.h => memoire principale qui 
+// memory.h => memoire principale qui

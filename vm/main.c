@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
@@ -11,102 +12,65 @@
 #include "conversion.h"
 #include "store.h"
 #include "move.h"
+#include "u_arithmetic_logic.h"
+#include "s_arithmetic_logic.h"
+#include "f_arithmetic_logic.h"
+#include "output.h"
+#include "lecture.h"
+#include "compare_jump.h"
 
-
-void (*opcode_functions[])(CPU*, Instruction) = {
-    loadu, loads, loadf,        // 0, 1, 2
-    loadv, loadt, loadg,        // 3, 4, 5
-    storeu, stores, storef,     // 6, 7, 8
-    storev, storet, storeg,     // 9, 10, 11
-    movu, movs, movf, movv, movt, movg,   // 12, 13, 14, 15, 16, 17, 18
-    //movui, movsi, movfi, movvi, movti, movgi,   // 19, 20, 21, 22, 23, 24
-    cvtus, cvtsu, cvtuf, cvtfu, cvtsf, cvtfs,  // 25, 26, 27, 28, 29, 30
-    //addu, subu, mulu, divu, modu, fmau, sqrtu, logu, incu, decu, andu, oru, xoru, shlu, shru, rolu, roru, popcntu, lmbu, // 31-50
-    //adds, subs, muls, divs, mods, fmas, sqrts, logs, ands, ors, xors, shls, shrs, rols, rors, popcnts, lmbs,  // 51-69
-    //addf, subf, mulf, divf, fmaf, sqrtf, logf,   // 70-76
-    //cmpu, cmps, cmpf, je, jne, jge, jl, jle, jz, jnz,  // 77-86
-    //outu, outs, outf, outa, outb, outx,   // 87-92
-    //hlt   // 93
+void (*opcode_functions[])(CPU *, u32) = {
+    loadu, loads, loadf,                      // 0, 1, 2
+    loadv, loadt, loadg,                      // 3, 4, 5
+    storeu, stores, storef,                   // 6, 7, 8
+    storev, storet, storeg,                   // 9, 10, 11
+    mov, movu, movs, movf, movv, movt, movg,  // 12, 13, 14, 15, 16, 17, 18
+    movui, movsi, movfi, movvi, movti, movgi, // 19, 20, 21, 22, 23, 24
+    cvtus, cvtsu, cvtuf, cvtfu, cvtsf, cvtfs, // 25, 26, 27, 28, 29, 30
+    addu, subu, mulu, divu, modu,             // 31, 32, 33, 34, 35
+    fmau, sqrtu, logu, incu, decu,            // 36, 37, 38, 39, 40
+    andu, oru, xoru, shlu, shru,              // 41, 42, 43, 44, 45
+    rolu, roru, popcntu, lmbu,                // 46, 47, 48, 49
+    adds, subs, muls, divs,                   // 50, 51, 52, 53
+    mods, fmas, sqrts, logs,                  // 54, 55, 56, 57
+    ands, ors, xors, shls, shrs,              // 58, 59, 60, 61, 62
+    rols, rors, popcnts, lmbs,                // 63, 64, 65, 66
+    addf, subf, mulf, divf,                   // 67, 68, 69, 70
+    fmaf_, sqrtf_, logf_,                     // 71, 72, 73
+    cmpu, cmps, cmpf,                         // 74, 75, 76
+    je, jne, jge, jl, jle, jz, jnz,           // 77, 78, 79, 80, 81, 82, 83
+    outu, outs, outf, outa, outb, outx,       // 84, 85, 86, 87, 88, 89
+    // hlt                                 // 90
 };
-
-void run_instruction(CPU *cpu, Instruction instruction, u32 instr, void (*opcode_functions[])(CPU*, Instruction)) {
-
-    // 1 - décoder les 32 bits et voir quel opérand
-    instruction = parse_instruction(instr); // 
-    (*opcode_functions[instruction.opcode])(cpu, instruction);
-}
-
 
 int main()
 {
     CPU cpu;
-    
     memset(&cpu, 0, sizeof(CPU)); // Initialize cpu to zero
+    struct Header header = get_header_binary_file("/home/user/FYMC/notre_ultime_fichier_binaire");
+    cpu.BinaryFile = lecture_fichier_binaire("/home/user/FYMC/notre_ultime_fichier_binaire", header);
+    cpu.IP = header.address_code_section;
 
-    // Initialisation de test pour l'instruction
-
-
-    //
-    u32 test[] = {0b00000000000000000000010001100000, 0b00000001000000000000000111100000};
-    Instruction instruction = parse_instruction(test[0]);
-
-    for(int i = 7; i < 15; i++) 
+    while (cpu.IP < header.total_binary_file_size)
     {
-        cpu.Memory[i] = i * 2;
+        char *opcode_byte = &cpu.BinaryFile[cpu.IP];
+        int opcode = (int)(*opcode_byte);
+        // int new_opcode = (int)opcode;
+        printf("%d\n", opcode);
+        // opcode_functions[19](&cpu, cpu.BinaryFile[cpu.IP]);
+        // printf("\n%d\n", opcode == 19);
+        if (opcode == 90)
+        {
+            exit(1);
+        }
+        opcode_functions[opcode](&cpu, cpu.BinaryFile[cpu.IP]);
+
+        // cpu.IP += 1;
     }
-
-    cpu.U[3] = 2;
-    cpu.U[0] = 5;
-    loadv(&cpu, instruction);
-    
-    printf("opcode: %u\n", instruction.opcode);
-    printf("unused: %u\n", instruction.unused);
-    printf("destination: %u\n", instruction.destination);
-    printf("source_1: %u\n", instruction.source_1);
-    printf("source_2: %u\n", instruction.source_2);
-
-    cpu.S[1] = -1;
-    cpu.U[3] = 1ULL << 62;
-    cvtus(&cpu, instruction);
-
-    
-
-    printf("U[3] : %llu, S[1] : %lld\n", cpu.U[3], cpu.S[1]);
-    /* printf("Memory à 7 : %llu, U[3] : %llu, U[0] : %llu\n", cpu.Memory[7], cpu.U[3], cpu.U[0]);
-    for(int i = 0; i < 8; i++) 
-    {
-         printf("Destination : %llu\n", cpu.V[1][i]);
-    }
-    */
-
-    /* // Décomposition de l'instruction
-    for (int i = 0; i < 2; i++)
-    {
-        instruction.opcode = (test[i] >> (SIZE_INSTRUCTION - 8)) & 0xFF;
-        instruction.unused = (test[i] >> (SIZE_INSTRUCTION - 17)) & 0x1FF;
-        instruction.destination = (test[i] >> (SIZE_INSTRUCTION - 22)) & 0x1F;
-        instruction.source_1 = (test[i] >> (SIZE_INSTRUCTION - 27)) & 0x1F;
-        instruction.source_2 = test[i] & 0x1F;
-
-        execute_instruction(
-            &cpu,
-            instruction.opcode,
-            instruction.unused,
-            instruction.destination,
-            instruction.source_1,
-            instruction.source_2);
-
-        // Affichage des résultats
-        printf("U[1]: %llu\n", cpu.scalar_regs.U[1]);
-        printf("U[2]: %llu\n", cpu.scalar_regs.U[2]);
-        printf("U[3]: %llu\n", cpu.scalar_regs.U[3]);
-        printf("S[15]: %llu\n", cpu.scalar_regs.S[15]);
-        printf("S[0]: %llu\n", cpu.scalar_regs.S[0]);
-
-        
-    }
-
-    execute_instruction(&cpu, ADDU, 0, 1, 2, 3); */
+    // for (int i = 0; i < header.total_binary_file_size; ++i)
+    // {
+    //     printf("%d ", cpu.BinaryFile[i]);
+    // }
 
     return 0;
 }

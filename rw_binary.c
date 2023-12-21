@@ -79,12 +79,12 @@ void ecriture()
         0b11,
         0b0000000,
         // en haut immediate 64 bits
-        0b1011011,
+        0b1011000,
         0b0,
         0b0,
         0b0,
         // en haut Outb u0
-        0b01011101,
+        0b1011010,
         0b0,
         0b0,
         0b0,
@@ -107,10 +107,10 @@ void ecriture()
     fclose(fichier);
 }
 
-char *lecture()
+char *lecture(char *file_name)
 {
     // Ouverture du fichier en lecture binaire
-    FILE *fichier = fopen("notre_ultime_fichier_binaire", "rb");
+    FILE *fichier = fopen(file_name, "rb");
 
     if (fichier == NULL)
     {
@@ -173,7 +173,7 @@ char *lecture()
 int main()
 {
     ecriture();
-    char *buffer = lecture();
+    char *buffer = lecture("notre_ultime_fichier_binaire");
     // Libère le buffer
     free(buffer);
 
