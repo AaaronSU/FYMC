@@ -97,9 +97,15 @@ bool add_semicolon(char* str)
             while(str[i] != ' ')
             {
                 //If there is a , between two word we replace it by a ;
-                if(str[i] == ',')
+                if(str[i] == ',') //This will also mark the end of the word
                 {
-                    str[i] = ';';
+                    str[i] = ' ';
+                }
+
+                if(str[i] == '#') //End of the line
+                {
+                    str[i] = '\0';
+                    return TRUE;
                 }
                 i++;
             }
@@ -148,18 +154,78 @@ bool add_semicolon(char* str)
 
 
 
+// //Retreiving token list from a string
+// char** retreive_token(char* line, char* const separator)
+// {
+//     char** tokens = (char**)malloc(sizeof(char*)*128); //MAX 128 elements per line
+//     char* token_temp, temp;
+// 	int i = 0; //Used to count tokens
+// 	tokens[i] = strtok(line,separator); //Retreiving first token
+// 	while(tokens[i] != NULL) //As long as we still have tokens
+// 	{
+// 		i = i + 1; //Next token count
+// 		tokens[i] = strtok(NULL,separator); //Reading next token
+// 	}
+
+//     //Returning token list ended by NULL value
+//     return tokens;
+// }
+
 //Retreiving token list from a string
-char** retreive_token(char* line, char* const separator)
+char** retreive_token(char* line, char const separator)
 {
-    char** tokens = (char**)malloc(sizeof(char*)*128); //MAX 128 elements per line
-    char* token_temp, temp;
-	int i = 0; //Used to count tokens
-	tokens[i] = strtok(line,separator); //Retreiving first token
-	while(tokens[i] != NULL) //As long as we still have tokens
-	{
-		i = i + 1; //Next token count
-		tokens[i] = strtok(NULL,separator); //Reading next token
-	}
+    //MAX 128 elements per line
+    char** tokens = (char**)malloc(sizeof(char*)*128);
+    for(int i = 0; i < 128; i++)
+    {
+        //128 char max per token
+        tokens[i] = (char*)malloc(sizeof(char)*128);
+    }
+    //   V       | strlen = 6 CONTRE 9
+    //ADD;U2;U3  |
+    char* line_temp = line;
+    int i = 0;
+    while((line_temp = strchr(line,separator)) != NULL)
+    {
+        //Copy of the string before the caracter we found
+        strncpy(tokens[i],line,strlen(line) - strlen(line_temp));
+        line = line_temp + 1; //Skipping the seperator
+        i = i + 1;
+    }
+
+    //NULL means no more separtor, i.e. last token
+    tokens[i] = line;
+    tokens[i+1] = NULL;
+
+    //If a string has been cutted, we reconstruct it
+    i = 0;
+    while(tokens[i] != NULL)
+    {
+        if(strchr(tokens[i],'\"') != NULL && strchr(tokens[i]+1,'\"') == NULL) //i.e opening quote but no closing quote = string cutted
+        {
+            int j = 1;
+            while((strchr(tokens[i+j],'\"') == NULL)) //i.e not closing quote yet
+            {
+                strcat(tokens[i],";");
+                strcat(tokens[i],tokens[i+j]);
+                j = j + 1;
+            }
+
+            //We found the closing quote, we add it
+            strcat(tokens[i],";");
+            strcat(tokens[i],tokens[i+j]);
+
+            //Now we need to move the rest of the words
+            int k = 1;
+            while(tokens[i+j+k] != NULL)
+            {
+                tokens[i+k] = tokens[i+j+k];
+                k = k + 1;
+            }
+            tokens[i+k] = NULL;
+        }
+        i = i + 1;
+    }
 
     //Returning token list ended by NULL value
     return tokens;

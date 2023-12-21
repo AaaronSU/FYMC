@@ -43,8 +43,14 @@ int main(int argc, char** argv)
 
 
 
-
-
+    // char temp[1024];
+    // char str[] = "add U1,   U2   \"h;;;e;ytest\"#izi";
+    // printf("original string : %s\n",str);
+    // add_semicolon(str);
+    // remove_space(str,temp);
+    // char** tokens = retreive_token(temp,';');
+    // print_tokens_line(tokens);
+    
 
 
 
