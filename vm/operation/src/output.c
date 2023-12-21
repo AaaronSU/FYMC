@@ -1,30 +1,26 @@
 #include <stdio.h>
 #include <output.h>
 
-void outu(CPU *cpu, u32 instruction)
+void outu(CPU *cpu, Instruction inst)
 {
-    Instruction inst = parse_instruction(instruction);
     printf("%llu\n", cpu->U[inst.destination]);
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void outs(CPU *cpu, u32 instruction)
+void outs(CPU *cpu, Instruction inst)
 {
-    Instruction inst = parse_instruction(instruction);
     printf("%lld\n", cpu->U[inst.destination]);
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void outf(CPU *cpu, u32 instruction)
+void outf(CPU *cpu, Instruction inst)
 {
-    Instruction inst = parse_instruction(instruction);
     printf("%f\n", cpu->F[inst.destination]);
     cpu->IP += SIZE_INSTRUCTION;
 }
 
-void outa(CPU *cpu, u32 instruction)
+void outa(CPU *cpu, Instruction inst)
 {
-    Instruction inst = parse_instruction(instruction);
     printf("%c\n", (char)(cpu->U[inst.destination] & 0xFF));
     cpu->IP += SIZE_INSTRUCTION;
 }
@@ -36,10 +32,9 @@ void outa(CPU *cpu, u32 instruction)
 //      - buffer : buffer where store data
 
 // Need to add overflow memory checking.
-void outb(CPU *cpu, u32 instruction)
+void outb(CPU *cpu, Instruction inst)
 {
     printf("welcome\n");
-    Instruction inst = parse_instruction(instruction);
     // printf("%d", inst.destination);
     u64 adress = cpu->U[inst.destination];
     printf("value: %d\n", adress);
@@ -77,9 +72,8 @@ void outb(CPU *cpu, u32 instruction)
     cpu->IP += 4;
 }
 
-void outx(CPU *cpu, u32 instruction)
+void outx(CPU *cpu, Instruction inst)
 {
-    Instruction inst = parse_instruction(instruction);
     printf("0x%llX\n", cpu->U[inst.destination]);
     cpu->IP += SIZE_INSTRUCTION;
 }

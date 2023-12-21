@@ -1,13 +1,13 @@
 #include "cpu.h"
 #include "type.h"
 
-void cmpu(CPU *cpu, u32 opcode) {}
-void cmps(CPU *cpu, u32 opcode) {}
-void cmpf(CPU *cpu, u32 opcode) {}
-void je(CPU *cpu, u32 opcode) {}
-void jne(CPU *cpu, u32 opcode) {}
-void jge(CPU *cpu, u32 opcode) {}
-void jl(CPU *cpu, u32 opcode) {}
-void jle(CPU *cpu, u32 opcode) {}
-void jz(CPU *cpu, u32 opcode) {}
-void jnz(CPU *cpu, u32 opcode) {}
+void cmpu(CPU *cpu, Instruction instruction) {}
+void cmps(CPU *cpu, Instruction instruction) {}
+void cmpf(CPU *cpu, Instruction instruction) {}
+void je(CPU *cpu, Instruction instruction) {}
+void jne(CPU *cpu, Instruction instruction) {}
+void jge(CPU *cpu, Instruction instruction) {}
+void jl(CPU *cpu, Instruction instruction) {}
+void jle(CPU *cpu, Instruction instruction) {}
+void jz(CPU *cpu, Instruction instruction) {}
+void jnz(CPU *cpu, Instruction instruction) {}

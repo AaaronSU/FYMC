@@ -19,7 +19,7 @@
 #include "lecture.h"
 #include "compare_jump.h"
 
-void (*opcode_functions[])(CPU *, u32) = {
+void (*opcode_functions[])(CPU *, Instruction) = {
     loadu, loads, loadf,                      // 0, 1, 2
     loadv, loadt, loadg,                      // 3, 4, 5
     storeu, stores, storef,                   // 6, 7, 8
@@ -63,7 +63,8 @@ int main()
         {
             exit(1);
         }
-        opcode_functions[opcode](&cpu, cpu.BinaryFile[cpu.IP]);
+        Instruction inst = parse_instruction(cpu.BinaryFile[cpu.IP]);
+        opcode_functions[opcode](&cpu, inst);
 
         // cpu.IP += 1;
     }

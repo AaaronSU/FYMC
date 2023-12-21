@@ -10,10 +10,9 @@
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loadu(CPU *cpu, u32 instruction)
+void loadu(CPU *cpu, Instruction inst)
 {
     // TODO : overflow
-    Instruction inst = parse_instruction(instruction);
     u8 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
     if (addr >= MEMORY_SIZE)
@@ -32,9 +31,8 @@ void loadu(CPU *cpu, u32 instruction)
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loads(CPU *cpu, u32 instruction)
+void loads(CPU *cpu, Instruction inst)
 {
-    Instruction inst = parse_instruction(instruction);
     u8 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
@@ -54,9 +52,8 @@ void loads(CPU *cpu, u32 instruction)
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loadf(CPU *cpu, u32 instruction)
+void loadf(CPU *cpu, Instruction inst)
 {
-    Instruction inst = parse_instruction(instruction);
     u8 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
@@ -76,9 +73,8 @@ void loadf(CPU *cpu, u32 instruction)
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loadv(CPU *cpu, u32 instruction)
+void loadv(CPU *cpu, Instruction inst)
 {
-    Instruction inst = parse_instruction(instruction);
     u8 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
@@ -101,9 +97,8 @@ void loadv(CPU *cpu, u32 instruction)
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loadt(CPU *cpu, u32 instruction)
+void loadt(CPU *cpu, Instruction inst)
 {
-    Instruction inst = parse_instruction(instruction);
     u8 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
@@ -126,9 +121,8 @@ void loadt(CPU *cpu, u32 instruction)
  * @param cpu Pointer to the CPU structure.
  * @param instruction Structure containing details of the instruction (e.g., source, destination).
  */
-void loadg(CPU *cpu, u32 instruction)
+void loadg(CPU *cpu, Instruction inst)
 {
-    Instruction inst = parse_instruction(instruction);
     u8 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
