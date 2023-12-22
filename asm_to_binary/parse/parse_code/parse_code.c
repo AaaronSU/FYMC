@@ -86,16 +86,32 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 	//now we need to check if they match
 
 	//Step 1 : a register begin with U,S,F,V,T or G
-	char register_type = reg[0];
+	char register_type[128];
+	int i = 0;
+	while(isalpha(reg[i]))
+	{
+		register_type[i] = reg[i];
+		i++;
+	}
+	register_type[i] = '\0';
 
-	if(register_type != 'U' &&
-	   register_type != 'S' &&
-	   register_type != 'F' &&
-	   register_type != 'V' &&
-	   register_type != 'T' &&
-	   register_type != 'G'
-	) {
-		fprintf(stderr,"Error : no register begin with %c.\n",register_type);
+	i = 0;
+	while(register_list[i][0] != NULL)
+	{
+		if(strcmp(register_type,register_list[i][0]) == 0)
+		{
+			i++;
+			break;
+		}
+		else
+		{
+			i++;
+		}
+	}
+
+	if(register_list[i][0] == NULL)
+	{
+		fprintf(stderr,"Error : no register begin with %s.\n",register_type);
 		return FALSE;
 	}
 
@@ -104,7 +120,7 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 	char** types_list = NULL;
 	for(int i = 0; register_list[i] != NULL; i++)
 	{
-		if(register_list[i][0][0] == register_type)
+		if(strcmp(register_type,register_list[i][0]) == 0)
 		{
 			//We are at the right place in the list
 			//We can retreive datas
@@ -116,13 +132,13 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 
 	//Step 2 : register number range
 	//We first check if we only have numbers and not some letters (else the conversion from string to int may be wrong)
-	if(reg[1] == '\0')
+	if(reg[strlen(register_type)] == '\0')
 	{
 		fprintf(stderr,"Error : invalid register number value (no number).\n");
 		return FALSE;
 	}
 
-	int i = 1; //This take in account that register may have different number size
+	i = strlen(register_type); //This take in account that register may have different number size
 	while(reg[i] != '\0')
 	{
 		if(!isdigit(reg[i]))
@@ -134,9 +150,9 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 	}
 
 	//Step 3 : is the number between 1 and MAX VALUE ?
-	if(atoi(&reg[1]) < 1 || atoi(&reg[1]) > register_range)
+	if(atoi(&reg[strlen(register_type)]) < 1 || atoi(&reg[strlen(register_type)]) > register_range)
 	{
-		if(atoi(&reg[1]) < 1)
+		if(atoi(&reg[strlen(register_type)]) < 1)
 		{
 			fprintf(stderr,"Error : register number too low (must be between 1 and %d).\n",register_range);
 		}
