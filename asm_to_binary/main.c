@@ -29,6 +29,10 @@ int main(int argc, char** argv)
     // char* loaded_file = load_file(argv[1]);
 
 
+    // char str[] = "add;U1;U2";
+    // correct_op_code(retreive_token(str,';'),op_name_list[0],register_list);
+
+
     long long int nb_code = 0;
     long long int nb_data = 0;
 
