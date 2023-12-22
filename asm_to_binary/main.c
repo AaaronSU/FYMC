@@ -6,6 +6,8 @@
 #include "parse/parse.h"
 #include "assembly/assembly.h"
 
+#define malloc_size 128
+
 // WARNING We don't handle immediate values just yet !!!!!!!!!!!!!!
 
 /// @brief Main function, used to launch big part of the asm to binary traduction
@@ -20,11 +22,27 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    char*** op_name_list; //Where the op name and specification are stored
-    op_name_list = tokenize("op_codes");
+    char*** op_name_list = (char***)malloc(sizeof(char**)*malloc_size); //Where the op name and specification are stored
+    char*** register_list = (char***)malloc(sizeof(char**)*malloc_size);
+    for(int i = 0; i < 128; i++)
+    {
+        op_name_list[i] = (char**)malloc(sizeof(char*)*malloc_size);
+        register_list[i] = (char**)malloc(sizeof(char*)*malloc_size);
+        for(int j = 0; j < 128; j++)
+        {
+            op_name_list[i][j] = (char*)malloc(sizeof(char)*malloc_size);
+            register_list[i][j] = (char*)malloc(sizeof(char)*malloc_size);
+        }
+    }
 
-    char*** register_list; //Where the registers infos are stored
-    register_list = tokenize("register_list");
+    tokenize("op_codes",op_name_list);
+    tokenize("register_list",register_list);
+
+    print_tokens_list(op_name_list);
+    print_tokens_list(register_list);
+
+    free_char3(op_name_list,128,128);
+    free_char3(register_list,128,128);
 
     //Loading the code in memory for faster accesses
     // NOTE: Yeah we might do that, but right now no
@@ -34,7 +52,7 @@ int main(int argc, char** argv)
     // char str[] = "add;U1;U2";
     // correct_op_code(retreive_token(str,';'),op_name_list[0],register_list);
 
-
+    /*
     long long int nb_code = 0;
     long long int nb_data = 0;
 
@@ -148,7 +166,7 @@ int main(int argc, char** argv)
     // assembly();
 
     //We dont need the file loaded in memory anymore
-    free(file);
+    free(file);*/
 
     return EXIT_SUCCESS;
 }

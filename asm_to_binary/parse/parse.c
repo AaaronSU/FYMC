@@ -176,15 +176,8 @@ bool add_semicolon(char* str)
 // }
 
 //Retreiving token list from a string
-char** retreive_token(char* line, char const separator)
+void retreive_token(char* line, char const separator, char** tokens)
 {
-    //MAX 128 elements per line
-    char** tokens = (char**)malloc(sizeof(char*)*128);
-    for(int i = 0; i < 128; i++)
-    {
-        //128 char max per token
-        tokens[i] = (char*)malloc(sizeof(char)*128);
-    }
     //   V       | strlen = 6 CONTRE 9
     //ADD;U2;U3  |
     char* line_temp = line;
@@ -232,9 +225,6 @@ char** retreive_token(char* line, char const separator)
         }
         i = i + 1;
     }
-
-    //Returning token list ended by NULL value
-    return tokens;
 }
 
 
@@ -407,7 +397,11 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
     char ligne[1024];
     char* char_ptr = malloc(1024);
     char* char_ptr_tmp = malloc(1024);
-    char** token_thing;
+    char** token_thing = (char**)malloc(sizeof(char*)*128);
+    for(int i = 0; i < 128; i++)
+    {
+        token_thing[i] = (char*)malloc(sizeof(char)*128);
+    }
     if (*nb_data == -1 || *nb_code == -1)
         return FALSE;  // code and / or data sections not placed correctly
 
@@ -434,7 +428,7 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
             if (char_ptr_tmp[0] == '\n')
                     {--i; continue;}
 
-            token_thing = retreive_token(char_ptr_tmp, ';');
+            retreive_token(char_ptr_tmp, ';',token_thing);
             if (is_valid(token_thing) == FALSE)
                 return FALSE;
             // WARNING: Pas trop le temps de test si ce genre de carabistouille fonctionne
@@ -463,7 +457,7 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
         if (char_ptr_tmp[0] == '\n')
             {--i; continue;}
 
-        token_thing = retreive_token(char_ptr_tmp, ';');
+        retreive_token(char_ptr_tmp, ';',token_thing);
         if (correct_line(token_thing, op_name_list, register_list) == FALSE)
             return FALSE;
         // WARNING
@@ -476,12 +470,7 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
     // free(char_ptr);
     free(char_ptr_tmp);
 
-    for(int i = 0; i < 128; i++)
-    {
-        //128 char max per token
-        free(token_thing[i]);
-    }
-    free(token_thing);
+    free_char2(token_thing,128);
 
     return TRUE;
 }

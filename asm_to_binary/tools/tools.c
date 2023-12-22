@@ -96,15 +96,13 @@ void print_tokens_line(char** const tokens)
 
 /// @brief function that load all the registers saved in a file. They will be used for parsing
 /// @return the list of token of for each register
-char*** tokenize(char* const fileName)
+void tokenize(char* const fileName, char*** tokens_list)
 {
     if(access(fileName,F_OK) != 0)
     {
         fprintf(stderr,"Error: the %s file is missing, cannot proceed further.\n",fileName);
         abort();
     }
-
-    char*** token_list = (char***)malloc(sizeof(char**)*128);
 
     FILE* fileptr = fopen(fileName,"r");
     char line[128];
@@ -113,15 +111,14 @@ char*** tokenize(char* const fileName)
     while(fgets(line,127,fileptr) != NULL)
     {
         // printf("LINE TO TOKENIZE : %s",line);
-        token_list[i] = retreive_token(line,';');
+        retreive_token(line,';',tokens_list[i]);
         // print_tokens_line(token_list[i]);
         // printf("\n");
         i++;
     }
-    token_list[i] = NULL;
+    tokens_list[i] = NULL;
 
     fclose(fileptr);
-    return token_list;
 }
 
 

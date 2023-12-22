@@ -14,7 +14,7 @@ int size_without_chara(const char* str,
 
 void remove_space(const char* str_in, char* str_out);
 bool add_semicolon(char*);
-char** retreive_token(char* const line, char const separator);
+void retreive_token(char* const line, char const separator,char**);
 
 bool alphanumeric(int);
 
