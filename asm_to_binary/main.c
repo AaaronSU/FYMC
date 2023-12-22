@@ -7,6 +7,7 @@
 #include "assembly/assembly.h"
 
 // WARNING We don't handle immediate values just yet !!!!!!!!!!!!!!
+// WARNING Ça marche pas, mais ça marche un peu avec LeakSanitizer
 
 /// @brief Main function, used to launch big part of the asm to binary traduction
 /// @param argc Number of arguments in the command line

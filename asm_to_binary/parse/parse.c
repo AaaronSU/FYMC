@@ -445,8 +445,7 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
                     all_good = FALSE;
                     break;
                 }
-            // WARNING: Pas trop le temps de test si ce genre de carabistouille fonctionne
-            // Si ça se trouve faut utiliser une fonction de copy ou quoi jsp
+            // WARNING: Y'a un pb dans la matrice
             size_t k = 0;
             while (token_thing[k] != NULL)
             {
