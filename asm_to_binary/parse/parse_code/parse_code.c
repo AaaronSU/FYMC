@@ -1,4 +1,5 @@
 #include "parse_code.h"
+#include "../../tools/tools.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -59,6 +60,8 @@ bool correct_alias(char** array)
 /// @return return the line where the data of the op code are stored (-1 if the op code does not exist)
 int detect_op_code(char* op_name, char*** op_name_list)
 {
+	printf("%s\n", op_name);
+	printf("%c\n", op_name_list[0][0][0]);
   	for (int i = 0; op_name_list[i][0] != NULL; i++)
   	{
     	if(strcmp(op_name,op_name_list[i][0]) == 0)
@@ -194,12 +197,13 @@ bool correct_op_code(char** tokens, char** op_code_datas, char*** register_list)
 
 bool correct_line(char** line, char*** op_name_list, char*** register_list)
 {
+
 	// Vérifie les alias
 	if (detect_alias(line) == TRUE && correct_alias(line) == FALSE)
 		return FALSE;
-
 	// Vérifie op_code et registres
 	int position = 0;
+	printf("%c\n", op_name_list[0][0][0]);
 	position = detect_op_code(line[0], op_name_list);
 	if (position == -1)
 		return FALSE;

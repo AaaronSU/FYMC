@@ -14,7 +14,7 @@ bool has_only_valid_characters(char** array)
   size_t j = 0;
   while (i < 2)
     {
-      for (j = 0; j < strlen(array[i]); ++j)
+      for (j = 0; j < strlen(array[i]) - 1; ++j)
       {
         if (!((array[i][j] >= 65 && array[i][j] <= 90)
             || (array[i][j] >= 97 && array[i][j] <= 122)
@@ -34,7 +34,7 @@ bool seems_valid(char** array)
   int i = 0;
 
   // You can't have an alias in data section I believe
-  if (!has_only_valid_characters(array))
+  if (has_only_valid_characters(array) == FALSE)
     return FALSE;
 
   while (array[i] != NULL)
@@ -63,7 +63,7 @@ bool is_in_list(char* str, char** array)
 bool type_exists(char* str)
 {
   // This array shall not be created in the function !
-  char* types_array[5] = {"u64", "i64", "f64", "ascii", NULL};
+  char* types_array[5] = {"u64", "i64", "f64", "ascii\0", NULL};
 
   // Checks if element is a valid type
   return is_in_list(str, types_array);
@@ -159,6 +159,7 @@ bool good_ascii(char* str)
   }
 
   char* next_quote = strchr(&str[1],'\"'); //Skipping first "
+  char* last_quote = strrchr(str,'\"'); //Skipping first "
 
   if(next_quote == NULL)
   {
@@ -166,7 +167,7 @@ bool good_ascii(char* str)
     return FALSE;
   }
 
-  if(next_quote[1] != '\0')
+  if(next_quote != last_quote)
   {
     fprintf(stderr,"Error : \" detected which is not the quote that close the string.\n");
     return FALSE;
@@ -189,13 +190,13 @@ bool is_valid(char** array)
     {
         if (name_is_valid(array[1]))
         {
-          if (strcmp(array[0], "u64"))
+          if (strcmp(array[0], "u64") == 0)
             return good_integer(array[2], FALSE);
-          if (strcmp(array[0], "i64"))
+          if (strcmp(array[0], "i64") == 0)
             return good_integer(array[2], FALSE);
-          if (strcmp(array[0], "f64"))
+          if (strcmp(array[0], "f64") == 0)
             return good_float(array[2]);
-          if (strcmp(array[0], "ascii"))
+          if (strcmp(array[0], "ascii") == 0)
             return good_ascii(array[2]);
         }
     }

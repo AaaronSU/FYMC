@@ -6,6 +6,7 @@
 #include "parse_code/parse_code.h"
 #include "parse_data/parse_data.h"
 #include "parse.h"
+#include "../tools/tools.h"
 
 
 
@@ -100,6 +101,7 @@ bool add_semicolon(char* str)
                 if(str[i] == ',') //This will also mark the end of the word
                 {
                     str[i] = ' ';
+                    break;
                 }
 
                 if(str[i] == '#') //End of the line
@@ -138,6 +140,7 @@ bool add_semicolon(char* str)
                 str[i++] = ';';
             }
 
+            ++i;
             continue; //Next char
         }
 
@@ -189,6 +192,7 @@ char** retreive_token(char* line, char const separator)
     {
         //Copy of the string before the caracter we found
         strncpy(tokens[i],line,strlen(line) - strlen(line_temp));
+        tokens[i][strlen(line) - strlen(line_temp)] = '\0';
         line = line_temp + 1; //Skipping the seperator
         i = i + 1;
     }
@@ -310,7 +314,7 @@ long long int compter(char* buffer, FILE *in, bool has_data, bool has_code)
         char* ligne = strtok(buffer, " \t");
         if (ligne)
         {
-            if (ligne[0] == '#')
+            if (ligne[0] == '#' || ligne[0] == '\n')
                 {continue;}
             else
                 {++retour;}
@@ -337,30 +341,39 @@ void nb_ligne_section(char* const nom, long long int* nb_data, long long int* nb
     *nb_data = 0;
     *nb_code = 0;
 
-    if (is_in_string(buffer, "data:"))  // Si data en premier
+    while (fgets(buffer, 1024, in))
     {
-        has_data = TRUE;
-        *nb_data = compter(buffer, in, has_data, has_code);
-        if (*nb_data == -1)
-            return; // NOTE: Crash here?
-        *nb_code = compter(buffer, in, has_data, has_code);
-        if (*nb_code == -1)
-            return; // NOTE: Crash here?
-    }
-    else if (is_in_string(buffer, "code:"))  // Si code en premier
-    {
-        has_code = TRUE;
-        *nb_code = compter(buffer, in, has_data, has_code);
-        if (*nb_code == -1)
-            return; // NOTE: Crash here?
-    }
-    else // Ni data ni code en premier ?
+        if (is_in_string(buffer, "data:"))  // Si data en premier
         {
-            // Set to avoid problems
-            *nb_code = -1;
-            *nb_data = -1;
-            return;  // NOTE: Crash here?
+            has_data = TRUE;
+            *nb_data = compter(buffer, in, has_data, has_code);
+            if (*nb_data == -1)
+                return; // NOTE: Crash here?
+            *nb_code = compter(buffer, in, has_data, has_code);
+            if (*nb_code == -1)
+                return; // NOTE: Crash here?
+            break;
         }
+        else if (is_in_string(buffer, "code:"))  // Si code en premier
+        {
+            has_code = TRUE;
+            *nb_code = compter(buffer, in, has_data, has_code);
+            if (*nb_code == -1)
+                return; // NOTE: Crash here?
+            break;
+        }
+        else // Ni data ni code en premier ?
+            {
+                char string_tmp[1024];
+                remove_space(buffer, string_tmp);
+                if (buffer[0] == '#' || buffer[0] == '\n')
+                    continue;
+                // Set to avoid problems
+                *nb_code = -1;
+                *nb_data = -1;
+                return;  // NOTE: Crash here?
+            }
+    }
 
     (void)fclose(in);
     return;
@@ -376,7 +389,7 @@ void nb_ligne_section(char* const nom, long long int* nb_data, long long int* nb
 // op_name_list et register_list => voir main.c
 bool parse(char* const nom, char*** data_array, char*** code_array,
            long long int* const nb_data, long long int* const nb_code,
-           char*** const op_name_list, char*** const register_list)
+           char*** op_name_list, char*** register_list)
 {
     FILE *file = fopen(nom, "r");
 
@@ -390,19 +403,35 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
     long long int indice_data = 0;
     long long int indice_code = 0;
     char ligne[1024];
+    char* char_ptr = malloc(1024);
+    char* char_ptr_tmp = malloc(1024);
     char** token_thing;
-    nb_ligne_section(nom, nb_data, nb_code);
     if (*nb_data == -1 || *nb_code == -1)
         return FALSE;  // code and / or data sections not placed correctly
 
     // Handling data section
-    if (nb_data != 0)
+    if (*nb_data != 0)
     {
-        fgets(ligne, 1024, file); // Having fgets skip data: line
+        // Move towards data section
+        char_ptr = fgets(ligne, 1024, file);
+        while (strcmp(char_ptr, "data:") == FALSE)
+        {
+            char_ptr = fgets(ligne, 1024, file);
+        }
+        char_ptr = fgets(ligne, 1024, file);
+
         for (size_t i = 0; i < *nb_data; ++i)
         {
-            add_semicolon(fgets(ligne, 1024, file));
-            token_thing = retreive_token(ligne, ';');
+            char_ptr = fgets(ligne, 1024, file);
+            if (is_in_string(char_ptr, "#"))
+                { --i; continue;}
+            add_semicolon(char_ptr);
+            remove_space(char_ptr, char_ptr_tmp);
+            if (char_ptr_tmp[0] == '\n')
+                    {--i; continue;}
+
+            token_thing = retreive_token(char_ptr_tmp, ';');
+            print_tokens_line(token_thing);
             if (is_valid(token_thing) == FALSE)
                 return FALSE;
             // WARNING: Pas trop le temps de test si ce genre de carabistouille fonctionne
@@ -413,19 +442,36 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
     }
 
     // Handling code section
-    fgets(ligne, 1024, file); // Having fgets skip code: line
-        for (size_t i = 0; i < *nb_code; ++i)
-        {
-            add_semicolon(fgets(ligne, 1024, file));
-            token_thing = retreive_token(ligne, ';');
-            if (correct_line(token_thing, op_name_list, register_list) == FALSE)
-                return FALSE;
-            // WARNING
-            code_array[indice_code] = token_thing;
-            ++indice_code;
-        }
+    // Move towards code section
+    char_ptr = fgets(ligne, 1024, file);
+    while (strcmp(char_ptr, "code:") == FALSE)
+    {
+        char_ptr = fgets(ligne, 1024, file);
+    }
+    char_ptr = fgets(ligne, 1024, file);
+
+    for (size_t i = 0; i < *nb_code; ++i)
+    {
+        char_ptr = fgets(ligne, 1024, file);
+        if (is_in_string(char_ptr, "#"))
+            {--i; continue;}
+        add_semicolon(char_ptr);
+        remove_space(char_ptr, char_ptr_tmp);
+        if (char_ptr_tmp[0] == '\n')
+            {--i; continue;}
+
+        token_thing = retreive_token(char_ptr_tmp, ';');
+        print_tokens_line(token_thing);
+        if (correct_line(token_thing, op_name_list, register_list) == FALSE)
+            return FALSE;
+        // WARNING
+        code_array[indice_code] = token_thing;
+        ++indice_code;
+    }
 
     (void)fclose(file);
+    free(char_ptr);
+    free(char_ptr_tmp);
 
     return TRUE;
 }

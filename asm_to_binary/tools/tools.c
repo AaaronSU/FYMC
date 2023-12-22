@@ -79,13 +79,9 @@ void print_tokens_line(char** const tokens)
     printf("LINE : [");
     while(tokens[i] != NULL)
     {
-        printf("%s",tokens[i++]);
-        if(tokens[i] != NULL)
-        {
-            printf(",");
-        }
+        printf("%s,",tokens[i++]);
     }
-    printf(",NULL]\n");
+    printf("NULL]\n");
 }
 
 

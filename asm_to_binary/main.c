@@ -6,6 +6,8 @@
 #include "parse/parse.h"
 #include "assembly/assembly.h"
 
+// WARNING We don't handle immediate values just yet !!!!!!!!!!!!!!
+
 /// @brief Main function, used to launch big part of the asm to binary traduction
 /// @param argc Number of arguments in the command line
 /// @param argv Values of arguments in the command line
@@ -37,6 +39,8 @@ int main(int argc, char** argv)
     char*** data_array = malloc(nb_data);
     char*** code_array = malloc(nb_code);
 
+    print_tokens_list(op_name_list);
+
     // NOTE: Maybe something will go wrong with pointers, const and stuff idk
     // TODO: test parse (normal cases, empty sections, secctions of size 1 and other weird cases)
     bool parsing_went_alright = parse(argv[1], data_array, code_array,
@@ -46,6 +50,8 @@ int main(int argc, char** argv)
     printf("%d\n", parsing_went_alright);
     free(data_array);
     free(code_array);
+    free(op_name_list);
+    free(register_list);
 
 
 
