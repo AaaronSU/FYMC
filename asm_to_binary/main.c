@@ -52,8 +52,12 @@ int main(int argc, char** argv)
                                         op_name_list, register_list);
 
     printf("%d\n", parsing_went_alright);
-    free(data_array);
-    free(code_array);
+
+
+    if (parsing_went_alright)
+        write_stuff(argv[1], data_array, code_array,
+                    &nb_data, &nb_code, op_name_list, register_list);
+
 
     for (int i = 0; i < 128; i++)
     {
@@ -77,6 +81,8 @@ int main(int argc, char** argv)
 
     free(op_name_list);
     free(register_list);
+    free(data_array);
+    free(code_array);
 
 
     // //We now read how many lines we have in data and how many lines we have in code
