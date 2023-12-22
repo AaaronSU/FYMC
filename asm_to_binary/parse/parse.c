@@ -192,13 +192,14 @@ char** retreive_token(char* line, char const separator)
     {
         //Copy of the string before the caracter we found
         strncpy(tokens[i],line,strlen(line) - strlen(line_temp));
-        tokens[i][strlen(line) - strlen(line_temp)] = '\0';
         line = line_temp + 1; //Skipping the seperator
         i = i + 1;
     }
 
-    //NULL means no more separtor, i.e. last token
+    //NULL means no more separator, i.e. last token
     tokens[i] = line;
+    char* slash_n = strchr(line,'\n');
+    slash_n[0] = '\0';
     tokens[i+1] = NULL;
 
     //If a string has been cutted, we reconstruct it

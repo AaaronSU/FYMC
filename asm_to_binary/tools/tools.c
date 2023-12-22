@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include "../parse/parse.h"
 #include "tools.h"
 
 
@@ -85,6 +86,17 @@ void print_tokens_line(char** const tokens)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
 /// @brief function that load all the registers saved in a file. They will be used for parsing
 /// @return the list of token of for each register
 char*** tokenize(char* const fileName)
@@ -101,29 +113,23 @@ char*** tokenize(char* const fileName)
         token_list[i] = (char**)malloc(sizeof(char*)*128);
         for (int y = 0; y < 128; y++)
         {
-            token_list[i][y] = NULL; //Initialize to NULL
+            token_list[i][y] = (char*)malloc(sizeof(char)*128);
         }
     }
 
     FILE* fileptr = fopen(fileName,"r");
-    char line[64];
+    char line[128];
     int i = 0;
 
-    while(fgets(line,64,fileptr) != NULL)
+    while(fgets(line,128,fileptr) != NULL)
     {
-        line[strcspn(line,"\n")] = '\0'; //Remove newline character if present
-
-        int y = 0;
-        char* token = strtok(line, ";");
-        while(token != NULL)
-        {
-            //Allocate memory for the token and copy it
-            token_list[i][y] = strdup(token);
-            token = strtok(NULL,";");
-            y++;
-        }
+        printf("LINE TO TOKENIZE : %s",line);
+        token_list[i] = retreive_token(line,';');
+        print_tokens_line(token_list[i]);
+        printf("\n");
         i++;
     }
+    token_list[i][0] = NULL;
 
     fclose(fileptr);
     return token_list;
