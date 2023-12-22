@@ -94,9 +94,6 @@ void print_tokens_line(char** const tokens)
 
 
 
-
-
-
 /// @brief function that load all the registers saved in a file. They will be used for parsing
 /// @return the list of token of for each register
 char*** tokenize(char* const fileName)
@@ -108,20 +105,12 @@ char*** tokenize(char* const fileName)
     }
 
     char*** token_list = (char***)malloc(sizeof(char**)*128);
-    for (int i = 0; i < 128; i++)
-    {
-        token_list[i] = (char**)malloc(sizeof(char*)*128);
-        for (int y = 0; y < 128; y++)
-        {
-            token_list[i][y] = (char*)malloc(sizeof(char)*128);
-        }
-    }
 
     FILE* fileptr = fopen(fileName,"r");
     char line[128];
     int i = 0;
 
-    while(fgets(line,128,fileptr) != NULL)
+    while(fgets(line,127,fileptr) != NULL)
     {
         // printf("LINE TO TOKENIZE : %s",line);
         token_list[i] = retreive_token(line,';');
@@ -129,7 +118,7 @@ char*** tokenize(char* const fileName)
         // printf("\n");
         i++;
     }
-    token_list[i][0] = NULL;
+    token_list[i] = NULL;
 
     fclose(fileptr);
     return token_list;
@@ -140,22 +129,55 @@ char*** tokenize(char* const fileName)
 void print_tokens_list(char*** const token_list)
 {
     //When we find an empty line we stop
-    for(int i = 0; token_list[i][0] != NULL; i++)
+    int i = 0;
+    while(token_list[i] != NULL)
     {
-        printf("LINE %d : [",i);
-        int y = 0;
-        while(token_list[i][y] != NULL)
+        print_tokens_line(token_list[i]);
+        i++;
+    }
+}
+
+
+void free_char2(char** char2, int size_dim_1)
+{
+    //If already empty
+    if(char2 == NULL)
+    {
+        return;
+    }
+
+    for(int i = 0; i < size_dim_1; i++)
+    {
+        if(char2[i] != NULL)
         {
-            printf("%s",token_list[i][y]);
-            if(token_list[i][y + 1] != NULL)
-            {
-                printf(",");
-            }
-            else
-            {
-                printf(",NULL]\n");
-            }
-            y++;
+            free(char2[i]);
         }
     }
+    free(char2);
+}
+
+
+void free_char3(char*** char3, int size_dim_1, int size_dim_2)
+{
+    //If already empty
+    if(char3 == NULL)
+    {
+        return;
+    }
+
+    for(int i = 0; i < size_dim_1; i++)
+    {
+        if(char3[i] != NULL)
+        {
+            for(int j = 0; j < size_dim_2; j++)
+            {
+                if(char3[i][j] != NULL)
+                {
+                    free(char3[i][j]);
+                }
+            }
+            free(char3[i]);
+        }
+    }
+    free(char3);
 }

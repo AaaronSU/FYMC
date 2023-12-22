@@ -72,6 +72,7 @@ void remove_space(char const *str_in, char *str_out)
         }
         ++i;
     }
+    free(str_tmp);
 }
 
 
@@ -474,6 +475,13 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
     // freeing char_ptr has LeakSanitizer say it's a bad pointer so I don't free it
     // free(char_ptr);
     free(char_ptr_tmp);
+
+    for(int i = 0; i < 128; i++)
+    {
+        //128 char max per token
+        free(token_thing[i]);
+    }
+    free(token_thing);
 
     return TRUE;
 }

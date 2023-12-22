@@ -63,7 +63,7 @@ bool is_in_list(char* str, char** array)
 bool type_exists(char* str)
 {
   // This array shall not be created in the function !
-  char* types_array[5] = {"u64", "i64", "f64", "ascii\0", NULL};
+  char* types_array[5] = {"u64", "i64", "f64", "ascii", NULL};
 
   // Checks if element is a valid type
   return is_in_list(str, types_array);
