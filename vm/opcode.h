@@ -1,130 +1,37 @@
-#ifndef OPCODE_H
-#define OPCODE_H
+#include "type.h"
+#include "tools.h"
+#include "cpu.h"
+#include "load.h"
+#include "conversion.h"
+#include "store.h"
+#include "move.h"
+#include "u_arithmetic_logic.h"
+#include "s_arithmetic_logic.h"
+#include "f_arithmetic_logic.h"
+#include "output.h"
+#include "lecture.h"
+#include "compare_jump.h"
 
-enum Opcode
-{
-    // 1 - Memory
-
-    // 1.1.1 - Scalar Load
-    LOADU,
-    LOADS,
-    LOADF,
-    // 1.1.2 - Vector Load
-    LOADV,
-    LOADT,
-    LOADG,
-    // 1.2.1 - Scalar Store
-    STOREU,
-    STORES,
-    STOREF,
-    // 1.2.2 - Vector Store
-    STOREV,
-    STORET,
-    STOREG,
-
-    // 2 - Data movement and type conversion
-
-    // 2.1 - Data movement
-    // 2.1.1 Move registre to an another
-    MOV,
-    MOVU,
-    MOVS,
-    MOVF,
-    MOVV,
-    MOVT,
-    MOVG,
-    // 2.1.2 Move Immediate to registre
-    MOVUI,
-    MOVSI,
-    MOVFI,
-    MOVVI,
-    MOVTI,
-    MOVGI,
-
-    // 2.2 Type conversion
-    CVTUS,
-    CVTSU,
-    CVTUF,
-    CVTFU,
-    CVTSF,
-    CVTFS,
-
-    // 3 - Unsigned arithmetic and logic
-    ADDU,
-    SUBU,
-    MULU,
-    DIVU,
-    MODU,
-    FMAU,
-    SQRTU,
-    LOGU,
-    INCU,
-    DECU,
-    ANDU,
-    ORU,
-    XORU,
-    SHLU,
-    SHRU,
-    ROLU,
-    RORU,
-    POPCNTU,
-    LMBU,
-
-    // 4 - Signed arithmetic and logic
-    ADDS,
-    SUBS,
-    MULS,
-    DIVS,
-    MODS,
-    FMAS,
-    SQRTS,
-    LOGS,
-    // INCS,
-    // DECS,
-    ANDS,
-    ORS,
-    XORS,
-    SHLS,
-    SHRS,
-    ROLS,
-    RORS,
-    POPCNTS,
-    LMBS,
-
-    // 5 - Floating-point arithmetic
-    ADDF,
-    SUBF,
-    MULF,
-    DIVF,
-    FMAF,
-    SQRTF,
-    LOGF,
-
-    // 6 - Comparaison and control flow
-    // 6.1 Comparaison
-    CMPU,
-    CMPS,
-    CMPF,
-
-    // 6.2 Control flow
-    JE,
-    JNE,
-    JGE,
-    JL,
-    JLE,
-    JZ,
-    JNZ,
-
-    // 7 - Input/Output
-    OUTU,
-    OUTS,
-    OUTF,
-    OUTA,
-    OUTB,
-    OUTX,
-
-    // 8 - Program termination
-    HLT
+void (*opcode_functions[])(CPU *, Instruction) = {
+    loadu, loads, loadf,                      // 0, 1, 2
+    loadv, loadt, loadg,                      // 3, 4, 5
+    storeu, stores, storef,                   // 6, 7, 8
+    storev, storet, storeg,                   // 9, 10, 11
+    mov, movu, movs, movf, movv, movt, movg,  // 12, 13, 14, 15, 16, 17, 18
+    movui, movsi, movfi, movvi, movti, movgi, // 19, 20, 21, 22, 23, 24
+    cvtus, cvtsu, cvtuf, cvtfu, cvtsf, cvtfs, // 25, 26, 27, 28, 29, 30
+    addu, subu, mulu, divu, modu,             // 31, 32, 33, 34, 35
+    fmau, sqrtu, logu, incu, decu,            // 36, 37, 38, 39, 40
+    andu, oru, xoru, shlu, shru,              // 41, 42, 43, 44, 45
+    rolu, roru, popcntu, lmbu,                // 46, 47, 48, 49
+    adds, subs, muls, divs,                   // 50, 51, 52, 53
+    mods, fmas, sqrts, logs,                  // 54, 55, 56, 57
+    ands, ors, xors, shls, shrs,              // 58, 59, 60, 61, 62
+    rols, rors, popcnts, lmbs,                // 63, 64, 65, 66
+    addf, subf, mulf, divf,                   // 67, 68, 69, 70
+    fmaf_, sqrtf_, logf_,                     // 71, 72, 73
+    cmpu, cmps, cmpf,                         // 74, 75, 76
+    je, jne, jge, jl, jle, jz, jnz,           // 77, 78, 79, 80, 81, 82, 83
+    outu, outs, outf, outa, outb, outx,       // 84, 85, 86, 87, 88, 89
+    // hlt                                 // 90
 };
-
-#endif

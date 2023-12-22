@@ -17,3 +17,18 @@ u8 get_offset(u16 unused)
     // les 8 bits de poids faible
     return unused & 0xFF;
 }
+
+int get_immediate(CPU *cpu)
+{
+    int i = 0;
+    int immediat = 0;
+    while (i < 8)
+    {
+        char *value_adress = &(cpu->BinaryFile[cpu->IP]);
+        int value = (int)*value_adress;
+        immediat += value << (8 - 1);
+        i++;
+        cpu->IP += 1;
+    }
+    return immediat;
+}

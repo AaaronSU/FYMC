@@ -12,8 +12,7 @@
  */
 void loadu(CPU *cpu, Instruction inst)
 {
-    // TODO : overflow
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
     if (addr >= MEMORY_SIZE)
     {
@@ -33,7 +32,7 @@ void loadu(CPU *cpu, Instruction inst)
  */
 void loads(CPU *cpu, Instruction inst)
 {
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
     if (addr >= MEMORY_SIZE)
@@ -54,7 +53,7 @@ void loads(CPU *cpu, Instruction inst)
  */
 void loadf(CPU *cpu, Instruction inst)
 {
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
     if (addr >= MEMORY_SIZE)
@@ -75,7 +74,7 @@ void loadf(CPU *cpu, Instruction inst)
  */
 void loadv(CPU *cpu, Instruction inst)
 {
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
     if (addr >= MEMORY_SIZE)
@@ -99,7 +98,7 @@ void loadv(CPU *cpu, Instruction inst)
  */
 void loadt(CPU *cpu, Instruction inst)
 {
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
     if (addr >= MEMORY_SIZE)
@@ -123,7 +122,7 @@ void loadt(CPU *cpu, Instruction inst)
  */
 void loadg(CPU *cpu, Instruction inst)
 {
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.source_1] + cpu->U[inst.source_2] + offset;
 
     if (addr >= MEMORY_SIZE)

@@ -18,7 +18,7 @@ set(HEADER_FILES
     include/compare_jump.h
 )
 
-set(SOURCE_FILES
+set(SOURCES
     src/load.c
     src/move.c
     src/store.c
@@ -33,7 +33,7 @@ set(SOURCE_FILES
 )
 
 
-add_library(operation STATIC ${SOURCE_FILES})
+add_library(operation STATIC ${SOURCES})
 target_link_libraries(operation m)
 
 target_include_directories(operation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

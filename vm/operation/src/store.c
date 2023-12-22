@@ -11,7 +11,7 @@ void storeu(CPU *cpu, Instruction inst)
     // TODO : gérer le dépassement de 1 bit + vérifier l'adresse existante ?
     // (U0, U1 [, OFFSET]), U2
 
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.destination] + cpu->U[inst.source_1] + offset; //  (U0, U1 [, OFFSET])
 
     if (addr >= MEMORY_SIZE)
@@ -29,7 +29,7 @@ void stores(CPU *cpu, Instruction inst)
     // TODO : gérer le dépassement de 1 bit + vérifier l'adresse existante ?
     // (U0, U1 [, OFFSET]), U2
 
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.destination] + cpu->U[inst.source_1] + offset; //  (U0, U1 [, OFFSET])
 
     if (addr >= MEMORY_SIZE)
@@ -47,7 +47,7 @@ void storef(CPU *cpu, Instruction inst)
     // TODO : gérer le dépassement de 1 bit + vérifier l'adresse existante ?
     // (U0, U1 [, OFFSET]), U2
 
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.destination] + cpu->U[inst.source_1] + offset; //  (U0, U1 [, OFFSET])
 
     if (addr >= MEMORY_SIZE)
@@ -62,7 +62,7 @@ void storef(CPU *cpu, Instruction inst)
 void storev(CPU *cpu, Instruction inst)
 {
 
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.destination] + cpu->U[inst.source_1] + offset;
 
     if (addr >= MEMORY_SIZE)
@@ -80,7 +80,7 @@ void storev(CPU *cpu, Instruction inst)
 void storet(CPU *cpu, Instruction inst)
 {
 
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.destination] + cpu->U[inst.source_1] + offset;
 
     if (addr >= MEMORY_SIZE)
@@ -97,7 +97,7 @@ void storet(CPU *cpu, Instruction inst)
 };
 void storeg(CPU *cpu, Instruction inst)
 {
-    u8 offset = get_offset(inst.unused);
+    u16 offset = get_offset(inst.unused);
     u64 addr = cpu->U[inst.destination] + cpu->U[inst.source_1] + offset;
 
     if (addr >= MEMORY_SIZE)

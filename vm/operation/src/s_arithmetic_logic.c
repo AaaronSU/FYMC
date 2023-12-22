@@ -6,34 +6,30 @@
 
 void adds(CPU *cpu, Instruction inst)
 {
-    // TODO : gestion de l'overflow
     cpu->S[inst.destination] = cpu->S[inst.source_1] + cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void subs(CPU *cpu, Instruction inst)
 {
-    // TODO : gestion de l'overflow
     cpu->S[inst.destination] = cpu->S[inst.source_1] - cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void muls(CPU *cpu, Instruction inst)
 {
-    // TODO : gestion de l'overflow
     cpu->S[inst.destination] = cpu->S[inst.source_1] * cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void divs(CPU *cpu, Instruction inst)
 {
-    if (cpu->S[inst.source_2] == 0)
+    if (cpu->S[inst.source_2] == 0.0)
     {
-        cpu->CF += 1; // Erreur : division par zéro
-        exit(EXIT_FAILURE);
+        cpu->CF |= 2;
     }
     cpu->S[inst.destination] = cpu->S[inst.source_1] / cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void mods(CPU *cpu, Instruction inst)
@@ -44,7 +40,7 @@ void mods(CPU *cpu, Instruction inst)
         exit(EXIT_FAILURE);
     }
     cpu->S[inst.destination] = cpu->S[inst.source_1] % cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void fmas(CPU *cpu, Instruction inst)
@@ -52,7 +48,7 @@ void fmas(CPU *cpu, Instruction inst)
     // TODO : gestion de l'overflow
 
     cpu->S[inst.destination] += cpu->S[inst.source_1] * cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void sqrts(CPU *cpu, Instruction inst)
@@ -62,7 +58,7 @@ void sqrts(CPU *cpu, Instruction inst)
         exit(EXIT_FAILURE);
     }
     cpu->S[inst.destination] = sqrt(cpu->S[inst.source_1]);
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void logs(CPU *cpu, Instruction inst)
@@ -72,25 +68,25 @@ void logs(CPU *cpu, Instruction inst)
         exit(EXIT_FAILURE);
     }
     cpu->S[inst.destination] = log(cpu->S[inst.source_1]);
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void ands(CPU *cpu, Instruction inst)
 {
     cpu->S[inst.destination] = cpu->S[inst.source_1] & cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void ors(CPU *cpu, Instruction inst)
 {
     cpu->S[inst.destination] = cpu->S[inst.source_1] | cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void xors(CPU *cpu, Instruction inst)
 {
     cpu->S[inst.destination] = cpu->S[inst.source_1] ^ cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void shls(CPU *cpu, Instruction inst)
@@ -98,7 +94,7 @@ void shls(CPU *cpu, Instruction inst)
     // TODO : gestion de l'overflow
 
     cpu->S[inst.destination] = cpu->S[inst.source_1] << cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void shrs(CPU *cpu, Instruction inst)
@@ -106,29 +102,29 @@ void shrs(CPU *cpu, Instruction inst)
     // TODO : gestion de l'overflow
 
     cpu->S[inst.destination] = cpu->S[inst.source_1] >> cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void rols(CPU *cpu, Instruction inst)
 {
     cpu->S[inst.destination] = cpu->S[inst.source_1] << ~cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void rors(CPU *cpu, Instruction inst)
 {
     cpu->S[inst.destination] = cpu->S[inst.source_1] >> ~cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void popcnts(CPU *cpu, Instruction inst)
 {
     cpu->U[inst.destination] = __builtin_popcountll(cpu->U[inst.source_1]);
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void lmbs(CPU *cpu, Instruction inst)
 {
-    // TODO
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->U[inst.destination] = __builtin_clzll(cpu->U[inst.source_1]);
+    cpu->IP += INSTRUCTION_BYTES;
 }

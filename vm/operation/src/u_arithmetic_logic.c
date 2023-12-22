@@ -10,24 +10,23 @@ void addu(CPU *cpu, Instruction inst)
 {
     // TODO : overflow à gérer
     cpu->U[inst.destination] = cpu->U[inst.source_1] + cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void subu(CPU *cpu, Instruction inst)
 {
-    if (cpu->U[inst.source_1] < cpu->U[inst.source_2])
+    if (cpu->U[inst.source_2] == 0.0)
     {
-        cpu->CF += 1; // 0: an unsigned subtraction with the first source operand lower than the second source operand
-        exit(EXIT_FAILURE);
+        cpu->CF |= 2;
     }
     cpu->U[inst.destination] = cpu->U[inst.source_1] - cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void mulu(CPU *cpu, Instruction inst)
 {
     cpu->U[inst.destination] = cpu->U[inst.source_1] * cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void divu(CPU *cpu, Instruction inst)
@@ -40,7 +39,7 @@ void divu(CPU *cpu, Instruction inst)
     }
 
     cpu->U[inst.destination] = cpu->U[inst.source_1] / cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void modu(CPU *cpu, Instruction inst)
@@ -52,20 +51,20 @@ void modu(CPU *cpu, Instruction inst)
         exit(EXIT_FAILURE);
     }
     cpu->U[inst.destination] = cpu->U[inst.source_1] % cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void fmau(CPU *cpu, Instruction inst)
 {
     // TODO : overflow à gerer
     cpu->U[inst.destination] += cpu->U[inst.source_1] * cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void sqrtu(CPU *cpu, Instruction inst)
 {
     cpu->U[inst.destination] = sqrt(cpu->U[inst.source_1]);
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void logu(CPU *cpu, Instruction inst)
@@ -75,7 +74,7 @@ void logu(CPU *cpu, Instruction inst)
         exit(EXIT_FAILURE); // mieux gerer :(
     }
     cpu->U[inst.destination] = log(cpu->U[inst.source_1]);
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void incu(CPU *cpu, Instruction inst)
@@ -88,7 +87,7 @@ void incu(CPU *cpu, Instruction inst)
     {
         exit(EXIT_FAILURE); // mieux gerer :(
     }
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void decu(CPU *cpu, Instruction inst)
@@ -101,61 +100,63 @@ void decu(CPU *cpu, Instruction inst)
     {
         exit(EXIT_FAILURE); // mieux gerer :(
     }
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void andu(CPU *cpu, Instruction inst)
 {
     cpu->U[inst.destination] = cpu->U[inst.source_1] & cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void oru(CPU *cpu, Instruction inst)
 {
     cpu->U[inst.destination] = cpu->U[inst.source_1] | cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void xoru(CPU *cpu, Instruction inst)
 {
     cpu->U[inst.destination] = cpu->U[inst.source_1] ^ cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void shlu(CPU *cpu, Instruction inst)
 {
     // TODO : gerer l'overflow du shift
     cpu->U[inst.destination] = cpu->U[inst.source_1] << cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void shru(CPU *cpu, Instruction inst)
 {
     // TODO : gerer l'overflow du shift
     cpu->U[inst.destination] = cpu->U[inst.source_1] >> cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void rolu(CPU *cpu, Instruction inst)
 {
     cpu->S[inst.destination] = cpu->S[inst.source_1] << ~cpu->S[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void roru(CPU *cpu, Instruction inst)
 {
     cpu->U[inst.destination] = cpu->U[inst.source_1] >> ~cpu->U[inst.source_2];
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void popcntu(CPU *cpu, Instruction inst)
 {
-    // Hamming weight : utilisation de c mais peut-etre à la main ?
+    // Hamming weight: using built-in popcount function
     cpu->U[inst.destination] = __builtin_popcountll(cpu->U[inst.source_1]);
-    cpu->IP += SIZE_INSTRUCTION;
+    cpu->IP += INSTRUCTION_BYTES;
 }
 
 void lmbu(CPU *cpu, Instruction inst)
 {
-    // TODO
+    // Count leading zero bits using built-in clz function
+    cpu->U[inst.destination] = __builtin_clzll(cpu->U[inst.source_1]);
+    cpu->IP += INSTRUCTION_BYTES;
 }

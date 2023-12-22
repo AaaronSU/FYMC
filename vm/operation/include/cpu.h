@@ -9,6 +9,7 @@
 #define MEMORY_SIZE 65536
 #define SIZE_INSTRUCTION 32
 #define SIZE_VECTOR 8
+#define INSTRUCTION_BYTES 4
 
 // Define the simulator state
 typedef struct
