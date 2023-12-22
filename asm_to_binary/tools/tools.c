@@ -123,10 +123,10 @@ char*** tokenize(char* const fileName)
 
     while(fgets(line,128,fileptr) != NULL)
     {
-        printf("LINE TO TOKENIZE : %s",line);
+        // printf("LINE TO TOKENIZE : %s",line);
         token_list[i] = retreive_token(line,';');
-        print_tokens_line(token_list[i]);
-        printf("\n");
+        // print_tokens_line(token_list[i]);
+        // printf("\n");
         i++;
     }
     token_list[i][0] = NULL;

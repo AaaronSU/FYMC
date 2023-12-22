@@ -421,8 +421,10 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
         }
         char_ptr = fgets(ligne, 1024, file);
 
+
         for (size_t i = 0; i < *nb_data; ++i)
         {
+
             char_ptr = fgets(ligne, 1024, file);
             if (is_in_string(char_ptr, "#"))
                 { --i; continue;}
@@ -432,7 +434,6 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
                     {--i; continue;}
 
             token_thing = retreive_token(char_ptr_tmp, ';');
-            print_tokens_line(token_thing);
             if (is_valid(token_thing) == FALSE)
                 return FALSE;
             // WARNING: Pas trop le temps de test si ce genre de carabistouille fonctionne
@@ -462,7 +463,6 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
             {--i; continue;}
 
         token_thing = retreive_token(char_ptr_tmp, ';');
-        print_tokens_line(token_thing);
         if (correct_line(token_thing, op_name_list, register_list) == FALSE)
             return FALSE;
         // WARNING
@@ -471,30 +471,9 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
     }
 
     (void)fclose(file);
-    free(char_ptr);
+    // freeing char_ptr has LeakSanitizer say it's a bad pointer so I don't free it
+    // free(char_ptr);
     free(char_ptr_tmp);
 
     return TRUE;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

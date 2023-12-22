@@ -43,7 +43,7 @@ int main(int argc, char** argv)
     char*** data_array = malloc(nb_data);
     char*** code_array = malloc(nb_code);
 
-    print_tokens_list(op_name_list);
+    // print_tokens_list(op_name_list);
 
     // NOTE: Maybe something will go wrong with pointers, const and stuff idk
     // TODO: test parse (normal cases, empty sections, secctions of size 1 and other weird cases)

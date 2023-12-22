@@ -60,11 +60,18 @@ bool correct_alias(char** array)
 /// @return return the line where the data of the op code are stored (-1 if the op code does not exist)
 int detect_op_code(char* op_name, char*** op_name_list)
 {
-	printf("%s\n", op_name);
-	printf("%c\n", op_name_list[0][0][0]);
+	//NOTE
+	// We use a capsed version of the op_code
+	// Maybe do it with register names too, or not do it at all.
+	char* tmp;
+	strcpy(tmp, op_name);
+	for(int i = 0; tmp[i]; i++){
+		tmp[i] = toupper(tmp[i]);
+	}
+
   	for (int i = 0; op_name_list[i][0] != NULL; i++)
   	{
-    	if(strcmp(op_name,op_name_list[i][0]) == 0)
+    	if(strcmp(tmp,op_name_list[i][0]) == 0)
 		{
 			return i;
 		}
@@ -149,16 +156,17 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 		i++;
 	}
 
-	//Step 3 : is the number between 1 and MAX VALUE ?
-	if(atoi(&reg[strlen(register_type)]) < 1 || atoi(&reg[strlen(register_type)]) > register_range)
+	// NOTE: it said between 1 and MAX VALUE but register can be 0 or 32 iirc
+	//Step 3 : is the number between 0 and MAX VALUE ?
+	if(atoi(&reg[strlen(register_type)]) < 0 || atoi(&reg[strlen(register_type)]) > register_range)
 	{
-		if(atoi(&reg[strlen(register_type)]) < 1)
+		if(atoi(&reg[strlen(register_type)]) < 0)
 		{
-			fprintf(stderr,"Error : register number too low (must be between 1 and %d).\n",register_range);
+			fprintf(stderr,"Error : register number too low (must be between 0 and %d).\n",register_range);
 		}
 		else
 		{
-			fprintf(stderr,"Error : register number too high (must be between 1 and %d).\n",register_range);
+			fprintf(stderr,"Error : register number too high (must be between 0 and %d).\n",register_range);
 		}
 		return FALSE;
 	}
@@ -219,7 +227,6 @@ bool correct_line(char** line, char*** op_name_list, char*** register_list)
 		return FALSE;
 	// Vérifie op_code et registres
 	int position = 0;
-	printf("%c\n", op_name_list[0][0][0]);
 	position = detect_op_code(line[0], op_name_list);
 	if (position == -1)
 		return FALSE;
