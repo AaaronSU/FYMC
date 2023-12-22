@@ -394,6 +394,7 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
            char*** op_name_list, char*** register_list)
 {
     FILE *file = fopen(nom, "r");
+    bool all_good = TRUE;
 
     // Si impossible d'ouvrir le fichier
     if (!file) {
@@ -409,7 +410,11 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
     char* char_ptr_tmp = malloc(1024);
     char** token_thing;
     if (*nb_data == -1 || *nb_code == -1)
-        return FALSE;  // code and / or data sections not placed correctly
+        {
+            free(char_ptr);
+            free(char_ptr_tmp);
+            return FALSE;
+        }  // code and / or data sections not placed correctly
 
     // Handling data section
     if (*nb_data != 0)
@@ -436,39 +441,62 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
 
             token_thing = retreive_token(char_ptr_tmp, ';');
             if (is_valid(token_thing) == FALSE)
-                return FALSE;
+                {
+                    all_good = FALSE;
+                    break;
+                }
             // WARNING: Pas trop le temps de test si ce genre de carabistouille fonctionne
             // Si ça se trouve faut utiliser une fonction de copy ou quoi jsp
-            data_array[indice_data] = token_thing;
+            size_t k = 0;
+            while (token_thing[k] != NULL)
+            {
+                // On fait des strcpy car on veut pas garder token_thing en vie
+                strcpy(data_array[indice_data][k], token_thing[k]);
+                ++k;
+            }
+            data_array[indice_data][k] = NULL;
             ++indice_data;
         }
     }
 
-    // Handling code section
-    // Move towards code section
-    char_ptr = fgets(ligne, 1024, file);
-    while (strcmp(char_ptr, "code:") == FALSE)
+    if (all_good)
     {
+        // Handling code section
+        // Move towards code section
         char_ptr = fgets(ligne, 1024, file);
-    }
-    char_ptr = fgets(ligne, 1024, file);
-
-    for (size_t i = 0; i < *nb_code; ++i)
-    {
+        while (strcmp(char_ptr, "code:") == FALSE)
+        {
+            char_ptr = fgets(ligne, 1024, file);
+        }
         char_ptr = fgets(ligne, 1024, file);
-        if (is_in_string(char_ptr, "#"))
-            {--i; continue;}
-        add_semicolon(char_ptr);
-        remove_space(char_ptr, char_ptr_tmp);
-        if (char_ptr_tmp[0] == '\n')
-            {--i; continue;}
 
-        token_thing = retreive_token(char_ptr_tmp, ';');
-        if (correct_line(token_thing, op_name_list, register_list) == FALSE)
-            return FALSE;
-        // WARNING
-        code_array[indice_code] = token_thing;
-        ++indice_code;
+        for (size_t i = 0; i < *nb_code; ++i)
+        {
+            char_ptr = fgets(ligne, 1024, file);
+            if (is_in_string(char_ptr, "#"))
+                {--i; continue;}
+            add_semicolon(char_ptr);
+            remove_space(char_ptr, char_ptr_tmp);
+            if (char_ptr_tmp[0] == '\n')
+                {--i; continue;}
+
+            token_thing = retreive_token(char_ptr_tmp, ';');
+            if (correct_line(token_thing, op_name_list, register_list) == FALSE)
+                {
+                    all_good = FALSE;
+                    break;
+                }
+            // WARNING POURQUOI ÇA MARCHE PAS AVEC CODE MAIS ÇA MARCHE AVEC DATA ???????????????????
+            size_t k = 0;
+            while (token_thing[k] != NULL)
+            {
+                strcpy(code_array[indice_code][k], token_thing[k]);
+                ++k;
+            }
+            code_array[indice_code][k] = NULL;
+            ++indice_code;
+        }
+
     }
 
     (void)fclose(file);
@@ -482,6 +510,8 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
         free(token_thing[i]);
     }
     free(token_thing);
+    code_array[*nb_code + 1] = NULL;
+    data_array[*nb_data + 1] = NULL;
 
-    return TRUE;
+    return all_good;
 }

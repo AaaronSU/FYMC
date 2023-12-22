@@ -15,4 +15,5 @@ void write_stuff(char* path, char*** data_array, char*** code_array,
 {
   print_tokens_list(data_array);
   print_tokens_list(code_array);
+  // printf("%lld\n", *nb_code);
 }

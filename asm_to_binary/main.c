@@ -40,8 +40,27 @@ int main(int argc, char** argv)
 
     nb_ligne_section(argv[1], &nb_data, &nb_code);
 
-    char*** data_array = malloc(nb_data);
-    char*** code_array = malloc(nb_code);
+    char*** data_array = malloc(nb_data + 1);
+    char*** code_array = malloc(nb_code + 1);
+
+    // TODO Réussir à free ces merdes
+    for (size_t i = 0; i <nb_data; ++i)
+    {
+        data_array[i] = (char**)malloc(sizeof(char*)*128);
+        for(size_t j = 0; j < 128; ++j)
+        {
+            data_array[i][j] = (char*)malloc(sizeof(char)*128);
+        }
+    }
+
+    for (size_t i = 0; i < nb_code; ++i)
+    {
+        code_array[i] = (char**)malloc(sizeof(char*)*128);
+        for(size_t j = 0; j < 128; ++j)
+        {
+            code_array[i][j] = (char*)malloc(sizeof(char)*128);
+        }
+    }
 
     // print_tokens_list(op_name_list);
 
@@ -51,38 +70,42 @@ int main(int argc, char** argv)
                                         &nb_data, &nb_code,
                                         op_name_list, register_list);
 
-    printf("%d\n", parsing_went_alright);
-
+    // printf("%d\n", parsing_went_alright);
+    // printf("%c\n", code_array[0][0][0]);
 
     if (parsing_went_alright)
         write_stuff(argv[1], data_array, code_array,
                     &nb_data, &nb_code, op_name_list, register_list);
 
 
-    for (int i = 0; i < 128; i++)
-    {
-
-        for (int y = 0; y < 128; y++)
-        {
-            // free(op_name_list[i][y]);
-        }
-        free(op_name_list[i]);
-    }
-
-    for (int i = 0; i < 128; i++)
-    {
-
-        for (int y = 0; y < 128; y++)
-        {
-            // free(op_name_list[i][y]);
-        }
-        free(register_list[i]);
-    }
+    free_char2(op_name_list, 128);
+    free_char2(register_list, 128);
+    free_char3(data_array, nb_data, 128);
+    free_char3(code_array, nb_code, 128);
+    // for (int i = 0; i < 128; i++)
+    // {
+    //
+    //     for (int y = 0; y < 128; y++)
+    //     {
+    //         // free(op_name_list[i][y]);
+    //     }
+    //     free(op_name_list[i]);
+    // }
+    //
+    // for (int i = 0; i < 128; i++)
+    // {
+    //
+    //     for (int y = 0; y < 128; y++)
+    //     {
+    //         // free(op_name_list[i][y]);
+    //     }
+    //     free(register_list[i]);
+    // }
 
     free(op_name_list);
     free(register_list);
-    free(data_array);
-    free(code_array);
+    // free(data_array);
+    // free(code_array);
 
 
     // //We now read how many lines we have in data and how many lines we have in code
