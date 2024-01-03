@@ -24,8 +24,13 @@ int main(int argc, char** argv)
     char*** op_name_list; //Where the op name and specification are stored
     op_name_list = tokenize("op_codes");
 
+
     char*** register_list; //Where the registers infos are stored
     register_list = tokenize("register_list");
+
+    // print_tokens_list(op_name_list);
+    // printf("--------------\n");
+    // print_tokens_list(register_list);
 
     //Loading the code in memory for faster accesses
     // NOTE: Yeah we might do that, but right now no
@@ -41,25 +46,25 @@ int main(int argc, char** argv)
 
     nb_ligne_section(argv[1], &nb_data, &nb_code);
 
-    char*** data_array = malloc(nb_data + 1);
-    char*** code_array = malloc(nb_code + 1);
+    char*** data_array = calloc(nb_data + 1, sizeof(char**));
+    char*** code_array = calloc(nb_code + 1, sizeof(char**));
 
     // TODO Réussir à free ces merdes
     for (size_t i = 0; i <nb_data; ++i)
     {
-        data_array[i] = (char**)malloc(sizeof(char*)*128);
+        data_array[i] = calloc(128, sizeof(char*));
         for(size_t j = 0; j < 128; ++j)
         {
-            data_array[i][j] = (char*)malloc(sizeof(char)*128);
+            data_array[i][j] = calloc(128, sizeof(char));
         }
     }
 
     for (size_t i = 0; i < nb_code; ++i)
     {
-        code_array[i] = (char**)malloc(sizeof(char*)*128);
+        code_array[i] = calloc(128, sizeof(char*));
         for(size_t j = 0; j < 128; ++j)
         {
-            code_array[i][j] = (char*)malloc(sizeof(char)*128);
+            code_array[i][j] = calloc(128, sizeof(char));
         }
     }
 
@@ -71,7 +76,7 @@ int main(int argc, char** argv)
                                         &nb_data, &nb_code,
                                         op_name_list, register_list);
 
-    // printf("%d\n", parsing_went_alright);
+    printf("%d\n", parsing_went_alright);
     // printf("%c\n", code_array[0][0][0]);
 
     if (parsing_went_alright)
@@ -79,10 +84,10 @@ int main(int argc, char** argv)
                     &nb_data, &nb_code, op_name_list, register_list);
 
 
-    free_char2(op_name_list, 128);
-    free_char2(register_list, 128);
-    free_char3(data_array, nb_data, 128);
-    free_char3(code_array, nb_code, 128);
+    // free_char3(op_name_list, 128, 128);
+    // free_char3(register_list, 128, 128);
+    // free_char3(data_array, nb_data, 128);
+    // free_char3(code_array, nb_code, 128);
     // for (int i = 0; i < 128; i++)
     // {
     //
@@ -103,8 +108,6 @@ int main(int argc, char** argv)
     //     free(register_list[i]);
     // }
 
-    free(op_name_list);
-    free(register_list);
     // free(data_array);
     // free(code_array);
 
@@ -163,7 +166,7 @@ int main(int argc, char** argv)
 
 
 
-
+/*
     //We load the file to assemble in memory
     char* file = load_file(argv[1]);
 
@@ -179,7 +182,7 @@ int main(int argc, char** argv)
 
     //We dont need the file loaded in memory anymore
     free(file);
-
+*/
     return EXIT_SUCCESS;
 }
 

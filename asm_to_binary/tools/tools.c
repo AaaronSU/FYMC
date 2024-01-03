@@ -86,11 +86,10 @@ void print_tokens_line(char** const tokens)
 }
 
 
-
-
-
-
-
+typedef struct {
+    void* array;
+    long long int ipu;
+} conteneur;
 
 
 
@@ -104,7 +103,7 @@ char*** tokenize(char* const fileName)
         abort();
     }
 
-    char*** token_list = (char***)malloc(sizeof(char**)*128);
+    char*** token_list = calloc(128, sizeof(char**));
 
     FILE* fileptr = fopen(fileName,"r");
     char line[128];

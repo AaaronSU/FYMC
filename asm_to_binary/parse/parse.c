@@ -159,31 +159,16 @@ bool add_semicolon(char* str)
 
 
 // //Retreiving token list from a string
-// char** retreive_token(char* line, char* const separator)
-// {
-//     char** tokens = (char**)malloc(sizeof(char*)*128); //MAX 128 elements per line
-//     char* token_temp, temp;
-// 	int i = 0; //Used to count tokens
-// 	tokens[i] = strtok(line,separator); //Retreiving first token
-// 	while(tokens[i] != NULL) //As long as we still have tokens
-// 	{
-// 		i = i + 1; //Next token count
-// 		tokens[i] = strtok(NULL,separator); //Reading next token
-// 	}
-
-//     //Returning token list ended by NULL value
-//     return tokens;
-// }
-
-//Retreiving token list from a string
 char** retreive_token(char* line, char const separator)
 {
     //MAX 128 elements per line
-    char** tokens = (char**)malloc(sizeof(char*)*128);
+    //NOTE Changed malloc to calloc, seems like my intuition was right on that
+    //TODO use calloc properly
+    char** tokens = calloc(128, sizeof(char*));
     for(int i = 0; i < 128; i++)
     {
         //128 char max per token
-        tokens[i] = (char*)malloc(sizeof(char)*128);
+        tokens[i] = calloc(128, sizeof(char));
     }
     //   V       | strlen = 6 CONTRE 9
     //ADD;U2;U3  |
@@ -192,18 +177,20 @@ char** retreive_token(char* line, char const separator)
     while((line_temp = strchr(line,separator)) != NULL)
     {
         //Copy of the string before the caracter we found
-        strncpy(tokens[i],line,strlen(line) - strlen(line_temp));
+        strncpy(tokens[i], line, strlen(line) - strlen(line_temp));
         line = line_temp + 1; //Skipping the seperator
         i = i + 1;
     }
 
     //NULL means no more separator, i.e. last token
-    tokens[i] = line;
+    strncpy(tokens[i], line, strlen(line) - 1);
+    // tokens[i] = line;
     char* slash_n = strchr(line,'\n');
     slash_n[0] = '\0';
     tokens[i+1] = NULL;
 
     //If a string has been cutted, we reconstruct it
+    // NOTE: I'm not sure when this happens but I'll let that here
     i = 0;
     while(tokens[i] != NULL)
     {
