@@ -167,11 +167,11 @@ void free_char3(char*** char3, int size_dim_1, int size_dim_2)
 
     for(int i = 0; i < size_dim_1; ++i)
     {
-        if(char3[i])
+        if(char3[i] != NULL)
         {
             for(int j = 0; j < size_dim_2; ++j)
             {
-                if(char3[i][j])
+                if(char3[i][j] != NULL)
                 {
                     free(char3[i][j]);
                 }

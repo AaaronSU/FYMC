@@ -63,7 +63,7 @@ int detect_op_code(char* op_name, char*** op_name_list)
 	//NOTE
 	// We use a capsed version of the op_code
 	// Maybe do it with register names too, or not do it at all.
-	char* tmp;
+	char* tmp = calloc(strlen(op_name) + 1, sizeof(char));
 	strcpy(tmp, op_name);
 	for(int i = 0; tmp[i]; i++){
 		tmp[i] = toupper(tmp[i]);
@@ -73,10 +73,12 @@ int detect_op_code(char* op_name, char*** op_name_list)
   	{
     	if(strcmp(tmp,op_name_list[i][0]) == 0)
 		{
+			free(tmp);
 			return i;
 		}
   	}
 
+	free(tmp);
 	//No op code with the same name found, returning false
 	return -1; //-1 means not a valid op code
 }

@@ -395,12 +395,9 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
     long long int indice_data = 0;
     long long int indice_code = 0;
     char ligne[1024];
-    char* char_ptr = malloc(1024);
-    char* char_ptr_tmp = malloc(1024);
-    char** token_thing;
+    char* char_ptr_tmp = calloc(1024, sizeof(char));
     if (*nb_data == -1 || *nb_code == -1)
         {
-            free(char_ptr);
             free(char_ptr_tmp);
             return FALSE;
         }  // code and / or data sections not placed correctly
@@ -409,7 +406,7 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
     if (*nb_data != 0)
     {
         // Move towards data section
-        char_ptr = fgets(ligne, 1024, file);
+        char* char_ptr = fgets(ligne, 1024, file);
         while (strcmp(char_ptr, "data:") == FALSE)
         {
             char_ptr = fgets(ligne, 1024, file);
@@ -428,13 +425,12 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
             if (char_ptr_tmp[0] == '\n')
                     {--i; continue;}
 
-            token_thing = retreive_token(char_ptr_tmp, ';');
+            char** token_thing = retreive_token(char_ptr_tmp, ';');
             if (is_valid(token_thing) == FALSE)
                 {
                     all_good = FALSE;
                     break;
                 }
-            // WARNING: Y'a un pb dans la matrice
             size_t k = 0;
             while (token_thing[k] != NULL)
             {
@@ -442,8 +438,11 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
                 strcpy(data_array[indice_data][k], token_thing[k]);
                 ++k;
             }
+            free(data_array[indice_data][k]);
             data_array[indice_data][k] = NULL;
             ++indice_data;
+
+            free_char2(token_thing, 128);
         }
     }
 
@@ -451,7 +450,7 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
     {
         // Handling code section
         // Move towards code section
-        char_ptr = fgets(ligne, 1024, file);
+        char* char_ptr = fgets(ligne, 1024, file);
         while (strcmp(char_ptr, "code:") == FALSE)
         {
             char_ptr = fgets(ligne, 1024, file);
@@ -468,36 +467,31 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
             if (char_ptr_tmp[0] == '\n')
                 {--i; continue;}
 
-            token_thing = retreive_token(char_ptr_tmp, ';');
+            char** token_thing = retreive_token(char_ptr_tmp, ';');
             if (correct_line(token_thing, op_name_list, register_list) == FALSE)
                 {
                     all_good = FALSE;
                     break;
                 }
-            // WARNING POURQUOI ÇA MARCHE PAS AVEC CODE MAIS ÇA MARCHE AVEC DATA ???????????????????
             size_t k = 0;
             while (token_thing[k] != NULL)
             {
                 strcpy(code_array[indice_code][k], token_thing[k]);
                 ++k;
             }
+            free(code_array[indice_code][k]);
             code_array[indice_code][k] = NULL;
             ++indice_code;
+
+            free_char2(token_thing, 128);
         }
 
     }
 
     (void)fclose(file);
-    // freeing char_ptr has LeakSanitizer say it's a bad pointer so I don't free it
-    // free(char_ptr);
     free(char_ptr_tmp);
-
-    for(int i = 0; i < 128; i++)
-    {
-        //128 char max per token
-        free(token_thing[i]);
-    }
-    free(token_thing);
+    free(code_array[*nb_code + 1]);
+    free(code_array[*nb_data + 1]);
     code_array[*nb_code + 1] = NULL;
     data_array[*nb_data + 1] = NULL;
 

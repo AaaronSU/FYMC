@@ -7,7 +7,6 @@
 #include "assembly/assembly.h"
 
 // WARNING We don't handle immediate values just yet !!!!!!!!!!!!!!
-// WARNING Ça marche pas, mais ça marche un peu avec LeakSanitizer
 
 /// @brief Main function, used to launch big part of the asm to binary traduction
 /// @param argc Number of arguments in the command line
@@ -22,11 +21,11 @@ int main(int argc, char** argv)
     }
 
     //Where the op name and specification are stored
-    char***  op_name_list = tokenize("op_codes");
+    char*** op_name_list = tokenize("op_codes");
 
 
     //Where the registers infos are stored
-    char***  register_list = tokenize("register_list");
+    char*** register_list = tokenize("register_list");
 
     // print_tokens_list(op_name_list);
     // printf("--------------\n");
@@ -46,10 +45,11 @@ int main(int argc, char** argv)
 
     nb_ligne_section(argv[1], &nb_data, &nb_code);
 
+    //NOTE calloc of size nb+1 so that memory is mine, but last elt is NULL
+    // (set to NULL is parse)
     char*** data_array = calloc(nb_data + 1, sizeof(char**));
     char*** code_array = calloc(nb_code + 1, sizeof(char**));
 
-    // TODO Réussir à free ces merdes
     for (size_t i = 0; i <nb_data; ++i)
     {
         data_array[i] = calloc(128, sizeof(char*));
@@ -68,8 +68,6 @@ int main(int argc, char** argv)
         }
     }
 
-    // print_tokens_list(op_name_list);
-
     // NOTE: Maybe something will go wrong with pointers, const and stuff idk
     // TODO: test parse (normal cases, empty sections, secctions of size 1 and other weird cases)
     bool parsing_went_alright = parse(argv[1], data_array, code_array,
@@ -83,11 +81,11 @@ int main(int argc, char** argv)
         write_stuff(argv[1], data_array, code_array,
                     &nb_data, &nb_code, op_name_list, register_list);
 
-
     free_char3(op_name_list, 128, 128);
     free_char3(register_list, 128, 128);
     free_char3(data_array, nb_data, 128);
     free_char3(code_array, nb_code, 128);
+
     // for (int i = 0; i < 128; i++)
     // {
     //
