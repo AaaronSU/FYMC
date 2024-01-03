@@ -187,6 +187,8 @@ char** retreive_token(char* line, char const separator)
     // tokens[i] = line;
     char* slash_n = strchr(line,'\n');
     slash_n[0] = '\0';
+    // WARNING We're making tokens[i+1] a NULL ptr so we free old memory
+    free(tokens[i+1]);
     tokens[i+1] = NULL;
 
     //If a string has been cutted, we reconstruct it

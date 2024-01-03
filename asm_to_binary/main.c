@@ -21,12 +21,12 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    char*** op_name_list; //Where the op name and specification are stored
-    op_name_list = tokenize("op_codes");
+    //Where the op name and specification are stored
+    char***  op_name_list = tokenize("op_codes");
 
 
-    char*** register_list; //Where the registers infos are stored
-    register_list = tokenize("register_list");
+    //Where the registers infos are stored
+    char***  register_list = tokenize("register_list");
 
     // print_tokens_list(op_name_list);
     // printf("--------------\n");
@@ -84,10 +84,10 @@ int main(int argc, char** argv)
                     &nb_data, &nb_code, op_name_list, register_list);
 
 
-    // free_char3(op_name_list, 128, 128);
-    // free_char3(register_list, 128, 128);
-    // free_char3(data_array, nb_data, 128);
-    // free_char3(code_array, nb_code, 128);
+    free_char3(op_name_list, 128, 128);
+    free_char3(register_list, 128, 128);
+    free_char3(data_array, nb_data, 128);
+    free_char3(code_array, nb_code, 128);
     // for (int i = 0; i < 128; i++)
     // {
     //
@@ -183,6 +183,7 @@ int main(int argc, char** argv)
     //We dont need the file loaded in memory anymore
     free(file);
 */
+
     return EXIT_SUCCESS;
 }
 

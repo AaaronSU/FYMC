@@ -109,6 +109,7 @@ char*** tokenize(char* const fileName)
     char line[128];
     int i = 0;
 
+    // TODO handle more than 128 lines
     while(fgets(line,127,fileptr) != NULL)
     {
         // printf("LINE TO TOKENIZE : %s",line);
@@ -164,13 +165,13 @@ void free_char3(char*** char3, int size_dim_1, int size_dim_2)
         return;
     }
 
-    for(int i = 0; i < size_dim_1; i++)
+    for(int i = 0; i < size_dim_1; ++i)
     {
-        if(char3[i] != NULL)
+        if(char3[i])
         {
-            for(int j = 0; j < size_dim_2; j++)
+            for(int j = 0; j < size_dim_2; ++j)
             {
-                if(char3[i][j] != NULL)
+                if(char3[i][j])
                 {
                     free(char3[i][j]);
                 }
