@@ -6,6 +6,45 @@
 #include "tools.h"
 
 
+//
+void remove_space(char const *str_in, char *str_out)
+{
+    // Allocating memory and initialiazin looping elements
+    int taille_in = (sizeof(char) * ((strlen(str_in)))) + sizeof(char);
+    int taille_out = (sizeof(char) * ((strlen(str_out)))) + sizeof(char);
+    char* str_tmp = calloc(taille_out, sizeof(char));
+
+    int i = 0;
+    int j = 0;
+
+    int quote_flag = FALSE;
+
+    while (i < taille_in)
+    {
+        if(str_in[i] == '\"')
+        {
+            if(quote_flag)
+            {
+                quote_flag = FALSE;
+            }
+            else
+            {
+                quote_flag = TRUE;
+            }
+        }
+
+        // 32 is space's ASCII code, 9 is end of line
+        if((str_in[i] != ' ' && str_in[i] != 9 && str_in[i] != 10) || quote_flag)
+        {
+            str_out[j] = str_in[i];
+            ++j;
+        }
+        ++i;
+    }
+    free(str_tmp);
+}
+
+
 
 /// @brief Function used to verify if argc >= 2 (i.e. their is a filename in argv[1]) and to test if the file does exist.
 /// @param argc Number of args passed in command line

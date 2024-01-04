@@ -36,46 +36,6 @@ int size_without_chara(const char* str,
 
 
 
-//
-void remove_space(char const *str_in, char *str_out)
-{
-    // Allocating memory and initialiazin looping elements
-    int taille_in = (sizeof(char) * ((strlen(str_in)))) + sizeof(char);
-    int taille_out = (sizeof(char) * ((strlen(str_out)))) + sizeof(char);
-    char* str_tmp = calloc(taille_out, sizeof(char));
-
-    int i = 0;
-    int j = 0;
-
-    int quote_flag = FALSE;
-
-    while (i < taille_in)
-    {
-        if(str_in[i] == '\"')
-        {
-            if(quote_flag)
-            {
-                quote_flag = FALSE;
-            }
-            else
-            {
-                quote_flag = TRUE;
-            }
-        }
-
-        // 32 is space's ASCII code, 9 is end of line
-        if((str_in[i] != ' ' && str_in[i] != 9 && str_in[i] != 10) || quote_flag)
-        {
-            str_out[j] = str_in[i];
-            ++j;
-        }
-        ++i;
-    }
-    free(str_tmp);
-}
-
-
-
 /// @brief Function that add a ; at the end of each word and will replace , with ; (except some exception)
 /// @param str line which we want to add ;
 bool add_semicolon(char* str)
@@ -93,7 +53,8 @@ bool add_semicolon(char* str)
         }
 
         //Case 2 : its a word, we analyze it
-        if(isalpha(str[i]))
+        // Added isdigit here for immediate values
+        if(isalpha(str[i]) || isdigit(str[i]))
         {
             i++; //Next char
             //We add the ; at the end of the word

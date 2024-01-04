@@ -1,5 +1,6 @@
 #include "parse_code.h"
 #include "../../tools/tools.h"
+#include "../parse_data/parse_data.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -97,6 +98,11 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 	//Step 1 : a register begin with U,S,F,V,T or G
 	char register_type[128];
 	int i = 0;
+
+	// Handling immediate values
+	if (isdigit(reg[i]))
+		return FALSE;
+
 	while(isalpha(reg[i]))
 	{
 		register_type[i] = reg[i];
@@ -194,6 +200,42 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 
 
 
+bool correct_immediate(char** tokens, int i, char** op_code_datas)
+{
+	// Immediate value must be the last one
+	if (tokens[i+1] == NULL)
+	{
+		for (size_t k = 2; op_code_datas[k] != NULL; ++k)
+		{
+			char* str_tmp = calloc(strlen(op_code_datas[k]) + 1, sizeof(char));
+			remove_space(op_code_datas[k], str_tmp);
+			// We can't have immediate ascii now can we ? (change this if we can)
+			if (strcmp(str_tmp, "ascii") != 0)
+			{
+				if (strcmp(str_tmp, "u64"))
+				{
+					free(str_tmp);
+					return good_integer(tokens[i], FALSE);
+				}
+				else if (strcmp(str_tmp, "s64"))
+				{
+					free(str_tmp);
+					return good_integer(tokens[i], TRUE);
+				}
+				else if (strcmp(str_tmp, "f64"))
+				{
+					free(str_tmp);
+					return good_float(tokens[i]);
+				}
+			}
+			free(str_tmp);
+		}
+
+	}
+	return FALSE;
+}
+
+
 
 bool correct_op_code(char** tokens, char** op_code_datas, char*** register_list)
 {
@@ -213,7 +255,8 @@ bool correct_op_code(char** tokens, char** op_code_datas, char*** register_list)
 		//TODO handle immediate values
 		if(!correct_register_name(tokens[i],&op_code_datas[2],register_list)) //tokens[2] because with skip op name and op arg count, we just send the types of the op code
 		{
-			return FALSE; //i.e. the register name is not correct
+			return correct_immediate(tokens, i, op_code_datas);
+			// return FALSE; //i.e. the register name is not correct
 		}
 	}
 
