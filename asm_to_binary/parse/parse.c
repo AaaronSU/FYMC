@@ -42,8 +42,7 @@ void remove_space(char const *str_in, char *str_out)
     // Allocating memory and initialiazin looping elements
     int taille_in = (sizeof(char) * ((strlen(str_in)))) + sizeof(char);
     int taille_out = (sizeof(char) * ((strlen(str_out)))) + sizeof(char);
-    //~ printf("%d\n", taille_out);
-    char* str_tmp = (char*)malloc(taille_out);
+    char* str_tmp = calloc(taille_out, sizeof(char));
 
     int i = 0;
     int j = 0;
@@ -64,8 +63,8 @@ void remove_space(char const *str_in, char *str_out)
             }
         }
 
-        // 32 is space's ASCII code
-        if(str_in[i] != ' ' || quote_flag)
+        // 32 is space's ASCII code, 9 is end of line
+        if((str_in[i] != ' ' && str_in[i] != 9 && str_in[i] != 10) || quote_flag)
         {
             str_out[j] = str_in[i];
             ++j;
@@ -85,7 +84,9 @@ bool add_semicolon(char* str)
     while(i < strlen(str))
     {
         //Case 1 : its a space, we ignore it
-        if(str[i] == ' ')
+        // Added tab to it (ASCII 9 in table)
+        // NOTE: Maybe put that as an else?
+        if(str[i] == ' ' || str[i] == 9)
         {
             i++;
             continue;
@@ -163,7 +164,7 @@ char** retreive_token(char* line, char const separator)
 {
     //MAX 128 elements per line
     //NOTE Changed malloc to calloc, seems like my intuition was right on that
-    //TODO use calloc properly
+
     char** tokens = calloc(128, sizeof(char*));
     for(int i = 0; i < 128; i++)
     {
@@ -174,8 +175,20 @@ char** retreive_token(char* line, char const separator)
     //ADD;U2;U3  |
     char* line_temp = line;
     int i = 0;
+    int is_ascii = 0;
     while((line_temp = strchr(line,separator)) != NULL)
     {
+        if (line[0] == '"')
+        {
+            // Get size of ascii
+            size_t quote = 1;
+            while (line[quote] != '"')
+                ++quote;
+            strncpy(tokens[i], line, quote + 1);
+            // Considering quotes are only in ascii, we break here
+            break;
+        }
+
         //Copy of the string before the caracter we found
         strncpy(tokens[i], line, strlen(line) - strlen(line_temp));
         line = line_temp + 1; //Skipping the seperator
@@ -183,54 +196,17 @@ char** retreive_token(char* line, char const separator)
     }
 
     //NULL means no more separator, i.e. last token
-    strncpy(tokens[i], line, strlen(line) - 1);
+    strncpy(tokens[i], line, strlen(line));
     // tokens[i] = line;
-    char* slash_n = strchr(line,'\n');
-    slash_n[0] = '\0';
+    // char* slash_n = strchr(line,'\n');
+    // slash_n[0] = '\0';
     // WARNING We're making tokens[i+1] a NULL ptr so we free old memory
     free(tokens[i+1]);
     tokens[i+1] = NULL;
 
-    //If a string has been cutted, we reconstruct it
-    // NOTE: I'm not sure when this happens but I'll let that here
-    i = 0;
-    while(tokens[i] != NULL)
-    {
-        if(strchr(tokens[i],'\"') != NULL && strchr(tokens[i]+1,'\"') == NULL) //i.e opening quote but no closing quote = string cutted
-        {
-            int j = 1;
-            while((strchr(tokens[i+j],'\"') == NULL)) //i.e not closing quote yet
-            {
-                strcat(tokens[i],";");
-                strcat(tokens[i],tokens[i+j]);
-                j = j + 1;
-            }
-
-            //We found the closing quote, we add it
-            strcat(tokens[i],";");
-            strcat(tokens[i],tokens[i+j]);
-
-            //Now we need to move the rest of the words
-            int k = 1;
-            while(tokens[i+j+k] != NULL)
-            {
-                tokens[i+k] = tokens[i+j+k];
-                k = k + 1;
-            }
-            tokens[i+k] = NULL;
-        }
-        i = i + 1;
-    }
-
     //Returning token list ended by NULL value
     return tokens;
 }
-
-
-
-
-// ------------ Handling parsing and stuf idk ---------------
-
 
 
 // Detects if arg is in string AND before any ""
@@ -339,18 +315,29 @@ void nb_ligne_section(char* const nom, long long int* nb_data, long long int* nb
             has_data = TRUE;
             *nb_data = compter(buffer, in, has_data, has_code);
             if (*nb_data == -1)
-                return; // NOTE: Crash here?
+                {
+                    (void)fclose(in);
+                    return; // NOTE: Crash here?
+                }
             *nb_code = compter(buffer, in, has_data, has_code);
             if (*nb_code == -1)
-                return; // NOTE: Crash here?
+                {
+                    (void)fclose(in);
+                    return; // NOTE: Crash here?
+                }
             break;
         }
         else if (is_in_string(buffer, "code:"))  // Si code en premier
         {
             has_code = TRUE;
+            // TODO: test empty data section
+            *nb_data = 0;
             *nb_code = compter(buffer, in, has_data, has_code);
             if (*nb_code == -1)
-                return; // NOTE: Crash here?
+                {
+                    (void)fclose(in);
+                    return; // NOTE: Crash here?
+                }
             break;
         }
         else // Ni data ni code en premier ?
@@ -362,6 +349,7 @@ void nb_ligne_section(char* const nom, long long int* nb_data, long long int* nb
                 // Set to avoid problems
                 *nb_code = -1;
                 *nb_data = -1;
+                (void)fclose(in);
                 return;  // NOTE: Crash here?
             }
     }
@@ -382,6 +370,12 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
            long long int* const nb_data, long long int* const nb_code,
            char*** op_name_list, char*** register_list)
 {
+    if (*nb_code == -1)
+        {
+            // Actually that shouldn't be reachable
+            return FALSE;
+        }  // code and / or data sections not placed correctly
+
     FILE *file = fopen(nom, "r");
     bool all_good = TRUE;
 
@@ -396,23 +390,19 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
     long long int indice_code = 0;
     char ligne[1024];
     char* char_ptr_tmp = calloc(1024, sizeof(char));
-    if (*nb_data == -1 || *nb_code == -1)
-        {
-            free(char_ptr_tmp);
-            return FALSE;
-        }  // code and / or data sections not placed correctly
+
 
     // Handling data section
-    if (*nb_data != 0)
+    if (*nb_data > 0)
     {
         // Move towards data section
         char* char_ptr = fgets(ligne, 1024, file);
-        while (strcmp(char_ptr, "data:") == FALSE)
+        remove_space(char_ptr, char_ptr_tmp);
+        while (strcmp(char_ptr_tmp, "data:") != 0)
         {
             char_ptr = fgets(ligne, 1024, file);
+            remove_space(char_ptr, char_ptr_tmp);
         }
-        char_ptr = fgets(ligne, 1024, file);
-
 
         for (size_t i = 0; i < *nb_data; ++i)
         {
@@ -429,6 +419,7 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
             if (is_valid(token_thing) == FALSE)
                 {
                     all_good = FALSE;
+                    free_char2(token_thing, 128);
                     break;
                 }
             size_t k = 0;
@@ -451,17 +442,19 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
         // Handling code section
         // Move towards code section
         char* char_ptr = fgets(ligne, 1024, file);
-        while (strcmp(char_ptr, "code:") == FALSE)
+        remove_space(char_ptr, char_ptr_tmp);
+        while (strcmp(char_ptr_tmp, "code:") != 0)
         {
             char_ptr = fgets(ligne, 1024, file);
+            remove_space(char_ptr, char_ptr_tmp);
         }
-        char_ptr = fgets(ligne, 1024, file);
 
         for (size_t i = 0; i < *nb_code; ++i)
         {
             char_ptr = fgets(ligne, 1024, file);
             if (is_in_string(char_ptr, "#"))
                 {--i; continue;}
+
             add_semicolon(char_ptr);
             remove_space(char_ptr, char_ptr_tmp);
             if (char_ptr_tmp[0] == '\n')
@@ -471,6 +464,7 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
             if (correct_line(token_thing, op_name_list, register_list) == FALSE)
                 {
                     all_good = FALSE;
+                    free_char2(token_thing, 128);
                     break;
                 }
             size_t k = 0;
@@ -490,10 +484,14 @@ bool parse(char* const nom, char*** data_array, char*** code_array,
 
     (void)fclose(file);
     free(char_ptr_tmp);
-    free(code_array[*nb_code + 1]);
-    free(code_array[*nb_data + 1]);
-    code_array[*nb_code + 1] = NULL;
-    data_array[*nb_data + 1] = NULL;
+    free(code_array[*nb_code]);
+    code_array[*nb_code] = NULL;
+
+    if (*nb_data > 0)
+    {
+        free(data_array[*nb_data]);
+        data_array[*nb_data] = NULL;
+    }
 
     return all_good;
 }

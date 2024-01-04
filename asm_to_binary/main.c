@@ -20,45 +20,20 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    //Where the op name and specification are stored
-    char*** op_name_list = tokenize("op_codes");
-
-
-    //Where the registers infos are stored
-    char*** register_list = tokenize("register_list");
-
-    // print_tokens_list(op_name_list);
-    // printf("--------------\n");
-    // print_tokens_list(register_list);
-
-    //Loading the code in memory for faster accesses
-    // NOTE: Yeah we might do that, but right now no
-    // char* loaded_file = load_file(argv[1]);
-
-
-    // char str[] = "add;U1;U2";
-    // correct_op_code(retreive_token(str,';'),op_name_list[0],register_list);
-
-
     long long int nb_code = 0;
     long long int nb_data = 0;
 
     nb_ligne_section(argv[1], &nb_data, &nb_code);
+    if (nb_code <= 0 || nb_data < 0)
+    {
+        fprintf(stderr, "No Code Section!\n");
+        //TODO: exit properly
+        return EXIT_FAILURE;
+    }
 
     //NOTE calloc of size nb+1 so that memory is mine, but last elt is NULL
     // (set to NULL is parse)
-    char*** data_array = calloc(nb_data + 1, sizeof(char**));
     char*** code_array = calloc(nb_code + 1, sizeof(char**));
-
-    for (size_t i = 0; i <nb_data; ++i)
-    {
-        data_array[i] = calloc(128, sizeof(char*));
-        for(size_t j = 0; j < 128; ++j)
-        {
-            data_array[i][j] = calloc(128, sizeof(char));
-        }
-    }
-
     for (size_t i = 0; i < nb_code; ++i)
     {
         code_array[i] = calloc(128, sizeof(char*));
@@ -68,13 +43,34 @@ int main(int argc, char** argv)
         }
     }
 
+    char*** data_array;
+    if (nb_data > 0)
+        {
+            data_array = calloc(nb_data + 1, sizeof(char**));
+            for (size_t i = 0; i <nb_data; ++i)
+            {
+                data_array[i] = calloc(128, sizeof(char*));
+                for(size_t j = 0; j < 128; ++j)
+                {
+                    data_array[i][j] = calloc(128, sizeof(char));
+                }
+            }
+        }
+
+    //Where the op name and specification are stored
+    char*** op_name_list = tokenize("op_codes");
+
+
+    //Where the registers infos are stored
+    char*** register_list = tokenize("register_list");
+
     // NOTE: Maybe something will go wrong with pointers, const and stuff idk
-    // TODO: test parse (normal cases, empty sections, secctions of size 1 and other weird cases)
+    // TODO: test parse (normal cases, empty sections, sections of size 1 and other weird cases)
     bool parsing_went_alright = parse(argv[1], data_array, code_array,
                                         &nb_data, &nb_code,
                                         op_name_list, register_list);
 
-    printf("%d\n", parsing_went_alright);
+    printf("Parsing result: %d\n", parsing_went_alright);
     // printf("%c\n", code_array[0][0][0]);
 
     if (parsing_went_alright)
@@ -83,7 +79,8 @@ int main(int argc, char** argv)
 
     free_char3(op_name_list, 128, 128);
     free_char3(register_list, 128, 128);
-    free_char3(data_array, nb_data, 128);
+    if (nb_data > 0)
+        free_char3(data_array, nb_data, 128);
     free_char3(code_array, nb_code, 128);
 
     // for (int i = 0; i < 128; i++)

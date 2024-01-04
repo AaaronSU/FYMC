@@ -71,11 +71,11 @@ int detect_op_code(char* op_name, char*** op_name_list)
 
   	for (int i = 0; op_name_list[i][0] != NULL; i++)
   	{
-    	if(strcmp(tmp,op_name_list[i][0]) == 0)
-		{
-			free(tmp);
-			return i;
-		}
+    	if(strcmp(tmp, op_name_list[i][0]) == 0)
+			{
+				free(tmp);
+				return i;
+			}
   	}
 
 	free(tmp);
@@ -200,12 +200,17 @@ bool correct_op_code(char** tokens, char** op_code_datas, char*** register_list)
 	int argc = atoi(op_code_datas[1]);
 	for(int i = 1; i <= argc; i++)
 	{
+		// If tokens[i] is a nullptr
+		if (!(tokens[i]))
+			return FALSE;
+
 		if(tokens[i] == NULL)
 		{
 			return FALSE; //i.e. not enough args
 		}
 
 		//We need to verify if the name of the register is correct
+		//TODO handle immediate values
 		if(!correct_register_name(tokens[i],&op_code_datas[2],register_list)) //tokens[2] because with skip op name and op arg count, we just send the types of the op code
 		{
 			return FALSE; //i.e. the register name is not correct
