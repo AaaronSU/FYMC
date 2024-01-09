@@ -20,9 +20,8 @@ bool detect_alias(char** array)
   int i = 0;
   while (array[i] != NULL)
     {
-      //~ printf("in the loop, i = %d\n", i);
-      // 58 is ASCII code for ':'
-      if (array[i][strlen(array[i]) - 1] == 58)
+      // We use strchr here 'cause there's no : or ascii at this point
+      if (strchr(array[i], ':'))
         return TRUE;
       ++i;
     }
@@ -105,12 +104,20 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 
 	while(isalpha(reg[i]))
 	{
-		register_type[i] = reg[i];
+		// We're stocking register types in upper case
+		register_type[i] = toupper(reg[i]);
 		i++;
 	}
 	register_type[i] = '\0';
 
 	i = 0;
+
+	if(register_list[i][0] == NULL)
+	{
+		fprintf(stderr,"Error : no register begin with %s.\n",register_type);
+		return FALSE;
+	}
+
 	while(register_list[i][0] != NULL)
 	{
 		if(strcmp(register_type,register_list[i][0]) == 0)
@@ -122,12 +129,6 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 		{
 			i++;
 		}
-	}
-
-	if(register_list[i][0] == NULL)
-	{
-		fprintf(stderr,"Error : no register begin with %s.\n",register_type);
-		return FALSE;
 	}
 
 	//We must retreive the datas associated with this register
@@ -200,7 +201,7 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 
 
 
-bool correct_immediate(char** tokens, int i, char** op_code_datas)
+bool correct_immediate(char** tokens, int i, char** op_code_datas, char*** data_array)
 {
 	// Immediate value must be the last one
 	if (tokens[i+1] == NULL)
@@ -209,20 +210,21 @@ bool correct_immediate(char** tokens, int i, char** op_code_datas)
 		{
 			char* str_tmp = calloc(strlen(op_code_datas[k]) + 1, sizeof(char));
 			remove_space(op_code_datas[k], str_tmp);
+
 			// We can't have immediate ascii now can we ? (change this if we can)
 			if (strcmp(str_tmp, "ascii") != 0)
 			{
-				if (strcmp(str_tmp, "u64"))
+				if (strcmp(str_tmp, "u64") == 0)
 				{
 					free(str_tmp);
 					return good_integer(tokens[i], FALSE);
 				}
-				else if (strcmp(str_tmp, "s64"))
+				else if (strcmp(str_tmp, "s64") == 0)
 				{
 					free(str_tmp);
 					return good_integer(tokens[i], TRUE);
 				}
-				else if (strcmp(str_tmp, "f64"))
+				else if (strcmp(str_tmp, "f64") == 0)
 				{
 					free(str_tmp);
 					return good_float(tokens[i]);
@@ -237,26 +239,100 @@ bool correct_immediate(char** tokens, int i, char** op_code_datas)
 
 
 
-bool correct_op_code(char** tokens, char** op_code_datas, char*** register_list)
+bool correct_variable(char** tokens, int i, char** op_code_datas, char*** data_array)
+{
+	// Can't be correct if no data to begin with
+	if (data_array != NULL)
+	{
+		int taille = strlen(tokens[i]);
+		char* str_tmp = calloc(taille + 1, sizeof(char));
+
+		if (tokens[i][0] == '$')
+				strncpy(str_tmp, tokens[i]+1, taille);
+		else
+			strncpy(str_tmp, tokens[i], taille+1);
+
+		// Checking if requested token is in data_array
+		for (size_t k = 0; data_array[k] != NULL; ++k)
+		{
+			if (strcmp(str_tmp, data_array[k][1]) == 0)
+			{
+				// Checking variable's type
+				if (tokens[i][0] == '@')
+				{
+					for (size_t l = 2; op_code_datas[l] != NULL; ++l)
+					{
+						// WARNING We consider pointers as integers
+						if (strcmp(op_code_datas[l], "u64") == 0)
+						{
+							free(str_tmp);
+							return TRUE;
+						}
+					}
+				}
+
+				else
+				// Other cases (only $ for now but maybe it'll change, who knows...)
+				for (size_t l = 2; op_code_datas[l] != NULL; ++l)
+				{
+					if (strcmp(op_code_datas[l], data_array[k][0]) == 0)
+					{
+						free(str_tmp);
+						return TRUE;
+					}
+				}
+			}
+		}
+
+		free(str_tmp);
+	}
+	return FALSE;
+}
+
+
+bool is_in_address_array(char* name, char** address_array)
+{
+	int int_tmp = atoi(address_array[0]);
+	if (int_tmp == 0)
+		return FALSE;
+	for (size_t i = 1; i <= int_tmp; ++i)
+	{
+		if (strcmp(address_array[i], name) == 0)
+			return TRUE;
+	}
+	return FALSE;
+}
+
+
+
+bool correct_op_code(char** tokens, char** op_code_datas, char*** register_list, char*** data_array, char** address_array)
 {
 	int argc = atoi(op_code_datas[1]);
 	for(int i = 1; i <= argc; i++)
 	{
-		// If tokens[i] is a nullptr
-		if (!(tokens[i]))
-			return FALSE;
-
 		if(tokens[i] == NULL)
 		{
 			return FALSE; //i.e. not enough args
 		}
 
-		//We need to verify if the name of the register is correct
-		//TODO handle immediate values
-		if(!correct_register_name(tokens[i],&op_code_datas[2],register_list)) //tokens[2] because with skip op name and op arg count, we just send the types of the op code
+		// Handling jump commands
+		if (strcmp(op_code_datas[2], "address") == 0)
 		{
-			return correct_immediate(tokens, i, op_code_datas);
-			// return FALSE; //i.e. the register name is not correct
+			if (is_in_address_array(tokens[i], address_array) == FALSE)
+				return FALSE;
+		}
+
+		else if (tokens[i][0] == '$' || tokens[i][0] == '@')
+		{
+			//Check if variable exists
+			return correct_variable(tokens, i, op_code_datas, data_array);
+		}
+
+		//We need to verify if the name of the register is correct
+		//tokens[i] because with skip op name and op arg count, we just send the types of the op code
+		else if(!correct_register_name(tokens[i],&op_code_datas[2],register_list))
+		{
+			return correct_immediate(tokens, i, op_code_datas, data_array);
 		}
 	}
 
@@ -269,21 +345,48 @@ bool correct_op_code(char** tokens, char** op_code_datas, char*** register_list)
 }
 
 
-bool correct_line(char** line, char*** op_name_list, char*** register_list)
+bool correct_line(char** line, char*** op_name_list, char*** register_list, char*** data_array, char** address_array)
 {
-
 	// Vérifie les alias
-	if (detect_alias(line) == TRUE && correct_alias(line) == FALSE)
-		return FALSE;
+	if (detect_alias(line) == TRUE)
+	{
+		if (correct_alias(line) == FALSE)
+			return FALSE;
+
+		// Alias can't be followed by anything besides blank line
+		if (line[1])
+			return FALSE;
+
+		// Removing final ':'
+		int taille = strlen(line[0]);
+		int int_tmp = atoi(address_array[0]) + 1;
+		char* tmp = calloc(taille, sizeof(char));
+		strncpy(tmp, line[0], taille - 1);
+		strcat(tmp, "\0");
+
+		// print_tokens_line(line);
+		if (is_in_address_array(tmp, address_array))
+			return FALSE;
+
+		// Adding address to array
+		strcpy(address_array[int_tmp], tmp);
+
+		// Converting integer to string
+		char* buf = calloc(2, sizeof(char));
+		sprintf(buf, "%d", int_tmp);
+
+		// Updating array size
+		strncpy(address_array[0], buf, 2);
+
+		free(buf);
+		free(tmp);
+		return TRUE;
+	}
+
 	// Vérifie op_code et registres
 	int position = 0;
 	position = detect_op_code(line[0], op_name_list);
 	if (position == -1)
 		return FALSE;
-	return correct_op_code(line, op_name_list[position], register_list);
+	return correct_op_code(line, op_name_list[position], register_list, data_array, address_array);
 }
-
-
-
-
-

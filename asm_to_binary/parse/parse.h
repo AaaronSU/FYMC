@@ -23,6 +23,6 @@ void nb_ligne_section(char* const nom, long long int* nb_data, long long int* nb
 // TODO: test function (normal cases, empty sections, secctions of size 1 and other weird cases)
 bool parse(char* const nom, char*** data_array, char*** code_array,
            long long int* const nb_data, long long int* const nb_code,
-           char*** op_name_list, char*** register_list);
+           char*** op_name_list, char*** register_list, char** address_array);
 
 #endif

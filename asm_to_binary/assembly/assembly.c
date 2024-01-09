@@ -13,7 +13,10 @@ void write_stuff(char* path, char*** data_array, char*** code_array,
                 long long int* const nb_data, long long int* const nb_code,
                 char*** op_name_list, char*** register_list)
 {
-  // print_tokens_list(data_array);
-  // print_tokens_list(code_array);
-  // printf("%lld\n", *nb_code);
+  // FILE *write_ptr = fopen("assembled", "wb");
+  // int* buf[10];
+  //
+  // // buf -> data; 10 -> sizeofdata; 1 -> number of data; write_ptr -> destination
+  // fwrite(buf, 10, 1, write_ptr);
+  // fclose(write_ptr);
 }
