@@ -13,7 +13,7 @@
 /// @return 0 if everything went well, 1 if something went wrong
 int main(int argc, char** argv)
 {
-    //Is argv[1] is a valid file ?
+    //Is argv[1] a valid file ?
     if(file_verification(argc, argv) == FALSE)
     {
         return EXIT_FAILURE;
@@ -87,8 +87,8 @@ int main(int argc, char** argv)
     // print_tokens_list(data_array);
 
     if (parsing_went_alright)
-        write_stuff(argv[1], data_array, code_array,
-                    &nb_data, &nb_code, op_name_list, register_list);
+        write_stuff("file_test", data_array, code_array,
+                    &nb_data, &nb_code, op_name_list, register_list, address_array);
 
     free_char3(op_name_list, 128, 128);
     free_char3(register_list, 128, 128);

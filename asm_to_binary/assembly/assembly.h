@@ -8,6 +8,6 @@
 
 void write_stuff(char* path, char*** data_array, char*** code_array,
                 long long int* const nb_data, long long int* const nb_code,
-                char*** op_name_list, char*** register_list);
+                char*** op_name_list, char*** register_list, char** address_array);
 
 #endif
