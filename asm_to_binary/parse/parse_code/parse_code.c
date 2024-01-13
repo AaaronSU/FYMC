@@ -85,6 +85,174 @@ int detect_op_code(char* op_name, char*** op_name_list)
 
 
 
+
+bool correct_parenthesis(char* reg, char** types, char*** register_list)
+{
+	bool is_ok = FALSE;
+
+	// Check if parenthesis are allowed for this register
+	for (size_t i = 0; types[i] != NULL; ++i)
+	{
+		if (strcmp(types[i], "par") == 0)
+			{
+				is_ok = TRUE;
+				break;
+			}
+	}
+
+	if (is_ok == FALSE)
+		return FALSE;
+
+	// Tokenizing
+	char* char_tmp = calloc(strlen(reg), sizeof(char));
+	strncpy(char_tmp, reg+1, strlen(reg)-2);
+	strcat(char_tmp, "\0");
+
+	char** token_thing = retreive_token(char_tmp, ',');
+	free(char_tmp);
+
+	if (token_thing[3] != NULL)
+		{
+			free(token_thing);
+			return FALSE;
+		}
+
+
+	// Retreive max number of register
+	int register_range = -1;
+	char** types_list = NULL;
+	for(int i = 0; register_list[i] != NULL; i++)
+	{
+		if(strcmp("U",register_list[i][0]) == 0)
+		{
+			//We are at the right place in the list
+			//We can retreive datas
+			register_range = atoi(register_list[i][1]);
+			types_list = &register_list[i][2];
+			break;
+		}
+	}
+	// If CPU doesn't handle unsigned for some reason
+	if (register_range == -1)
+		{free(token_thing); return FALSE;}
+
+
+	// Check if registers are correct (must be unsigned)
+	for (size_t i = 0; i < 2; ++i)
+	{
+		if (token_thing[i] != NULL)
+		{
+			if (toupper(token_thing[i][0]) == 'U')
+			{
+				char* tmp = calloc(strlen(token_thing[i]), sizeof(char));
+				strncpy(tmp, token_thing[i]+1, strlen(token_thing[i]));
+
+				if(atoi(tmp) < 0 || atoi(tmp) > register_range)
+				{
+					if(atoi(tmp) < 0)
+					{
+						fprintf(stderr,"Error : register number too low (must be between 0 and %d).\n",register_range);
+					}
+					else
+					{
+						fprintf(stderr,"Error : register number too high (must be between 0 and %d).\n",register_range);
+					}
+					free(tmp);
+					free(token_thing);
+					return FALSE;
+				}
+				free(tmp);
+			}
+			else
+				{free(token_thing); return FALSE;}
+		}
+		else
+			{free(token_thing); return FALSE;}
+	}
+
+	bool answer = TRUE;
+	if (token_thing[2] != NULL)
+		{
+			answer = good_integer(token_thing[2], TRUE);
+			// We write immediate values on 64 bits
+			// TODO: check if those values are reachable i.e. if I need to put <=
+			if (atoi(token_thing[2]) > 2147483647 || atoi(token_thing[2]) < -2147483647)
+				answer = FALSE;
+		}
+
+	free(token_thing);
+	return answer;
+}
+
+
+
+
+bool correct_brace(char* reg, char** types, char*** register_list)
+{
+	bool is_ok = FALSE;
+
+	// Check if parenthesis are allowed for this register
+	for (size_t i = 0; types[i] != NULL; ++i)
+	{
+		if (strcmp(types[i], "brace") == 0)
+			{
+				is_ok = TRUE;
+				break;
+			}
+	}
+
+	if (is_ok == FALSE)
+		return FALSE;
+
+	// Tokenizing
+	char* char_tmp = calloc(strlen(reg), sizeof(char));
+	strncpy(char_tmp, reg+1, strlen(reg)-2);
+	strcat(char_tmp, "\0");
+
+	char** token_thing = retreive_token(char_tmp, ',');
+	free(char_tmp);
+
+	if (token_thing[8] != NULL)
+	{
+		free(token_thing);
+		return FALSE;
+	}
+
+	char* type = types[2];
+	int type_int = -1;
+	if (strcmp(type, "u64") == 0)
+		type_int = 0;
+	if (strcmp(type, "s64") == 0)
+		type_int = 1;
+	if (strcmp(type, "f64") == 0)
+		type_int = 2;
+
+	if (type_int == -1)
+		{free(token_thing); return FALSE;}
+
+	int i = 0;
+	bool answer = FALSE;
+
+	while (token_thing[i] != NULL)
+	{
+		if (type_int == 0)
+			answer = good_integer(token_thing[i], FALSE);
+		if (type_int == 1)
+			answer = good_integer(token_thing[i], TRUE);
+		if (type_int == 2)
+			answer = good_float(token_thing[i]);
+		++i;
+	}
+
+	free(token_thing);
+
+	if (i != 8)
+		answer = FALSE;
+	return answer;
+}
+
+
+
 /// @brief function that tell if the register are correct
 /// @param tokens list of all the register and the op code
 /// @param register_list list of all the possible register and their data type associated
@@ -101,6 +269,15 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 	// Handling immediate values
 	if (isdigit(reg[i]))
 		return FALSE;
+
+	// Handling parenthesis
+	if (reg[0] == '(')
+		return correct_parenthesis(reg, types, register_list);
+
+
+	// Handling braces
+	if (reg[0] == '{')
+		return correct_brace(reg, types, register_list);
 
 	while(isalpha(reg[i]))
 	{

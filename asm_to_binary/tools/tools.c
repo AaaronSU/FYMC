@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <stdlib.h>
 #include "../parse/parse.h"
 #include "tools.h"
 
@@ -125,10 +129,71 @@ void print_tokens_line(char** const tokens)
 }
 
 
-typedef struct {
-    void* array;
-    long long int ipu;
-} conteneur;
+
+void print_tokens_list(char*** const token_list)
+{
+    //When we find an empty line we stop
+    int i = 0;
+    while(token_list[i] != NULL)
+    {
+        print_tokens_line(token_list[i]);
+        i++;
+    }
+}
+
+
+
+// //Retreiving token list from a string
+char** retreive_token(char* line, char const separator)
+{
+    //MAX 128 elements per line
+    //NOTE Changed malloc to calloc, seems like my intuition was right on that
+
+    char** tokens = calloc(128, sizeof(char*));
+    for(int i = 0; i < 128; i++)
+    {
+        //128 char max per token
+        tokens[i] = calloc(128, sizeof(char));
+    }
+    //   V       | strlen = 6 CONTRE 9
+    //ADD;U2;U3  |
+    char* line_temp = line;
+    int i = 0;
+    int is_ascii = 0;
+    while((line_temp = strchr(line,separator)) != NULL)
+    {
+        if (line[0] == '"')
+        {
+            // Get size of ascii
+            size_t quote = 1;
+            while (line[quote] != '"')
+                ++quote;
+            strncpy(tokens[i], line, quote + 1);
+            // Considering quotes are only in ascii, we break here
+            break;
+        }
+
+        //Copy of the string before the caracter we found
+        strncpy(tokens[i], line, strlen(line) - strlen(line_temp));
+        line = line_temp + 1; //Skipping the seperator
+        i = i + 1;
+    }
+
+    //NULL means no more separator, i.e. last token
+    if (line[strlen(line) - 1] == '\n')
+        strncpy(tokens[i], line, strlen(line) - 1);
+    else
+        strncpy(tokens[i], line, strlen(line));
+    // tokens[i] = line;
+    // char* slash_n = strchr(line,'\n');
+    // slash_n[0] = '\0';
+    // WARNING We're making tokens[i+1] a NULL ptr so we free old memory
+    free(tokens[i+1]);
+    tokens[i+1] = NULL;
+
+    //Returning token list ended by NULL value
+    return tokens;
+}
 
 
 
@@ -164,17 +229,144 @@ char*** tokenize(char* const fileName)
 }
 
 
-
-void print_tokens_list(char*** const token_list)
+/// @brief Function that add a ; at the end of each word and will replace , with ; (except some exception)
+/// @param str line which we want to add ;
+bool add_semicolon(char* str)
 {
-    //When we find an empty line we stop
     int i = 0;
-    while(token_list[i] != NULL)
+    while(i < strlen(str))
     {
-        print_tokens_line(token_list[i]);
-        i++;
+        //Case 1 : its a space, we ignore it
+        // Added tab to it (ASCII 9 in table)
+        // NOTE: Maybe put that as an else?
+        if(str[i] == ' ' || str[i] == 9)
+        {
+            i++;
+            continue;
+        }
+
+        //Case 2 : its a word, we analyze it
+        // Added isdigit here for immediate values
+        // Added a couple cases
+        if(isalpha(str[i]) || isdigit(str[i]) || str[i] == '$' || str[i] == '@'
+            || str[i] == '_' || str[i] == '-')
+        {
+            i++; //Next char
+            //We add the ; at the end of the word
+            while(str[i] != ' ')
+            {
+                //If there is a , between two word we replace it by a ;
+                if(str[i] == ',') //This will also mark the end of the word
+                {
+                    str[i] = ' ';
+                    break;
+                }
+
+                if(str[i] == '#') //End of the line
+                {
+                    str[i] = '\0';
+                    return TRUE;
+                }
+                i++;
+            }
+
+            //We replace the " " with ; and go to the next char
+            str[i++] = ';';
+            continue;
+        }
+
+        //Case 3 : its a quote, i.e. beginning of a string
+        if(str[i] == '\"')
+        {
+            i++; //We now search for the closing quote
+            while(str[i] != '\"') //Closing quote
+            {
+                if(str[i] == '\0') //Missing closing quote
+                {
+                    fprintf(stderr,"Error : the string has no closing \".\n");
+                    return FALSE;
+                }
+
+                i++;
+            }
+
+            //We are at the closing ", we go to the next char
+            i++;
+            //Is it the end of the words or are their still words after it ?
+            if(str[i] == ' ') //I.e. not \0 so their are still some word after
+            {
+                str[i++] = ';';
+            }
+
+            ++i;
+            continue; //Next char
+        }
+
+        //Case 4 : we read a #
+        if(str[i] == '#') //End of the line
+        {
+            str[i] = '\0';
+            return TRUE;
+        }
+
+        //Case 5 : its paranthesis
+        if(str[i] == '(')
+        {
+            i++; //We now search for the parenthesis
+            while(str[i] != ')') //Closing parenthesis
+            {
+                if(str[i] == '\0') //Missing closing parenthesis
+                {
+                    fprintf(stderr,"Error : the parenthesis are not closing.\n");
+                    return FALSE;
+                }
+
+                i++;
+            }
+
+            //We are at the closing ", we go to the next char
+            i++;
+            //Is it the end of the words or are their still words after it ?
+            if(str[i] == ' ') //I.e. not \0 so their are still some word after
+            {
+                str[i++] = ';';
+            }
+
+            ++i;
+            continue; //Next char
+        }
+
+        //Case 6 : {}
+        if(str[i] == '{')
+        {
+            i++;
+            while(str[i] != '}') //Closing {}
+            {
+                if(str[i] == '\0') //Missing closing {}
+                {
+                    fprintf(stderr,"Error : the brace ({}) are not closing.\n");
+                    return FALSE;
+                }
+
+                i++;
+            }
+
+            //We are at the closing ", we go to the next char
+            i++;
+            //Is it the end of the words or are their still words after it ?
+            if(str[i] == ' ') //I.e. not \0 so their are still some word after
+            {
+                str[i++] = ';';
+            }
+
+            ++i;
+            continue; //Next char
+        }
     }
+
+    return TRUE;
 }
+
 
 
 void free_char2(char** char2, int size_dim_1)

@@ -12,9 +12,6 @@ int size_without_chara(const char* str,
                         int const taille,
                         int const chara);
 
-bool add_semicolon(char*);
-char** retreive_token(char* const line, char const separator);
-
 bool alphanumeric(int);
 
 
