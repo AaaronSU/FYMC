@@ -72,7 +72,7 @@ int main(int argc, char** argv)
     // TODO: Make a special case for note above
     free(address_array[nb_code]);
     address_array[nb_code] = NULL;
-    strcpy(address_array[0], "0");
+    strcpy(address_array[0], "1");
 
     // NOTE: Maybe something will go wrong with pointers, const and stuff idk
     // TODO: test parse (normal cases, empty sections, sections of size 1 and other weird cases)
@@ -82,9 +82,12 @@ int main(int argc, char** argv)
 
     printf("Parsing result: %d\n", parsing_went_alright);
     // printf("%c\n", code_array[0][0][0]);
+    // print_tokens_line(address_array);
 
     // print_tokens_list(code_array);
     // print_tokens_list(data_array);
+
+    // printf("writing\n");
 
     if (parsing_went_alright)
         write_stuff("file_test", data_array, code_array,

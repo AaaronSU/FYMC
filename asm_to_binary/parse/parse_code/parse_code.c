@@ -65,11 +65,12 @@ int detect_op_code(char* op_name, char*** op_name_list)
 	// Maybe do it with register names too, or not do it at all.
 	char* tmp = calloc(strlen(op_name) + 1, sizeof(char));
 	strcpy(tmp, op_name);
+	printf("%s\n", tmp);
 	for(int i = 0; tmp[i]; i++){
 		tmp[i] = toupper(tmp[i]);
 	}
 
-  	for (int i = 0; op_name_list[i][0] != NULL; i++)
+  	for (int i = 0; op_name_list[i] != NULL; i++)
   	{
     	if(strcmp(tmp, op_name_list[i][0]) == 0)
 			{
@@ -295,7 +296,7 @@ bool correct_register_name(char* reg, char** types, char*** register_list)
 		return FALSE;
 	}
 
-	while(register_list[i][0] != NULL)
+	while(register_list[i] != NULL)
 	{
 		if(strcmp(register_type,register_list[i][0]) == 0)
 		{
@@ -439,8 +440,7 @@ bool correct_variable(char** tokens, int i, char** op_code_datas, char*** data_a
 				{
 					for (size_t l = 2; op_code_datas[l] != NULL; ++l)
 					{
-						// WARNING We consider pointers as integers
-						if (strcmp(op_code_datas[l], "u64") == 0)
+						if (strcmp(op_code_datas[l], "u64") == 0 || strcmp(op_code_datas[l], "ascii") == 0)
 						{
 							free(str_tmp);
 							return TRUE;
@@ -536,7 +536,7 @@ bool correct_line(char** line, char*** op_name_list, char*** register_list, char
 
 		// Removing final ':'
 		int taille = strlen(line[0]);
-		int int_tmp = atoi(address_array[0]) + 1;
+		int int_tmp = atoi(address_array[0]);
 		char* tmp = calloc(taille, sizeof(char));
 		strncpy(tmp, line[0], taille - 1);
 		strcat(tmp, "\0");
@@ -550,7 +550,7 @@ bool correct_line(char** line, char*** op_name_list, char*** register_list, char
 
 		// Converting integer to string
 		char* buf = calloc(2, sizeof(char));
-		sprintf(buf, "%d", int_tmp);
+		sprintf(buf, "%d", ++int_tmp);
 
 		// Updating array size
 		strncpy(address_array[0], buf, 2);
