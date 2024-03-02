@@ -19,6 +19,7 @@ int main(int argc, char *argv[])
     cpu.BinaryFile = lecture_fichier_binaire(argv[1], header);
     cpu.IP = header.address_code_section;
 
+    printf("0\n");
     while (cpu.IP < header.total_binary_file_size)
     {
         char *opcode_byte = &cpu.BinaryFile[cpu.IP];
@@ -29,6 +30,7 @@ int main(int argc, char *argv[])
             return 0;
         }
         Instruction inst = parse_instruction(cpu.BinaryFile[cpu.IP]);
+        printf("opcode : %d cpu u0 : %lld\n", opcode, cpu.U[inst.source_1]);
         opcode_functions[opcode](&cpu, inst);
     }
 

@@ -57,6 +57,7 @@ void movui(CPU *cpu, Instruction inst)
 {
     cpu->IP += INSTRUCTION_BYTES;
     int immediat = get_immediate(cpu);
+    printf("instruction destination : %d\n", inst.destination);
     cpu->U[inst.destination] = immediat;
 }
 
