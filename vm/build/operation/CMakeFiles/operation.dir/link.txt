@@ -1,2 +1,0 @@
-/usr/bin/ar qc liboperation.a CMakeFiles/operation.dir/src/load.c.o CMakeFiles/operation.dir/src/move.c.o CMakeFiles/operation.dir/src/store.c.o CMakeFiles/operation.dir/src/conversion.c.o CMakeFiles/operation.dir/src/u_arithmetic_logic.c.o CMakeFiles/operation.dir/src/f_arithmetic_logic.c.o CMakeFiles/operation.dir/src/s_arithmetic_logic.c.o CMakeFiles/operation.dir/src/tools.c.o CMakeFiles/operation.dir/src/output.c.o CMakeFiles/operation.dir/src/lecture.c.o CMakeFiles/operation.dir/src/compare_jump.c.o
-/usr/bin/ranlib liboperation.a
