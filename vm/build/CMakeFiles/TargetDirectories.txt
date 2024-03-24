@@ -1,0 +1,9 @@
+/home/user/FYMC/vm/build/CMakeFiles/main.dir
+/home/user/FYMC/vm/build/CMakeFiles/edit_cache.dir
+/home/user/FYMC/vm/build/CMakeFiles/rebuild_cache.dir
+/home/user/FYMC/vm/build/operation/CMakeFiles/operation.dir
+/home/user/FYMC/vm/build/operation/CMakeFiles/edit_cache.dir
+/home/user/FYMC/vm/build/operation/CMakeFiles/rebuild_cache.dir
+/home/user/FYMC/vm/build/operation/core/CMakeFiles/core.dir
+/home/user/FYMC/vm/build/operation/core/CMakeFiles/edit_cache.dir
+/home/user/FYMC/vm/build/operation/core/CMakeFiles/rebuild_cache.dir
