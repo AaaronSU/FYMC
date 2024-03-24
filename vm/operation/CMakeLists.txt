@@ -32,12 +32,12 @@ set(SOURCES
     src/compare_jump.c
 )
 
-
-add_library(operation STATIC ${SOURCES})
+add_subdirectory(../core core)
+add_library(operation STATIC ${SOURCES} core)
 target_link_libraries(operation m)
 
 target_include_directories(operation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
+target_include_directories(operation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../core)
 
 ######################### test cmocka ############################
 
