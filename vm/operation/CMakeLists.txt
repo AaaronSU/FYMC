@@ -10,9 +10,7 @@ set(HEADER_FILES
     include/u_arithmetic_logic.h
     include/f_arithmetic_logic.h
     include/s_arithmetic_logic.h
-    include/cpu.h
     include/tools.h
-    include/type.h
     include/output.h
     include/lecture.h
     include/compare_jump.h
@@ -38,6 +36,3 @@ target_link_libraries(operation m)
 
 target_include_directories(operation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(operation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../core)
-
-######################### test cmocka ############################
-

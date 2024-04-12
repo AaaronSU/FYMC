@@ -11,4 +11,4 @@ set(TARGET main)
 add_executable(${TARGET} ${SRCS})
 
 add_subdirectory(operation)
-target_link_libraries(${TARGET} operation)
+target_link_libraries(${TARGET} operation core)
