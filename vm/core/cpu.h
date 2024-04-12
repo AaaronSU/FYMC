@@ -1,7 +1,7 @@
 #ifndef CPU_H
 #define CPU_H
 
-#include <stdint.h> // c'est mieux je crois
+#include <stdint.h>
 #include "type.h"
 
 #define NUMBER_SCALAR_REGISTER 32
@@ -35,7 +35,7 @@ typedef struct core_s
     u8 *Memory;
     char *BinaryFile;
     // mutex
-    // pthread_mutex_t mutex_tab[MAX_MUTEX_PER_CORE];
+    //pthread_mutex_t mutex_tab[MAX_MUTEX_PER_CORE];
 
     // Pointer to the execution function
     // void (*insn_exec)(...);
@@ -51,10 +51,10 @@ typedef struct numa_node_s
 } numa_node_t;
 
 // fonction qui initialise, crée un seul coeur, on appelle dans numa_node_create
-CPU *core_create(u8 type, void (insn_exec())); 
+CPU *core_create(u8 type); 
 
 // nombre de coeurs etc, fonction qui initialise
-numa_node_t *numa_node_create();
+numa_node_t *numa_node_create(u16 number_of_core);
 
 /**********************************************************************************************/
 typedef struct
