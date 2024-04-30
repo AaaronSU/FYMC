@@ -467,8 +467,8 @@ void write_threads(FILE* fp, i64* thread_array, i64* thread_masks, i64 thread_nu
   for (i64 i = 0; i < thread_number; ++i)
   {
 //    printf("data: '%s'\n", data_to_write[i]);
-    fwrite(thread_array+i, sizeof(i32), 1, fp);
-    fwrite(thread_masks+i, sizeof(i32), 1, fp);
+    fwrite(htobe64(thread_array[i]), sizeof(i32), 1, fp);
+    fwrite(htobe64(thread_masks[i]), sizeof(i32), 1, fp);
   }
   return;
 }
