@@ -1,17 +1,17 @@
 CC=gcc
-CFLAGS=-std=c99
+CFLAGS=-std=c17
 
-all: assembleur
+all: fymcc
 
 #MAIN FILE
-assembleur: main.o tools/tools.o parse/parse.o parse_code.o parse_data.o assembly/assembly.o
+fymcc: main.o tools/tools.o parse/parse.o parse_code.o parse_data.o assembly/assembly.o
 	$(CC) $(CFLAGS) -O3 $^ -o $@
 # 	$(CC) $(CFLAGS) -O3 -fsanitize=leak $^ -o $@
 # NOTE : Il faut compiler le main avec TOUS les fichiers .o du programme, sinon le linker trépasse.
 
 
 #TOOLS
-tools.o : tools/tools.c
+tools.o : tools/tools.c tools/types.h
 	$(CC) $(CFLAGS) $^ -c
 
 
@@ -37,7 +37,7 @@ assembly.o : assembly/assembly.c
 #CLEAN
 .PHONY: clean
 clean:
-	rm -f assembleur
+	rm -f fymcc
 	rm -f *.o
 	rm -f tools/*.o
 	rm -f assembly/*.o

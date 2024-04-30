@@ -1,91 +1,96 @@
-LOADU;2;u64;ascii;par
-LOADS;2;s64;par
-LOADF;2;f64;par
-LOADV;2;u64;ascii;par
-LOADT;2;s64;par
-LOADG;2;f64;par
-STOREU;2;u64;ascii;par
-STORES;2;s64;par
-STOREF;2;f64;par
-STOREV;2;u64;ascii;par
-STORET;2;s64;par
-STOREG;2;f64;par
-MOV;2;u64;s64;f64;ascii
-MOVU;2;u64;ascii
-MOVS;2;s64
-MOVF;2;f64
-MOVV;2;u64;ascii
-MOVT;2;s64
-MOVG;2;f64
-MOVUI;2;u64;ascii
-MOVSI;2;s64
-MOVFI;2;f64
-MOVVI;2;u64;ascii;brace
-MOVTI;2;s64;brace
-MOVGI;2;f64;brace
-CVTUS;2;s64;u64;ascii
-CVTSU;2;s64;u64;ascii
-CVTUF;2;f64;u64;ascii
-CVTFU;2;f64;u64;ascii
-CVTSF;2;s64;f64
-CVTFS;2;f64;s64
-ADDU;3;u64;ascii
-SUBU;3;u64;ascii
-MULU;3;u64;ascii
-DIVU;3;u64;ascii
-MODU;3;u64;ascii
-FMAU;3;u64;ascii
-SQRTU;2;u64;ascii
-LOGU;2;u64;ascii
-INCU;1;u64;ascii
-DECU;1;u64;ascii
-ANDU;3;u64;ascii
-ORU;3;u64;ascii
-XORU;3;u64;ascii
-SHLU;3;u64;ascii
-SHRU;3;u64;ascii
-ROLU;3;u64;ascii
-RORU;3;u64;ascii
-POPCNTU;2;u64;ascii
-LMBU;2;u64;ascii
-ADDS;3;s64
-SUBS;3;s64
-MULS;3;s64
-DIVS;3;s64
-MODS;3;s64
-FMAS;3;s64
-SQRTS;2;s64
-LOGS;2;s64
-ANDS;3;s64
-ORS;3;s64
-XORS;3;s64
-SHLS;3;s64
-SHRS;3;s64
-ROLS;3;s64
-RORS;3;s64
-POPCNTS;2;s64
-LMBS;2;s64
-ADDF;3;f64
-SUBF;3;f64
-MULF;3;f64
-DIVF;3;f64
-FMAF;3;f64
-SQRTF;2;f64
-LOGF;2;f64
-CMPU;2;u64;ascii
-CMPS;2;s64
-CMPF;2;f64
-JE;1;address
-JNE;1;address
-JGE;1;address
-JL;1;address
-JLE;1;address
-JZ;1;address
-JNZ;1;address
-OUTU;1;u64;ascii
-OUTS;1;s64
-OUTF;1;f64
-OUTA;1;u64
-OUTB;1;u64
-OUTX;1;u64
-HLT;0
+LOADU 5 6 U ( U U off ) # opcode min_arg max_arg types
+LOADS 5 6 S ( S U off )
+LOADF 5 6 F ( F U off )
+LOADV 5 6 V ( V U off )
+LOADT 5 6 T ( T U off )
+LOADG 5 6 G ( G U off )
+STOREU 5 6 ( U U off ) U
+STORES 5 6 ( U U off ) S
+STOREF 5 6 ( U U off ) F
+STOREV 5 6 ( U U off ) V
+STORET 5 6 ( U U off ) T
+STOREG 5 6 ( U U off ) G
+MOV 2 2 any any
+MOVU 2 2 U U
+MOVS 2 2 S S
+MOVF 2 2 F F
+MOVV 2 2 V V
+MOVT 2 2 T T
+MOVG 2 2 G G
+MOVUI 2 2 U imu
+MOVSI 2 2 S ims
+MOVFI 2 2 F imf
+MOVVI 10 10 V { imu imu imu imu imu imu imu imu }
+MOVTI 10 10 T { ims ims ims ims ims ims ims ims }
+MOVGI 10 10 G { imf imf imf imf imf imf imf imf }
+CVTUS 2 2 S U
+CVTSU 2 2 U S
+CVTUF 2 2 F U
+CVTFU 2 2 U F
+CVTSF 2 2 F S
+CVTFS 2 2 S F
+ADDU 3 3 U U U
+SUBU 3 3 U U U
+MULU 3 3 U U U
+DIVU 3 3 U U U
+MODU 3 3 U U U
+FMAU 3 3 U U U
+SQRTU 2 2 U U
+LOGU 2 2 U U
+INCU 1 1 U
+DECU 1 1 U
+ANDU 3 3 U U U
+ORU 3 3 U U U
+XORU 3 3 U U U
+SHLU 3 3 U U U
+SHRU 3 3 U U U
+ROLU 3 3 U U U
+RORU 3 3 U U U
+POPCNTU 2 2 U U
+LMBU 2 2 U U
+ADDS 3 3 S S S
+SUBS 3 3 S S S
+MULS 3 3 S S S
+DIVS 3 3 S S S
+MODS 3 3 S S S
+FMAS 3 3 S S S
+SQRTS 2 2 S S
+LOGS 2 2 S S
+ANDS 3 3 S S S
+ORS 3 3 S S S
+XORS 3 3 S S S
+SHLS 3 3 S S S
+SHRS 3 3 S S S
+ROLS 3 3 S S S
+RORS 3 3 S S S
+POPCNTS 2 2 S S
+LMBS 2 2 S S
+ADDF 3 3 F F F
+SUBF 3 3 F F F
+MULF 3 3 F F F
+DIVF 3 3 F F F
+FMAF 3 3 F F F
+SQRTF 2 2 F F
+LOGF 2 2 F F
+CMPU 2 2 U U
+CMPS 2 2 S S
+CMPF 2 2 F F
+JE 1 1 addr
+JNE 1 1 addr
+JGE 1 1 addr
+JL 1 1 addr
+JLE 1 1 addr
+JZ 1 1 addr
+JNZ 1 1 addr
+OUTU 1 1 U
+OUTS 1 1 S
+OUTF 1 1 F
+OUTA 1 1 U
+OUTB 1 1 U
+OUTX 1 1 U
+HLT 0 0
+PARALLEL_ON 1 1 mask
+PARALLEL_OFF 0 0
+THREAD_ON imu
+LOCK_ON 1 1 imu
+LOCK_OFF 1 1 imu

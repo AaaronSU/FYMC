@@ -1,13 +1,13 @@
 #ifndef _ASSEMBLY_H_
 #define _ASSEMBLY_H_
 
-//Booleans define to make the code more readable
-#define bool int
-#define TRUE 1
-#define FALSE 0
+#include "../tools/types.h"
 
-void write_stuff(char* path, char*** data_array, char*** code_array,
-                long long int* const nb_data, long long int* const nb_code,
-                char*** op_name_list, char*** register_list, char** address_array);
+void write_stuff(char*     path,
+                 char***   tokens_list,   i32* tokens_list_sizes, i32 nb_tokens,
+                 i32 const data_start,    i32 const code_start,
+                 char***   op_name_list,  i32* op_sizes,          i32 op_size,
+                 char***   register_list, i32* register_sizes,    i32 register_size,
+                 char**    address_array, i32  address_size);
 
 #endif

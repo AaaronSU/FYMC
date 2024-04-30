@@ -4,22 +4,24 @@
 
 #include "parse_code/parse_code.h"
 #include "parse_data/parse_data.h"
+#include "../tools/types.h"
 
 
 // str_out is a buffer of size strlen(str_in) + sizeof(char)
 // define it with char str_out [size_without_spaces(str_in, (strlen(str_in) + sizeof(char)), ' ')]
-int size_without_chara(const char* str,
-                        int const taille,
-                        int const chara);
+i32 size_without_chara(const char* str,
+                       i32 const taille,
+                       i32 const chara);
 
-bool alphanumeric(int);
+bool alphanumeric(i32);
 
+i32 label_present(char* str,     char** list,
+                  i32 list_size, bool remove_label_sign);
 
-void nb_ligne_section(char* const nom, long long int* nb_data, long long int* nb_code);
-
-// TODO: test function (normal cases, empty sections, secctions of size 1 and other weird cases)
-bool parse(char* const nom, char*** data_array, char*** code_array,
-           long long int* const nb_data, long long int* const nb_code,
-           char*** op_name_list, char*** register_list, char** address_array);
+i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start,
+          char*** opcodes, i32  len_op,
+          char**  labels,  i32* indice_labels,
+          char**  requested_labels, i32* indice_req,
+          char*** registers,        i32* sizes_registers, i32 len_register);
 
 #endif

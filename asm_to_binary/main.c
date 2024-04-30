@@ -2,121 +2,250 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include "tools/tools.h"
+#include "tools/types.h"
 #include "parse/parse.h"
 #include "assembly/assembly.h"
+
+// TODO Make a function for error handling
 
 /// @brief Main function, used to launch big part of the asm to binary traduction
 /// @param argc Number of arguments in the command line
 /// @param argv Values of arguments in the command line
 /// @return 0 if everything went well, 1 if something went wrong
-int main(int argc, char** argv)
+i32 main(i32 argc, char** argv)
 {
-    //Is argv[1] a valid file ?
-    if(file_verification(argc, argv) == FALSE)
+  if (argc != 2 && argc != 3)
+  {
+    printf("Invalid number of argument. Usage: %s [source] [destination] ; destination is optional.\n", argv[0]);
+    return EXIT_FAILURE;
+  }
+
+  char* destination;
+  if (argc == 2)
+  {
+    destination = malloc(8 * sizeof(char));
+    memcpy(destination, "a.archy", 8);
+  }
+  else
+  {
+    i32 taille  = strlen(argv[2]) + 1;
+    destination = malloc(taille * sizeof(char));
+    if (destination == NULL)
     {
-        return EXIT_FAILURE;
+      perror("malloc in main");
+      return EXIT_FAILURE;
     }
 
-    long long int nb_code = 0;
-    long long int nb_data = 0;
+    memcpy(destination, argv[2], taille);
+  }
 
-    nb_ligne_section(argv[1], &nb_data, &nb_code);
-    if (nb_code <= 0 || nb_data < 0)
+  char*** tokens_list;
+  i32*    tokens_list_sizes;
+  FILE*   f;  // NOTE: tokenize function closes the file
+
+  i32         taille_fichier;
+  struct stat st;
+
+  if (stat(argv[1], &st) == -1)
+  {
+      perror("stat in main");
+      return EXIT_FAILURE;
+  }
+  // If is a dir
+  if (!S_ISREG(st.st_mode))
+  {
+    free(destination);
+    fprintf(stderr, "%s is a directory\n", argv[1]);
+    return EXIT_FAILURE;
+  }
+  taille_fichier = st.st_size;
+
+  f = fopen(argv[1], "r");
+  if(f == NULL)
+  {
+    fprintf(stderr, "Could not open %s\n", argv[1]);
+    perror("fopen in main");
+    return EXIT_FAILURE;
+  }
+
+  tokens_list = calloc(taille_fichier, sizeof(char**));
+  if (tokens_list == NULL)
+  {
+    perror("malloc in main");
+    return EXIT_FAILURE;
+  }
+  tokens_list_sizes = calloc(taille_fichier, sizeof(int));
+  if (tokens_list_sizes == NULL)
+  {
+    perror("malloc in main");
+    return EXIT_FAILURE;
+  }
+
+  int nb_tokens = tokenize(f, tokens_list, tokens_list_sizes);
+  if (nb_tokens == -1)
+  {
+    return EXIT_FAILURE;
+  }
+
+
+  // Opcodes
+  char*** opcodes_list;
+  i32*    opcodes_list_sizes;
+  FILE*   f_op;
+
+  if (stat("op_codes", &st) == -1)
+  {
+      perror("stat in main");
+      return EXIT_FAILURE;
+  }
+  taille_fichier = st.st_size;
+
+  f_op = fopen("op_codes", "r");
+  if(f_op == NULL)
+  {
+    fprintf(stderr, "Could not open %s\n", "op_codes");
+    perror("fopen in main");
+    return EXIT_FAILURE;
+  }
+
+  opcodes_list = calloc(taille_fichier, sizeof(char**));
+  if (opcodes_list == NULL)
+  {
+    perror("malloc in main");
+    return EXIT_FAILURE;
+  }
+  opcodes_list_sizes = calloc(taille_fichier, sizeof(i32));
+  if (opcodes_list_sizes == NULL)
+  {
+    perror("malloc in main");
+    return EXIT_FAILURE;
+  }
+
+  i32 nb_tokens_op = tokenize(f_op, opcodes_list, opcodes_list_sizes);
+  if (nb_tokens_op == -1)
+  {
+    return EXIT_FAILURE;
+  }
+
+  char*** registers;
+  i32*    sizes_registers;
+  i32     len_register;
+  FILE*   f_reg;
+
+  if (stat("register_list", &st) == -1)
+  {
+      perror("stat in parse");
+      return EXIT_FAILURE;
+  }
+  taille_fichier = st.st_size;
+
+  f_reg = fopen("register_list", "r");
+  if(f_reg == NULL)
+  {
+    fprintf(stderr, "Could not open %s\n", "register_list");
+    perror("fopen in parse");
+    return EXIT_FAILURE;
+  }
+
+  registers       = calloc(taille_fichier, sizeof(char**));
+  sizes_registers = calloc(taille_fichier, sizeof(i32));
+
+  len_register = tokenize(f_reg, registers, sizes_registers);
+  if (len_register == -1 || len_register == -3)
+  {
+    return EXIT_FAILURE;
+  }
+  else if (len_register == -2)
+  {
+    return EXIT_FAILURE;
+  }
+
+
+  i32 result;
+  i32 data_start;
+  i32 code_start;
+  i32 indice_labels       = 0;
+  i32 indice_req          = 0;
+  char** labels           = calloc(nb_tokens_op, sizeof(char**));
+  char** requested_labels = calloc(nb_tokens_op, sizeof(char**));
+  result = parse(tokens_list,      tokens_list_sizes, nb_tokens,
+                 &data_start,      &code_start,
+                 opcodes_list,     nb_tokens_op,
+                 labels,           &indice_labels,
+                 requested_labels, &indice_req,
+                 registers,        sizes_registers, len_register);
+
+  if (result == true)
+  {
+    write_stuff(destination,  tokens_list, tokens_list_sizes, nb_tokens,
+                data_start,   code_start,
+                opcodes_list, opcodes_list_sizes, nb_tokens_op,
+                registers,    sizes_registers, len_register,
+                requested_labels, indice_req);
+  }
+
+  else if (result == -2)
+  {
+    printf("Invalid syntax.\n");
+    goto END;
+  }
+  else
+  {
+    printf("Invalid syntax.\n");
+  }
+  for (u64 i = 0; i < nb_tokens; ++i)
+  {
+    for (u64 j = 0; j < tokens_list_sizes[i]; ++j)
     {
-        fprintf(stderr, "No Code Section!\n");
-        //TODO: exit properly
-        return EXIT_FAILURE;
+//      printf("'%s' ", tokens_list[i][j]);
+      free(tokens_list[i][j]);
     }
-
-    //NOTE calloc of size nb+1 so that memory is mine, but last elt is NULL
-    // (set to NULL is parse)
-    char*** code_array = calloc(nb_code + 1, sizeof(char**));
-    for (size_t i = 0; i < nb_code; ++i)
+//    printf("\n");
+    free(tokens_list[i]);
+  }
+  free(tokens_list);
+  free(tokens_list_sizes);
+  for (u64 i = 0; i < nb_tokens_op; ++i)
+  {
+    for (u64 j = 0; j < opcodes_list_sizes[i]; ++j)
     {
-        code_array[i] = calloc(128, sizeof(char*));
-        for(size_t j = 0; j < 128; ++j)
-        {
-            code_array[i][j] = calloc(128, sizeof(char));
-        }
+      // printf("'%s' ", opcodes_list[i][j]);
+      free(opcodes_list[i][j]);
     }
+    // printf("\n");
+    free(opcodes_list[i]);
+  }
+  free(opcodes_list);
+  free(opcodes_list_sizes);
 
-    char*** data_array;
-    if (nb_data > 0)
-        {
-            data_array = calloc(nb_data + 1, sizeof(char**));
-            for (size_t i = 0; i <nb_data; ++i)
-            {
-                data_array[i] = calloc(128, sizeof(char*));
-                for(size_t j = 0; j < 128; ++j)
-                {
-                    data_array[i][j] = calloc(128, sizeof(char));
-                }
-            }
-        }
+  for (u64 i = 0; i < indice_labels; ++i)
+  {
+    free(labels[i]);
+  }
+  free(labels);
+  for (u64 i = 0; i < indice_req; ++i)
+  {
+    free(requested_labels[i]);
+  }
+  free(requested_labels);
 
-    //Where the op name and specification are stored
-    char*** op_name_list = tokenize("op_codes");
-
-
-    //Where the registers infos are stored
-    char*** register_list = tokenize("register_list");
-
-    char** address_array = calloc(nb_code + 1, sizeof(char**));
-    for (size_t i = 0; i <nb_code; ++i)
+  for (u64 i = 0; i < len_register; ++i)
+  {
+    for (u64 j = 0; j < sizes_registers[i]; ++j)
     {
-        address_array[i] = calloc(2, sizeof(long int));
+      free(registers[i][j]);
     }
-    // NOTE: Probably no alias if 1 code line ; untested case but shouldn't happen
-    // TODO: Make a special case for note above
-    free(address_array[nb_code]);
-    address_array[nb_code] = NULL;
-    strcpy(address_array[0], "1");
+    free(registers[i]);
+  }
+  free(registers);
+  free(sizes_registers);
 
-    // NOTE: Maybe something will go wrong with pointers, const and stuff idk
-    // TODO: test parse (normal cases, empty sections, sections of size 1 and other weird cases)
-    bool parsing_went_alright = parse(argv[1], data_array, code_array,
-                                        &nb_data, &nb_code,
-                                        op_name_list, register_list, address_array);
+  END:
+  free(destination);
+  printf("%d\n", result);
 
-    printf("Parsing result: %d\n", parsing_went_alright);
-    // printf("%c\n", code_array[0][0][0]);
-    // print_tokens_line(address_array);
-
-    // print_tokens_list(code_array);
-    // print_tokens_list(data_array);
-
-    // printf("writing\n");
-
-    if (parsing_went_alright)
-        write_stuff("file_test", data_array, code_array,
-                    &nb_data, &nb_code, op_name_list, register_list, address_array);
-
-    free_char3(op_name_list, 128, 128);
-    free_char3(register_list, 128, 128);
-    if (nb_data > 0)
-        free_char3(data_array, nb_data, 128);
-    free_char3(code_array, nb_code, 128);
-    free_char2(address_array, nb_code);
-
-/*
-    //We load the file to assemble in memory
-    char* file = load_file(argv[1]);
-
-    //print_file(file);
-
-    //Initialization of operand code behaviour
-    // if(parse() == FALSE)
-    // {
-    //     return EXIT_FAILURE;
-    // }
-
-    // assembly();
-
-    //We dont need the file loaded in memory anymore
-    free(file);
-*/
-
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
