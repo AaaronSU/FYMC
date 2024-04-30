@@ -2,18 +2,12 @@
 
 #define _PARSE_CODE_H_
 
-#define bool int
+#include "../../tools/types.h"
 
-// Last element of array must be NULL !!!
-bool detect_alias(char** array);
-bool correct_alias(char** array);
-
-//Detect if a line is correctly writed
-int detect_op_code(char*,char***);
-bool correct_op_code(char**,char**,char***,char***, char**);
-bool correct_register_name(char*,char**,char***);
-
-// NOTE: We may want to comment the above
-bool correct_line(char** line, char*** op_name_list, char*** register_list, char*** data_array, char** address_array);
+i32 good_opcode   (char* in, char*** opcodes,   i32 len_op);
+bool good_register(char* in, char*** registers, i32 len_registers,
+                   char letter);
+i32 label_present (char* str, char** list, i32 list_size,
+                   bool remove_label_sign);
 
 #endif

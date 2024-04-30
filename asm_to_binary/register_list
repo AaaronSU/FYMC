@@ -1,6 +1,6 @@
-U;32;u64;ascii
-S;32;s64
-F;32;f64
-V;32;u64;ascii
-T;32;s64
-G;32;f64
+U 0 32 u64 ascii
+S 0 32 s64
+F 0 32 f64
+V 0 32 u64 ascii
+T 0 32 s64
+G 0 32 f64
