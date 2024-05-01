@@ -335,8 +335,8 @@ i64 assemble_code(char***   tokens_list,
     {
       i64 tmp_number           = *thread_number + 1;
       *thread_number           = tmp_number;
-      thread_array[tmp_number] = *taille_code;
-      thread_mask[tmp_number]  = retreive_value(tokens_list[i][1]);
+      thread_array[tmp_number] = htobe64(*taille_code);
+      thread_mask[tmp_number]  = htobe64(retreive_value(tokens_list[i][1]));
       i64 max                  = get_max(tokens_list[i][1]);
       if (max > *thread_max)
       {
@@ -418,7 +418,7 @@ void write_header(FILE* fp, i64 size_data, i64 size_code, i64 thread_number, i64
   //TODO add parallel data in header
   i64 to_write[8]  = {magic_number, size_header,
                       address_data, address_code,
-                      max_thread, address_threads,
+                      htobe64(max_thread), address_threads,
                       size_threads, size_total};
   fwrite(to_write, sizeof(i64), 8, fp);  // With 8 sizeof i64 (8 bytes)
   return;
@@ -467,8 +467,8 @@ void write_threads(FILE* fp, i64* thread_array, i64* thread_masks, i64 thread_nu
   for (i64 i = 0; i < thread_number; ++i)
   {
 //    printf("data: '%s'\n", data_to_write[i]);
-    fwrite(htobe64(thread_array[i]), sizeof(i32), 1, fp);
-    fwrite(htobe64(thread_masks[i]), sizeof(i32), 1, fp);
+    fwrite(thread_array+i, sizeof(i64), 1, fp);
+    fwrite(thread_masks+i, sizeof(i64), 1, fp);
   }
   return;
 }
