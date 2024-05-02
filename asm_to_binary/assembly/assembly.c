@@ -15,6 +15,22 @@
 #include "../tools/types.h"
 
 
+i64 get_number_of_one(char* mask)
+{
+  i64 taille = strlen(mask);
+  i64 return_value = 0;
+  for (i64 i = 2; i < taille; ++i)
+  {
+    if (mask[i] == '1')
+    {
+      ++return_value;
+    }
+  }
+  return return_value;
+}
+
+
+
 i64 get_max(char* mask)
 {
   i64 taille = strlen(mask);
@@ -46,9 +62,9 @@ i64 retreive_value(char* mask)
 
 
 // Checks if ligne[0] is in address_array
-bool its_an_alias(char* ligne, char** address_array, u64* i)
+bool its_an_alias(char* ligne, char** address_array, u64* i, i32 address_size)
 {
-  for (*i=1; *i <= atoi(address_array[0]); *i = *i + 1)
+  for (*i=0; *i < address_size; *i = *i + 1)
   // for (u64 i = 1; address_array[i] != NULL; ++i)
   {
     // Alias gotta be first in line
@@ -85,7 +101,8 @@ void code_to_number(char*** tokens_list,   i32* tokens_sizes, i32 tokens_size,
                     i32*    to_write,      i64* immediate_value,
                     char*** register_list, i32* reg_sizes, i32 reg_size,
                     bool*   imm, bool* vec,
-                    i64*    ascii_address, char** ascii_written, bool* thread_on)
+                    i64*    ascii_address, char** ascii_written, bool* thread_on,
+                    i64*    thread_adresse, i32 address_size)
 {
   // We'll write 32 bits => 4 bytes => 1 i32
   // 8 bits opcode
@@ -123,6 +140,11 @@ void code_to_number(char*** tokens_list,   i32* tokens_sizes, i32 tokens_size,
   if (position == 93)
   {
     *thread_on = true;
+    *imm       = true;
+    *to_write  += position << 24;
+    immediate_value[0] = htobe64(*thread_adresse + 1);
+    *thread_adresse    += get_number_of_one(tokens_list[indice][1]);
+    immediate_value[1] = htobe64(*thread_adresse);
     return;
   }
 
@@ -162,13 +184,13 @@ void code_to_number(char*** tokens_list,   i32* tokens_sizes, i32 tokens_size,
     if (isalpha(tokens_list[indice][i][0]))
     {
       // If it's an alias
-//      u64 j = 1;
-//      if (its_an_alias(tokens_list[indice][i], address_array, &j))
-//      {
-//        immediate_value[0] = address_indices[j];
-//        *imm = true;
-//        continue;
-//      }
+     u64 j = 1;
+     if (its_an_alias(tokens_list[indice][i], address_array, &j, address_size))
+     {
+       immediate_value[0] = address_indices[j];
+       *imm = true;
+       continue;
+     }
 
 
       // If it's a register
@@ -304,6 +326,7 @@ i64 assemble_code(char***   tokens_list,
   i32 j                = 1;
   i32 l                = 0;
   i64 taille           = 0;
+  i64 thread_adresse   = 0;
 
   for (u64 i = code_start + 1; i < tokens_size; ++i)
   {
@@ -328,7 +351,8 @@ i64 assemble_code(char***   tokens_list,
                    &instr_to_write, immediate_value,
                    register_list,   reg_sizes, reg_size,
                    &imm, &vec,
-                   ascii_address,   ascii_written, &thread_on);
+                   ascii_address,   ascii_written, &thread_on,
+                   &thread_adresse, address_size);
 //    printf("instr: %s ; imm: %d ; vec: %d\n", tokens_list[i][0], imm, vec);
 
 
@@ -348,15 +372,19 @@ i64 assemble_code(char***   tokens_list,
 
     if (imm == true)
     {
-      if (vec == false)
+      if (vec == false && thread_on == false)
       {
         instr_to_write += immediate_value[0] << 15;
       }
       else
       {
+        u8 max = 8;
+        if (thread_on == true)
+        {
+          max = 2;
+        }
         *there_is_something_to_write = true;
-        //TODO replace 8 by vec_size (define?)
-        for (u64 j = 0; j < 8; ++j)
+        for (u64 j = 0; j < max; ++j)
         {
           imm_to_write[l] = htobe64(immediate_value[j]);
           imm_indice[l]   = *taille_code;
@@ -408,19 +436,17 @@ i64 assemble_data(char*** tokens_list,   i32 const code_start,
 
 void write_header(FILE* fp, i64 size_data, i64 size_code, i64 thread_number, i64 max_thread)
 {
-  // TODO: check those addresses (might lack a +1 or something) and magic_number
-  i64 magic_number    = htobe64(0x4152434859302E30); // Check that
-  i64 size_header     = htobe64(72);
-  i64 address_threads = htobe64(size_header);
-  i64 size_threads    = htobe64(thread_number);
-  i64 address_data    = htobe64(address_threads + size_threads);
-  i64 address_code    = htobe64(address_data + size_data);
-  i64 size_total      = htobe64(address_code + size_code);
-  //TODO add parallel data in header
-  i64 to_write[8]  = {magic_number, size_header,
-                      address_data, address_code,
-                      htobe64(max_thread), address_threads,
-                      size_threads, size_total};
+  i64 magic_number    = 0x4152434859302E30;
+  i64 size_header     = 72;
+  i64 address_threads = size_header;
+  i64 size_threads    = thread_number;
+  i64 address_data    = address_threads + size_threads;
+  i64 address_code    = address_data + size_data;
+  i64 size_total      = address_code + size_code;
+  i64 to_write[8]     = {htobe64(magic_number), htobe64(size_header),
+                         htobe64(address_data), htobe64(address_code),
+                         htobe64(max_thread),   htobe64(address_threads),
+                         htobe64(size_threads), htobe64(size_total)};
   fwrite(to_write, sizeof(i64), 8, fp);  // With 8 sizeof i64 (8 bytes)
   return;
 }
