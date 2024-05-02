@@ -6,6 +6,7 @@
 #include <ctype.h>
 #include <sys/stat.h>
 #include <endian.h>
+#include <errno.h>
 
 // #include "../parse/parse_code/parse_code.h"
 // #include "../parse/parse_data/parse_data.h"
@@ -510,6 +511,10 @@ void write_stuff(char*     path,
 
   if (stat(path, &st) == -1)
   {
+    if (errno == 2)
+    {
+      goto CREATE_FILE;
+    }
     perror("stat in write_stuff");
     return;
   }
@@ -519,6 +524,7 @@ void write_stuff(char*     path,
     return;
   }
 
+  CREATE_FILE:
   file = fopen(path, "w");
   if(file == NULL)
   {
