@@ -613,14 +613,16 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
         }
         else if (strcasecmp(opcodes[opcode][indice_opcode], "mask") == 0)
         {
+
           //TODO check if this works
-          if (in[indice_in][i][0] == '0' && in[indice_in][i][1] == 'x')
+          if (in[indice_in][i][0] == '0' && in[indice_in][i][1] == 'b')
           {
             i32 taille = strlen(in[indice_in][i]) - 1;
             char* tmp = malloc(taille * sizeof(char));
-            memcpy(tmp, in[i]+2, taille);
+            memcpy(tmp, in[indice_in][i]+2, taille);
             if (good_integer(tmp, false) == true)
             {
+
               free(tmp);
               return_value = true;
               ++indice_opcode;
@@ -744,10 +746,12 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
       {
         if (good_variable(in[indice_line], opcodes, len_op) == false)
         {
-          if (printf("Invalid variable in data section\n") < 0)
+          fprintf(stderr, "Invalid operation in code section:");
+          for (i32 ind = 0; ind < sizes[indice_line]; ++ind)
           {
-            perror("printf in parse");
+            fprintf(stderr, " %s", in[indice_line][ind]);
           }
+          fprintf(stderr, "\n");
           return_value = false;
           goto END_parse;
         }
@@ -814,6 +818,12 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
       }
       else if (tmp == false)
       {
+        fprintf(stderr, "Invalid operation in code section:");
+        for (i32 ind = 0; ind < sizes[indice_line]; ++ind)
+        {
+          fprintf(stderr, " %s", in[indice_line][ind]);
+        }
+        fprintf(stderr, "\n");
         return_value = false;
         goto END_parse;
       }

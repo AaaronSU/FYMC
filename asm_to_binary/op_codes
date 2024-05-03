@@ -1,9 +1,9 @@
 LOADU 5 6 U ( U U off ) # opcode min_arg max_arg types
-LOADS 5 6 S ( S U off )
-LOADF 5 6 F ( F U off )
-LOADV 5 6 V ( V U off )
-LOADT 5 6 T ( T U off )
-LOADG 5 6 G ( G U off )
+LOADS 5 6 S ( U U off )
+LOADF 5 6 F ( U U off )
+LOADV 5 6 V ( U U off )
+LOADT 5 6 T ( U U off )
+LOADG 5 6 G ( U U off )
 STOREU 5 6 ( U U off ) U
 STORES 5 6 ( U U off ) S
 STOREF 5 6 ( U U off ) F
@@ -91,6 +91,8 @@ OUTX 1 1 U
 HLT 0 0
 PARALLEL_ON 1 1 mask
 PARALLEL_OFF 0 0
-THREAD_ON mask
+THREAD_ON 1 1 mask
+THREAD_OFF 0 0
 LOCK_ON 1 1 imu
 LOCK_OFF 1 1 imu
+GET_CORE 1 1 U

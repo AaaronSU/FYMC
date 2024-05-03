@@ -178,6 +178,19 @@ i32 make_tokens(char* line, char** out, u64 len)
 
   for (u64 i = 0; i < len; ++i)
   {
+    if (line[i] == '\\')
+    {
+      if (i + 1 < len)
+      {
+        if (line[i + 1] == 'n')
+        {
+          tmp[current_size++] = '\n';
+          ++i;
+          continue;
+        }
+      }
+    }
+
     // Handling character chains
     if (line[i] == '"')
     {

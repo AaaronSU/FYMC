@@ -245,7 +245,7 @@ i32 main(i32 argc, char** argv)
 
   END:
   free(destination);
-  printf("%d\n", result);
+  // printf("%d\n", result);
 
   return EXIT_SUCCESS;
 }
