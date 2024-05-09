@@ -131,7 +131,8 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
                     bool*   imm, bool* vec,
                     i64*    ascii_address,  char** ascii_written, bool* thread_on,
                     u64*    thread_adresse, i32 address_size,     u64* thread_rank,
-                    bool*   parallel_on,    bool* parallel_off)
+                    bool*   parallel_on,    bool* parallel_off,
+                    bool*   its_a_jump,     u64*  indice_label)
 {
   // We'll write 32 bits => 4 bytes => 1 i32
   // 8 bits opcode
@@ -159,6 +160,21 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
   i32 position = get_op_position(tokens_list[indice][0],
                                  op_name_list, op_list_size);
   *to_write  += position << 24;
+
+  // If it's a jump
+  if (position >= 77 && position <= 83)
+  {
+    *its_a_jump = true;
+    for (u64 indice = 0; address_array[indice] != NULL;  ++indice)
+    {
+      if (strcmp(address_array[indice], tokens_list[indice][indice]) == 0)
+      {
+        *indice_label = indice;
+        return;
+      }
+    }
+    return;  // Should be unreachable
+  }
 
   if (position == 91)
   {
@@ -228,9 +244,9 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
      u64 j = 1;
      if (its_an_alias(tokens_list[indice][i], address_array, &j, address_size))
      {
-       immediate_value[0] = address_indices[j];
-       *imm = true;
-       continue;
+        immediate_value[0] = address_indices[j];
+        *imm = true;
+        continue;
      }
 
       // If it's a register
@@ -369,16 +385,20 @@ i64 assemble_code(char***   tokens_list,
 {
   // We need to know on which line they are
   // address_array[i] <=> address_indices[i]
-  // (Do note that address_indices[0] = 0)
   u64* address_indices = calloc(address_size + 2, sizeof(u64));
-  u32 j                = 1;
+  u32 j                = 0;
   u32 l                = 0;
   u64 taille           = 0;
   u64 thread_adresse   = 0;
   u64 thread_ind_addr  = 0;
   u64 thread_rank      = 0;
+  u64 indice_adresse   = 0;
 
-  address_indices[0] = 0;
+  // address_indices[0] = 0;
+  // for (u32 i = 0; i <address_size +2; ++i)
+  //   fprintf(stderr, "%s\n", address_array[i]);
+  u64* where_to_write = calloc(tokens_size, sizeof(u64));
+  u64* what_to_write  = calloc(tokens_size, sizeof(u64));
 
   for (u64 i = code_start + 1; i < tokens_size; ++i)
   {
@@ -386,7 +406,7 @@ i64 assemble_code(char***   tokens_list,
     // if (its_an_alias(code_array[i], address_array))
     if (tokens_list[i][0][strlen(tokens_list[i][0]) - 1] == 58)
     {
-      address_indices[j++] = taille + size_data; // Check indice
+      address_indices[j++] = htobe64(taille + size_data + header_size * sizeof(i64)); // Check indice
       // fprintf(stderr, "j = %d address_size = %d\n", j, address_size);
       continue;
     }
@@ -398,6 +418,8 @@ i64 assemble_code(char***   tokens_list,
     bool thread_on           = false;
     bool parallel_on         = false;
     bool parallel_off        = false;
+    bool its_a_jump          = false;
+    u64  indice_label        = 0;
 
     code_to_number(tokens_list,     tokens_sizes, tokens_size,
                    code_start,      i,
@@ -408,11 +430,22 @@ i64 assemble_code(char***   tokens_list,
                    &imm, &vec,
                    ascii_address,   ascii_written, &thread_on,
                    &thread_adresse, address_size,  &thread_rank,
-                   &parallel_on,    &parallel_off);
+                   &parallel_on,    &parallel_off,
+                   &its_a_jump,     &indice_label);
 //    printf("instr: %s ; imm: %d ; vec: %d\n", tokens_list[i][0], imm, vec);
     // fprintf(stderr, "instruction : %d immediate_values =", instr_to_write >> 24);
 
     // fprintf(stderr, "imm=%ld i=%ld l=%d\n", imm_indice[l], i, l);
+
+    if (its_a_jump == true)
+    {
+      where_to_write[indice_adresse] = l;
+      what_to_write[indice_adresse]  = indice_label;
+      imm_indice[l]                  = *taille_code;
+      ++l;
+      ++indice_adresse;
+      taille += sizeof(i64);
+    }
 
     if (thread_on == true)
     {
@@ -488,7 +521,15 @@ i64 assemble_code(char***   tokens_list,
     free(immediate_value);
     // fprintf(stderr, "\n");
   }
+
+  for (u64 i = 0; i < indice_adresse; ++i)
+  {
+    imm_to_write[where_to_write[i]] = address_indices[what_to_write[i]];
+  }
+
   free(address_indices);
+  free(where_to_write);
+  free(what_to_write);
   return taille;
 }
 
