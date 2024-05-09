@@ -409,7 +409,7 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
                   // Finding the variable in the data section
                   if (strcmp(var_tmp, in[k][1]) == 0)
                   {
-                    if (strcmp(in[k][0], "u64") == 0)
+                    if (strcasecmp(in[k][0], "u64") == 0)
                     {
                       good = true;
                       break;
@@ -593,11 +593,15 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
               if (is_present == -1)
               {
                 return_value = -1;
+                goto END_good_instruction;
               }
-              goto END_good_instruction;
+              else if (is_present == true)
+              {
+                continue;
+              }
             }
             // requested_labels = realloc(requested_labels, *indice_req + 1);
-            requested_labels[*indice_req] = malloc(strlen(in[indice_in][i] + 1)
+            requested_labels[*indice_req] = malloc((strlen(in[indice_in][i]) + 1)
                                                    * sizeof(char));
             if (requested_labels[*indice_req] == NULL)
             {
@@ -613,8 +617,7 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
         }
         else if (strcasecmp(opcodes[opcode][indice_opcode], "mask") == 0)
         {
-
-          //TODO check if this works
+          // Masks are in the form 0bxxx with xxx 0 or 1
           if (in[indice_in][i][0] == '0' && in[indice_in][i][1] == 'b')
           {
             i32 taille = strlen(in[indice_in][i]) - 1;
@@ -680,50 +683,12 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
           char**  requested_labels, i32* indice_req,
           char*** registers, i32* sizes_registers, i32 len_register)
 {
+  // TODO: Find "Conditional jump or move depends on uninitialised value(s)"
   i32 return_value       = 0;
   i32 indice_line        = 0;
   i32 indice_within_line = 0;
 
-  // char*** registers;
-  // i32* sizes_registers;
-  // i32 len_register;
-  // FILE* f;
-  //
-  // i32 taille_fichier;
-  // struct stat st;
-  //
-  // if (stat("register_list", &st) == -1)
-  // {
-  //     perror("stat in parse");
-  //     return_value = -1;
-  //     goto END_parse;
-  // }
-  // taille_fichier = st.st_size;
-  //
-  // f = fopen("register_list", "r");
-  // if(f == NULL)
-  // {
-  //   fprintf(stderr, "Could not open %s\n", "register_list");
-  //   perror("fopen in parse");
-  //   return_value = -1;
-  //   goto END_parse;
-  // }
-  //
-  // registers = calloc(taille_fichier, sizeof(char**));
-  // sizes_registers = calloc(taille_fichier, sizeof(i32));
-  //
-  // len_register = tokenize(f, registers, sizes_registers);
-  // if (len_register == -1 || len_register == -3)
-  // {
-  //   return_value = -2;
-  //   goto END_parse;
-  // }
-  // else if (len_register == -2)
-  // {
-  //   return_value = -3;
-  //   goto END_parse;
-  // }
-
+  // Checking if data section is properly declared
   if (strcmp(in[0][0], "data:") == 0)
   {
     if (sizes[0] != 1)
@@ -739,6 +704,7 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
     *data_start = 0;
     ++indice_line;
 
+    // Checking everything in data section until code section or EOF
     while(strcmp(in[indice_line][0], "code:") != 0 && indice_line < len)
     {
       // Lines in data must be 3 tokens
@@ -746,6 +712,7 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
       {
         if (good_variable(in[indice_line], opcodes, len_op) == false)
         {
+          // Trying to give some information about error
           fprintf(stderr, "Invalid operation in code section:");
           for (i32 ind = 0; ind < sizes[indice_line]; ++ind)
           {
@@ -755,7 +722,6 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
           return_value = false;
           goto END_parse;
         }
-
       }
       ++indice_line;
     }
@@ -766,9 +732,11 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
   }
   else
   {
+    // No data section ; not a problem since it's optionnal
     *data_start = -1;
   }
 
+  // Checking everything in code section until EOF
   if (strcmp(in[indice_line][0], "code:") == 0 && indice_line < len)
   {
     if (sizes[indice_line] != 1)
@@ -786,8 +754,8 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
       ++indice_line;
     }
 
-    i32  tmp;
-    i32  i_data;
+    // Checking instructions
+    i32 tmp;
     bool parallel_on = false;
     while (indice_line < len)
     {
@@ -799,10 +767,7 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
                              requested_labels, indice_req, &parallel_on);
       if (tmp == -1)
       {
-        if (printf("An error occured, exiting.\n") < 0)
-        {
-          perror("printf in parse");
-        }
+        fprintf(stderr, "An error occured, exiting.\n");
         for (i32 i = 0; i < *indice_labels; ++i)
         {
           free(labels[i]);
@@ -838,17 +803,14 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
 
   else
   {
-    if (printf("Could not detect code section.\n") < 0)
-    {
-      perror("printf in parse");
-    }
+    fprintf(stderr, "Could not detect code section.\n");
     return_value = false;
     goto END_parse;
   }
 
 
   // Checking if every requested label has been defined
-  i32 cpt = 0;
+  i32 cpt    = 0;
   for (i32 i = 0; i < *indice_req; ++i)
   {
     for (i32 j = 0; j < *indice_labels; ++j)
@@ -862,10 +824,7 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
   }
   if (cpt != *indice_req)
   {
-    if (printf("At least one jump goes to an undefined label.\n") < 0)
-    {
-      perror("printf in parse");
-    }
+    fprintf(stderr, "At least one jump goes to an undefined label.\n");
     return_value = false;
   }
 

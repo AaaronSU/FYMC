@@ -9,7 +9,7 @@
 /// Returns true if the variable is valid, false if it is not
 bool good_variable(char** line, char*** opcodes, i32 len_op)
 {
-  bool return_value;
+  bool return_value = false;
 
   if (strcmp(line[0], "ascii") == 0)
   {

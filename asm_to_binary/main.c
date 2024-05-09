@@ -9,7 +9,7 @@
 #include "parse/parse.h"
 #include "assembly/assembly.h"
 
-// TODO Make a function for error handling
+// TODO Make a function for error handling (make it more readable)
 
 /// @brief Main function, used to launch big part of the asm to binary traduction
 /// @param argc Number of arguments in the command line

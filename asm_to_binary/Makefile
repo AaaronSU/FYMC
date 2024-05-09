@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-std=c17
+CFLAGS=-std=c11
 
 all: fymcc
 
