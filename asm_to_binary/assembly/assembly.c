@@ -132,7 +132,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
                     i64*    ascii_address,  char** ascii_written, bool* thread_on,
                     u64*    thread_adresse, i32 address_size,     u64* thread_rank,
                     bool*   parallel_on,    bool* parallel_off,
-                    bool*   its_a_jump,     u64*  indice_label)
+                    bool*   its_a_jump,     u64*  indice_label,   u64 op_size)
 {
   // We'll write 32 bits => 4 bytes => 1 i32
   // 8 bits opcode
@@ -154,22 +154,22 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
    General idea :
     The function calculates the i32 corresponding to the instruction (see above)
 
-   mov and parallelism are handled in their own way as they require extra work
+   mov, jump and parallelism are handled in their own way as they require extra work
 
    */
   i32 position = get_op_position(tokens_list[indice][0],
                                  op_name_list, op_list_size);
-  *to_write  += position << 24;
+  *to_write    += position << 24;
 
   // If it's a jump
   if (position >= 77 && position <= 83)
   {
     *its_a_jump = true;
-    for (u64 indice = 0; address_array[indice] != NULL;  ++indice)
+    for (u64 k = 0; k < op_size;  ++k)
     {
-      if (strcmp(address_array[indice], tokens_list[indice][indice]) == 0)
+      if (strcmp(address_array[k], tokens_list[indice][1]) == 0)
       {
-        *indice_label = indice;
+        *indice_label = k;
         return;
       }
     }
@@ -395,7 +395,7 @@ i64 assemble_code(char***   tokens_list,
   u64 indice_adresse   = 0;
 
   // address_indices[0] = 0;
-  // for (u32 i = 0; i <address_size +2; ++i)
+  // for (u32 i = 0; i <address_size; ++i)
   //   fprintf(stderr, "%s\n", address_array[i]);
   u64* where_to_write = calloc(tokens_size, sizeof(u64));
   u64* what_to_write  = calloc(tokens_size, sizeof(u64));
@@ -431,7 +431,7 @@ i64 assemble_code(char***   tokens_list,
                    ascii_address,   ascii_written, &thread_on,
                    &thread_adresse, address_size,  &thread_rank,
                    &parallel_on,    &parallel_off,
-                   &its_a_jump,     &indice_label);
+                   &its_a_jump,     &indice_label, op_list_size);
 //    printf("instr: %s ; imm: %d ; vec: %d\n", tokens_list[i][0], imm, vec);
     // fprintf(stderr, "instruction : %d immediate_values =", instr_to_write >> 24);
 
@@ -439,6 +439,7 @@ i64 assemble_code(char***   tokens_list,
 
     if (its_a_jump == true)
     {
+      // fprintf(stderr, "%ld\n", indice_label);
       where_to_write[indice_adresse] = l;
       what_to_write[indice_adresse]  = indice_label;
       imm_indice[l]                  = *taille_code;
@@ -525,6 +526,7 @@ i64 assemble_code(char***   tokens_list,
   for (u64 i = 0; i < indice_adresse; ++i)
   {
     imm_to_write[where_to_write[i]] = address_indices[what_to_write[i]];
+    // fprintf(stderr, "%ld\n", what_to_write[i]);
   }
 
   free(address_indices);
@@ -560,35 +562,6 @@ i64 assemble_data(char*** tokens_list,   i32 const code_start,
   }
   return retour;
 }
-
-
-// void write_header(FILE* fp, i64 size_data, i64 size_code, i64 thread_number, i64 max_thread)
-// {
-//
-//   #define header_size 7
-//   i64 magic_number    = 0x4152434859302E30;
-//   i64 size_header     = header_size * sizeof(i64);
-//   i64 address_data    = header_size;
-//   i64 address_code    = address_data + size_data;
-//   // i64 address_threads = address_code + size_code;
-//   // i64 size_threads    = thread_number * 2 * sizeof(i64);
-//   i64 size_total      = address_code + size_code;
-//   i64 to_write[header_size] = {htobe64(magic_number),    htobe64(header_size),
-//                                htobe64(address_data),    htobe64(size_data),
-//                                htobe64(address_code),    htobe64(size_code),
-//                                htobe64(size_total)};
-//   if (fwrite(to_write, sizeof(i64), header_size, fp) == 0)
-//     {
-//       fprintf(stderr, "An error happened upon writing, exiting.\n");
-//       //TODO complete error handling
-//     }
-//   // for (i64 i = 0; i <header_size; ++i)
-//   // {
-//   //   fprintf(stderr, "%ld\n", be64toh(to_write[i]));
-//   // }
-//   return;
-// }
-
 
 
 void write_header(FILE* fp, i64 size_data, i64 size_code, i64 thread_number, i64 max_thread)
