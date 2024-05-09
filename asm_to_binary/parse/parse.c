@@ -683,7 +683,6 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
           char**  requested_labels, i32* indice_req,
           char*** registers, i32* sizes_registers, i32 len_register)
 {
-  // TODO: Find "Conditional jump or move depends on uninitialised value(s)"
   i32 return_value       = 0;
   i32 indice_line        = 0;
   i32 indice_within_line = 0;
