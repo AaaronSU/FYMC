@@ -300,7 +300,15 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
       {
         *imm = true;
       }
-      immediate_value[imm_indice++] = atoi(tokens_list[indice][i]);
+      if (toupper(tokens_list[indice][0][strlen(tokens_list[indice][0]) - 2]) == 'F'
+          || toupper(tokens_list[indice][0][strlen(tokens_list[indice][0]) - 2]) == 'G')
+      {
+        immediate_value[imm_indice++] = atof(tokens_list[indice][i]);
+      }
+      else
+      {
+        immediate_value[imm_indice++] = atoi(tokens_list[indice][i]);
+      }
       // *to_write += 1 << (15);
       // *to_write += immediate_value[imm_indice++] << (15);
     }
