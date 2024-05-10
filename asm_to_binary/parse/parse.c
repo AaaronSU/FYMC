@@ -46,7 +46,7 @@ bool is_in_string(char* string, char* arg)
   i32 taille_arg    = strlen(arg);
   i32 taille_string = strlen(string);  // To not get out of range
   bool im_readin_it = false;
-  u64 j = 0;
+  i32 j = 0;
   if (!strstr(string, arg))
   {
     return false;
@@ -55,7 +55,7 @@ bool is_in_string(char* string, char* arg)
   {
     return true;
   }
-  for (u64 i = 0; i < taille_string; ++i)
+  for (i32 i = 0; i < taille_string; ++i)
   {
     if (im_readin_it)
     {
@@ -91,8 +91,8 @@ i32 where_in_string(char* string, char* arg)
   i32 taille_string = strlen(string);  // To not get out of range
   bool im_readin_it = false;
   bool im_in_quote  = false;
-  u64 j             = 0;
-  for (u64 i = 0; i < taille_string; ++i)
+  i32 j             = 0;
+  for (i32 i = 0; i < taille_string; ++i)
   {
     // printf("'%c' '%c'\n", string[i], arg[j]);
     // Ignoring it if it's in quotes
@@ -142,7 +142,7 @@ i32 where_in_string(char* string, char* arg)
 ///   If a malloc fails, -1 is returned and memory must be freed up to indice_labels and indice_req
 i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opcodes, i32 len_op,
                      i32     data_start, i32  code_start,
-                     char*** registers,  i32* registers_sizes, i32 len_registers,
+                     char*** registers,  i32 len_registers,
                      char**  labels,     i32* indice_labels,
                      char**  requested_labels, i32* indice_req, bool* parallel_on)
 {
@@ -158,7 +158,7 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
       char* deux_points = strchr(in[indice_in][0], ':');
       if (deux_points != NULL)
       {
-        i32 indice_deux_points = (i32)(deux_points - in[indice_in][0]);
+        u64 indice_deux_points = (u64)(deux_points - in[indice_in][0]);
         if (indice_deux_points == strlen(in[indice_in][0]) - 1)
         {
           // Adding it to potential labels ; should be checked outside the function
@@ -440,19 +440,19 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
           else
           {
             i32 good = false;
-            i32 incr = 0;
+            // i32 incr = 0;
             if (in[indice_in][i][0] == '$' || in[indice_in][i][0] == '@')
             {
               char* var_tmp = in[indice_in][i]+1;
-              char* var_tmp_at;
-              if (in[indice_in][i][0] == '@')
-              {
-                var_tmp_at = in[indice_in][i];
-              }
-              else
-              {
-                var_tmp_at = var_tmp;
-              }
+              // char* var_tmp_at;
+              // if (in[indice_in][i][0] == '@')
+              // {
+              //   var_tmp_at = in[indice_in][i];
+              // }
+              // else
+              // {
+              //   var_tmp_at = var_tmp;
+              // }
               for (i32 k = data_start + 1; k < code_start; ++k)
               {
                 // Finding the variable in the data section
@@ -491,19 +491,19 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
           else
           {
             i32 good = false;
-            i32 incr = 0;
+            // i32 incr = 0;
             if (in[indice_in][i][0] == '$' || in[indice_in][i][0] == '@')
             {
               char* var_tmp = in[indice_in][i]+1;
-              char* var_tmp_at;
-              if (in[indice_in][i][0] == '@')
-              {
-                var_tmp_at = in[indice_in][i];
-              }
-              else
-              {
-                var_tmp_at = var_tmp;
-              }
+              // char* var_tmp_at;
+              // if (in[indice_in][i][0] == '@')
+              // {
+              //   var_tmp_at = in[indice_in][i];
+              // }
+              // else
+              // {
+              //   var_tmp_at = var_tmp;
+              // }
               for (i32 k = data_start + 1; k < code_start; ++k)
               {
                 // Finding the variable in the data section
@@ -541,19 +541,19 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
           else
           {
             i32 good = false;
-            i32 incr = 0;
+            // i32 incr = 0;
             if (in[indice_in][i][0] == '$' || in[indice_in][i][0] == '@')
             {
               char* var_tmp = in[indice_in][i]+1;
-              char* var_tmp_at;
-              if (in[indice_in][i][0] == '@')
-              {
-                var_tmp_at = in[indice_in][i];
-              }
-              else
-              {
-                var_tmp_at = var_tmp;
-              }
+              // char* var_tmp_at;
+              // if (in[indice_in][i][0] == '@')
+              // {
+              //   var_tmp_at = in[indice_in][i];
+              // }
+              // else
+              // {
+              //   var_tmp_at = var_tmp;
+              // }
               for (i32 k = data_start + 1; k < code_start; ++k)
               {
                 // Finding the variable in the data section
@@ -681,11 +681,11 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
           char*** opcodes, i32  len_op,
           char**  labels,  i32* indice_labels,
           char**  requested_labels, i32* indice_req,
-          char*** registers, i32* sizes_registers, i32 len_register)
+          char*** registers, i32 len_register)
 {
   i32 return_value       = 0;
   i32 indice_line        = 0;
-  i32 indice_within_line = 0;
+  // i32 indice_within_line = 0;
 
   // Checking if data section is properly declared
   if (strcmp(in[0][0], "data:") == 0)
@@ -709,7 +709,7 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
       // Lines in data must be 3 tokens
       if (sizes[indice_line] == 3)
       {
-        if (good_variable(in[indice_line], opcodes, len_op) == false)
+        if (good_variable(in[indice_line]) == false)
         {
           // Trying to give some information about error
           fprintf(stderr, "Invalid operation in code section:");
@@ -761,7 +761,7 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
       tmp = good_instruction(in, sizes, indice_line,
                              opcodes, len_op,
                              *data_start, *code_start,
-                             registers, sizes_registers, len_register,
+                             registers, len_register,
                              labels, indice_labels,
                              requested_labels, indice_req, &parallel_on);
       if (tmp == -1)

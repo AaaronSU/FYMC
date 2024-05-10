@@ -7,7 +7,7 @@
 // #include <stdlib.h>
 
 /// Returns true if the variable is valid, false if it is not
-bool good_variable(char** line, char*** opcodes, i32 len_op)
+bool good_variable(char** line)
 {
   bool return_value = false;
 

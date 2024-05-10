@@ -5,8 +5,8 @@
 #include "../../tools/types.h"
 
 bool wrong_signing_symbol(char* str);
-bool good_integer        (char* str,   bool is_signed);
+bool good_integer        (char* str, bool is_signed);
 bool good_float          (char* str);
-bool good_variable       (char** line, char*** opcodes, i32 len_op);
+bool good_variable       (char** line);
 
 #endif

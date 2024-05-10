@@ -176,14 +176,14 @@ i32 main(i32 argc, char** argv)
                  opcodes_list,     nb_tokens_op,
                  labels,           &indice_labels,
                  requested_labels, &indice_req,
-                 registers,        sizes_registers, len_register);
+                 registers,        len_register);
 
   if (result == true)
   {
     write_stuff(destination,  tokens_list, tokens_list_sizes, nb_tokens,
                 data_start,   code_start,
-                opcodes_list, opcodes_list_sizes, nb_tokens_op,
-                registers,    sizes_registers, len_register,
+                opcodes_list, nb_tokens_op,
+                registers,    len_register,
                 requested_labels, indice_req);
   }
 

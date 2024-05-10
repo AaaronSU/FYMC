@@ -22,6 +22,6 @@ i32 parse(char*** in,      i32* sizes, i32 len, i32* data_start, i32* code_start
           char*** opcodes, i32  len_op,
           char**  labels,  i32* indice_labels,
           char**  requested_labels, i32* indice_req,
-          char*** registers,        i32* sizes_registers, i32 len_register);
+          char*** registers,        i32 len_register);
 
 #endif

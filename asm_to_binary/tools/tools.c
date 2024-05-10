@@ -287,7 +287,7 @@ i32 tokenize(FILE* f, char*** out, i32* sizes)
 
   // Iterating on every line of the file
   len = getline(&line, &buffer_size, f);
-  for(i = 1; len != -1; ++i)
+  for(i = 1; len != (u64)-1; ++i)
   {
     // Allocating memory
     out[indice] = malloc(buffer_size * sizeof(char*));
@@ -301,9 +301,9 @@ i32 tokenize(FILE* f, char*** out, i32* sizes)
       //    ~> no memory left, but we create variables
       //    => use already existing one?
       CLEAN_tokenize:
-      for (u64 k = 0; k < indice - 1; ++k)
+      for (i32 k = 0; k < indice - 1; ++k)
       {
-        for (u64 l = 0; l < sizes[k]; ++l)
+        for (i32 l = 0; l < sizes[k]; ++l)
         {
           free(out[k][l]);
         }

@@ -63,7 +63,7 @@ i64 retreive_value(char* mask)
 
 
 // Checks if ligne[0] is in address_array
-bool its_an_alias(char* ligne, char** address_array, u64* i, i32 address_size)
+bool its_an_alias(char* ligne, char** address_array, i32* i, i32 address_size)
 {
   for (*i=0; *i < address_size; *i = *i + 1)
   // for (u64 i = 1; address_array[i] != NULL; ++i)
@@ -122,12 +122,12 @@ void get_threads_position(char*** tokens_list,  i64  start,       char*** op_nam
 
 
 // Returns the 32bits sequence we need to write for ligne
-void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
+void code_to_number(char*** tokens_list,    i32* tokens_sizes,
                     i32     code_start,     i32  indice,
                     char**  address_array,  u64* address_indices,
                     char*** op_name_list,   i32  op_list_size,
                     i32*    to_write,       i64* immediate_value,
-                    char*** register_list,  i32* reg_sizes, i32 reg_size,
+                    char*** register_list,  i32 reg_size,
                     bool*   imm, bool* vec,
                     i64*    ascii_address,  char** ascii_written, bool* thread_on,
                     u64*    thread_adresse, i32 address_size,     u64* thread_rank,
@@ -217,7 +217,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
     {
       *to_write += 1 << 19;
     }
-    for (u64 i = 1; i < tokens_sizes[indice]; ++i)
+    for (i32 i = 1; i < tokens_sizes[indice]; ++i)
     {
       if (tokens_list[indice][i][0]    == 'S'
           || tokens_list[indice][i][0] == 'T')
@@ -243,7 +243,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
     if (isalpha(tokens_list[indice][i][0]))
     {
       // If it's an alias
-     u64 j = 1;
+     i32 j = 1;
      if (its_an_alias(tokens_list[indice][i], address_array, &j, address_size))
      {
         immediate_value[0] = address_indices[j];
@@ -264,7 +264,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
       free(str_tmp);
       // fprintf(stderr, "instr: %d ; i: %d ; rind: %d\n", ((*to_write) >> 24), i, register_indice );
 
-      for (u64 k = 0; k < reg_size; ++k)
+      for (i32 k = 0; k < reg_size; ++k)
       {
         if (tokens_list[indice][i][0] == register_list[k][0][0])
         {
@@ -303,7 +303,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
       if (toupper(tokens_list[indice][0][strlen(tokens_list[indice][0]) - 2]) == 'F'
           || toupper(tokens_list[indice][0][strlen(tokens_list[indice][0]) - 2]) == 'G')
       {
-        immediate_value[imm_indice++] = atof(tokens_list[indice][i]);
+        immediate_value[imm_indice++] = (i64)atof(tokens_list[indice][i]);
       }
       else
       {
@@ -316,14 +316,14 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
     // Handling variables
     else if (tokens_list[indice][i][0] == '$')
     {
-      for (u64 j = 1; j < code_start; ++j)
+      for (i32 j = 1; j < code_start; ++j)
       {
         if (strcmp(tokens_list[j][1], tokens_list[indice][i]+1) == 0)
         {
           if (strcasecmp(tokens_list[j][0], "u64") == 0 || strcasecmp(tokens_list[j][0], "s64") == 0)
             immediate_value[imm_indice++] = atoi(tokens_list[j][2]);
           else if (strcasecmp(tokens_list[j][0], "f64") == 0)
-            immediate_value[imm_indice++] = atof(tokens_list[j][2]);
+            immediate_value[imm_indice++] = (i64)atof(tokens_list[j][2]);
           break;
         }
       }
@@ -347,7 +347,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
         // fprintf(stderr, "%s\n", ascii_written[j]);
         if (strcmp(ascii_written[j], tokens_list[indice][i]+1) == 0)
         {
-          immediate_value[imm_indice++] = (ascii_address[i] + header_size * sizeof(i64));
+          immediate_value[imm_indice++] = (ascii_address[i] + (header_size * sizeof(i64)));
           break;
         }
       //   if (strcmp(tokens_list[j][1], tokens_list[indice][i]+1) == 0)
@@ -385,17 +385,16 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
 
 
 i64 assemble_code(char***   tokens_list,
-                  i32 const data_start,    i32 const code_start,
-                  i32 const tokens_size,   i32*      tokens_sizes,
-                  char***   op_name_list,  i32       op_list_size,
-                  char***   register_list, i32*      reg_sizes, i32 reg_size,
-                  char**    address_array, i32*      code_to_write,
-                  i64*      imm_to_write,  i64*      imm_indice,
-                  i64*      ascii_address, char**    ascii_written,
-                  u64*      taille_code,   i32       address_size,
-                  i64*      thread_array,  i64* thread_mask,         i64* thread_number,
-                  i64*      thread_max,    i64* thread_on_addresses, i64* thread_on_indices,
-                  i64       size_data)
+                  i32 const code_start,
+                  i32 const tokens_size,   i32*   tokens_sizes,
+                  char***   op_name_list,  i32    op_list_size,
+                  char***   register_list, i32    reg_size,
+                  char**    address_array, i32*   code_to_write,
+                  i64*      imm_to_write,  i64*   imm_indice,
+                  i64*      ascii_address, char** ascii_written,
+                  u64*      taille_code,   i32    address_size,
+                  i64*      thread_array,  i64*   thread_mask, i64* thread_number,
+                  i64*      thread_max,    i64    size_data)
 {
   // We need to know on which line they are
   // address_array[i] <=> address_indices[i]
@@ -414,7 +413,7 @@ i64 assemble_code(char***   tokens_list,
   u64* where_to_write = calloc(tokens_size, sizeof(u64));
   u64* what_to_write  = calloc(tokens_size, sizeof(u64));
 
-  for (u64 i = code_start + 1; i < tokens_size; ++i)
+  for (i32 i = code_start + 1; i < tokens_size; ++i)
   {
     // print_tokens_line(code_array[i]);
     // if (its_an_alias(code_array[i], address_array))
@@ -435,12 +434,12 @@ i64 assemble_code(char***   tokens_list,
     bool its_a_jump          = false;
     u64  indice_label        = 0;
 
-    code_to_number(tokens_list,     tokens_sizes, tokens_size,
+    code_to_number(tokens_list,     tokens_sizes,
                    code_start,      i,
                    address_array,   address_indices,
                    op_name_list,    op_list_size,
                    &instr_to_write, immediate_value,
-                   register_list,   reg_sizes, reg_size,
+                   register_list,   reg_size,
                    &imm, &vec,
                    ascii_address,   ascii_written, &thread_on,
                    &thread_adresse, address_size,  &thread_rank,
@@ -556,7 +555,7 @@ i64 assemble_data(char*** tokens_list,   i32 const code_start,
 {
   i32 indice = 0;
   i64 retour = 0;
-  for (u64 i = 0; i < code_start; ++i)
+  for (i32 i = 0; i < code_start; ++i)
   {
     if (strcmp(tokens_list[i][0], "ascii") == 0)
     {
@@ -607,7 +606,7 @@ void write_header(FILE* fp, i64 size_data, i64 size_code, i64 thread_number, i64
 
 void write_data(FILE* fp, char** data_to_write, i64* nb_data_to_write)
 {
-  for (u64 i = 0; i < *nb_data_to_write; ++i)
+  for (i32 i = 0; i < *nb_data_to_write; ++i)
   {
    // fprintf(stderr, "data: '%s'\n", data_to_write[i]);
     fwrite(data_to_write[i], sizeof(char), strlen(data_to_write[i]) + 1, fp);
@@ -626,7 +625,7 @@ void write_code(FILE* fp,           i32* code_to_write,
     fwrite(code_to_write+i, sizeof(i32), 1, fp);
 
     // Write immediate values (e.g. movui)
-    while (i == imm_indice[j])
+    while (i == (u64)imm_indice[j])
     {
       // fprintf(stderr, " imm: %ld", imm_indice[j]);
       fwrite(imm_to_write+j, sizeof(i64), 1, fp);
@@ -653,8 +652,8 @@ void write_threads(FILE* fp, i64* thread_array, i64* thread_masks, i64 thread_nu
 void write_stuff(char*     path,
                  char***   tokens_list,   i32* tokens_list_sizes, i32 nb_tokens,
                  i32 const data_start,    i32 const code_start,
-                 char***   op_name_list,  i32* op_sizes,          i32 op_size,
-                 char***   register_list, i32* register_sizes,    i32 register_size,
+                 char***   op_name_list,  i32 op_size,
+                 char***   register_list, i32 register_size,
                  char**    address_array, i32  address_size)
 {
   /*
@@ -722,18 +721,16 @@ void write_stuff(char*     path,
                                 &nb_data_to_write,
                                 ascii_address, ascii_written);
 
-  i64 size_code = assemble_code(tokens_list,   data_start, code_start,
+  i64 size_code = assemble_code(tokens_list,   code_start,
                                 nb_tokens,     tokens_list_sizes,
                                 op_name_list,  op_size,
-                                register_list, register_sizes,
-                                register_size,
+                                register_list, register_size,
                                 address_array, code_to_write,
                                 imm_to_write,  imm_indice,
                                 ascii_address, ascii_written,
                                 &taille_code,  address_size,
-                                thread_array, thread_masks, &thread_number,
-                                &thread_max,  thread_on_addresses, thread_on_indices,
-                                size_data);
+                                thread_array,  thread_masks, &thread_number,
+                                &thread_max,   size_data);
   free_char2(ascii_written, code_start);
   free(thread_on_addresses);
   free(thread_on_indices);
