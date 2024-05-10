@@ -31,7 +31,7 @@ i32 main(i32 argc, char** argv)
   }
   else
   {
-    i32 taille  = strlen(argv[2]) + 1;
+    u64 taille  = strlen(argv[2]) + 1;
     destination = malloc(taille * sizeof(char));
     if (destination == NULL)
     {
@@ -46,7 +46,7 @@ i32 main(i32 argc, char** argv)
   i32*    tokens_list_sizes;
   FILE*   f;  // NOTE: tokenize function closes the file
 
-  i32         taille_fichier;
+  i64         taille_fichier;
   struct stat st;
 
   if (stat(argv[1], &st) == -1)
@@ -71,20 +71,20 @@ i32 main(i32 argc, char** argv)
     return EXIT_FAILURE;
   }
 
-  tokens_list = calloc(taille_fichier, sizeof(char**));
+  tokens_list = calloc((u64)taille_fichier, sizeof(char**));
   if (tokens_list == NULL)
   {
     perror("malloc in main");
     return EXIT_FAILURE;
   }
-  tokens_list_sizes = calloc(taille_fichier, sizeof(int));
+  tokens_list_sizes = calloc((u64)taille_fichier, sizeof(int));
   if (tokens_list_sizes == NULL)
   {
     perror("malloc in main");
     return EXIT_FAILURE;
   }
 
-  int nb_tokens = tokenize(f, tokens_list, tokens_list_sizes);
+  i32 nb_tokens = tokenize(f, tokens_list, tokens_list_sizes);
   if (nb_tokens == -1)
   {
     return EXIT_FAILURE;
@@ -111,13 +111,13 @@ i32 main(i32 argc, char** argv)
     return EXIT_FAILURE;
   }
 
-  opcodes_list = calloc(taille_fichier, sizeof(char**));
+  opcodes_list = calloc((u64)taille_fichier, sizeof(char**));
   if (opcodes_list == NULL)
   {
     perror("malloc in main");
     return EXIT_FAILURE;
   }
-  opcodes_list_sizes = calloc(taille_fichier, sizeof(i32));
+  opcodes_list_sizes = calloc((u64)taille_fichier, sizeof(i32));
   if (opcodes_list_sizes == NULL)
   {
     perror("malloc in main");
@@ -150,8 +150,8 @@ i32 main(i32 argc, char** argv)
     return EXIT_FAILURE;
   }
 
-  registers       = calloc(taille_fichier, sizeof(char**));
-  sizes_registers = calloc(taille_fichier, sizeof(i32));
+  registers       = calloc((u64)taille_fichier, sizeof(char**));
+  sizes_registers = calloc((u64)taille_fichier, sizeof(i32));
 
   len_register = tokenize(f_reg, registers, sizes_registers);
   if (len_register == -1 || len_register == -3)
@@ -169,8 +169,8 @@ i32 main(i32 argc, char** argv)
   i32 code_start;
   i32 indice_labels       = 0;
   i32 indice_req          = 0;
-  char** labels           = calloc(nb_tokens_op, sizeof(char**));
-  char** requested_labels = calloc(nb_tokens_op, sizeof(char**));
+  char** labels           = calloc((u64)nb_tokens_op, sizeof(char**));
+  char** requested_labels = calloc((u64)nb_tokens_op, sizeof(char**));
   result = parse(tokens_list,      tokens_list_sizes, nb_tokens,
                  &data_start,      &code_start,
                  opcodes_list,     nb_tokens_op,
@@ -196,9 +196,9 @@ i32 main(i32 argc, char** argv)
   {
     printf("Invalid syntax.\n");
   }
-  for (u64 i = 0; i < nb_tokens; ++i)
+  for (i32 i = 0; i < nb_tokens; ++i)
   {
-    for (u64 j = 0; j < tokens_list_sizes[i]; ++j)
+    for (i32 j = 0; j < tokens_list_sizes[i]; ++j)
     {
 //      printf("'%s' ", tokens_list[i][j]);
       free(tokens_list[i][j]);
@@ -208,9 +208,9 @@ i32 main(i32 argc, char** argv)
   }
   free(tokens_list);
   free(tokens_list_sizes);
-  for (u64 i = 0; i < nb_tokens_op; ++i)
+  for (i32 i = 0; i < nb_tokens_op; ++i)
   {
-    for (u64 j = 0; j < opcodes_list_sizes[i]; ++j)
+    for (i32 j = 0; j < opcodes_list_sizes[i]; ++j)
     {
       // printf("'%s' ", opcodes_list[i][j]);
       free(opcodes_list[i][j]);
@@ -221,20 +221,20 @@ i32 main(i32 argc, char** argv)
   free(opcodes_list);
   free(opcodes_list_sizes);
 
-  for (u64 i = 0; i < indice_labels; ++i)
+  for (i32 i = 0; i < indice_labels; ++i)
   {
     free(labels[i]);
   }
   free(labels);
-  for (u64 i = 0; i < indice_req; ++i)
+  for (i32 i = 0; i < indice_req; ++i)
   {
     free(requested_labels[i]);
   }
   free(requested_labels);
 
-  for (u64 i = 0; i < len_register; ++i)
+  for (i32 i = 0; i < len_register; ++i)
   {
-    for (u64 j = 0; j < sizes_registers[i]; ++j)
+    for (i32 j = 0; j < sizes_registers[i]; ++j)
     {
       free(registers[i][j]);
     }

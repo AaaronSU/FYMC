@@ -4,8 +4,8 @@
 data:
 	ascii msg "Hello, World!\n"
 
-	# The code section 
+	# The code section
 code:
-	movui u0, $msg 
+	movui u0, @msg
 	outb u0
 	hlt
