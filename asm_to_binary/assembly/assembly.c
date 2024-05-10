@@ -235,8 +235,10 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
 
   // Looking for registers
   //TODO addresses
+  i32 register_indice = 0;
   for (i32 i = 1; i < tokens_sizes[indice]; ++i)
   {
+    ++register_indice;
     // If it's a register or an alias
     if (isalpha(tokens_list[indice][i][0]))
     {
@@ -246,6 +248,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
      {
         immediate_value[0] = address_indices[j];
         *imm = true;
+        --register_indice;
         continue;
      }
 
@@ -257,14 +260,15 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
         return;
       }
       strncpy(str_tmp, tokens_list[indice][i]+1, tokens_sizes[indice]);
-      *to_write += atoi(str_tmp) << (15 - 5 * i);
+      *to_write += atoi(str_tmp) << (15 - 5 * register_indice);
       free(str_tmp);
+      // fprintf(stderr, "instr: %d ; i: %d ; rind: %d\n", ((*to_write) >> 24), i, register_indice );
 
       for (u64 k = 0; k < reg_size; ++k)
       {
         if (tokens_list[indice][i][0] == register_list[k][0][0])
         {
-          *to_write += i << (19);
+          *to_write += register_indice << (19);
         }
       }
     }
@@ -273,6 +277,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
     else if (tokens_list[indice][i][0]    == '('
              || tokens_list[indice][i][0] == ')')
     {
+      --register_indice;
       continue;
     }
 
@@ -280,6 +285,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes, i32 tokens_size,
     else if (tokens_list[indice][i][0]    == '{'
              || tokens_list[indice][i][0] == '}')
     {
+      --register_indice;
       continue;
     }
 
@@ -608,13 +614,13 @@ void write_code(FILE* fp,           i32* code_to_write,
   i32 j = 0;
   for (u64 i = 0; i < k; ++i)
   {
-    // fprintf(stderr, "instr: %d", be32toh(code_to_write[i]));
+    // fprintf(stderr, "instr: %d", be32toh(code_to_write[i]) >> 24);
     fwrite(code_to_write+i, sizeof(i32), 1, fp);
 
     // Write immediate values (e.g. movui)
     while (i == imm_indice[j])
     {
-      // fprintf(stderr, "i=%ld imm: %d\n", i, j);
+      // fprintf(stderr, " imm: %ld", imm_indice[j]);
       fwrite(imm_to_write+j, sizeof(i64), 1, fp);
       ++j;
     }
