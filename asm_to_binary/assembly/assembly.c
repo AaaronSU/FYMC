@@ -18,9 +18,9 @@
 
 i64 get_number_of_one(char* mask)
 {
-  i64 taille = strlen(mask);
+  u64 taille = strlen(mask);
   i64 return_value = 0;
-  for (i64 i = 2; i < taille; ++i)
+  for (u64 i = 2; i < taille; ++i)
   {
     if (mask[i] == '1')
     {
@@ -31,11 +31,11 @@ i64 get_number_of_one(char* mask)
 }
 
 
-i64 get_max(char* mask)
+u64 get_max(char* mask)
 {
-  i64 taille = strlen(mask);
-  i64 return_value = 0;
-  for (i64 i = 2; i < taille; ++i)
+  u64 taille = strlen(mask);
+  u64 return_value = 0;
+  for (u64 i = 2; i < taille; ++i)
   {
     if (mask[i] == '1')
     {
@@ -47,11 +47,11 @@ i64 get_max(char* mask)
 }
 
 
-i64 retreive_value(char* mask)
+u64 retreive_value(char* mask)
 {
-  i64 taille = strlen(mask);
-  i64 return_value = 0;
-  for (i64 i = 2; i < taille; ++i)
+  u64 taille = strlen(mask);
+  u64 return_value = 0;
+  for (u64 i = 2; i < taille; ++i)
   {
     if (mask[i] == '1')
     {
@@ -94,9 +94,9 @@ i32 get_op_position(char* to_find, char*** op_name_list, i32 size)
 
 
 void get_threads_position(char*** tokens_list,  i64  start,       char*** op_name_list,
-                          i32     op_list_size, u64* thread_rank, i64*    out)
+                          i32     op_list_size, u64* thread_rank, u64*    out)
 {
-  i64 i = start;
+  u64 i = (u64)start;
   bool has_written = false;
   i32 position = get_op_position(tokens_list[i][0],
                                  op_name_list, op_list_size);
@@ -132,7 +132,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
                     i64*    ascii_address,  char** ascii_written, bool* thread_on,
                     u64*    thread_adresse, i32 address_size,     u64* thread_rank,
                     bool*   parallel_on,    bool* parallel_off,
-                    bool*   its_a_jump,     u64*  indice_label,   u64 op_size)
+                    bool*   its_a_jump,     u64*  indice_label)
 {
   // We'll write 32 bits => 4 bytes => 1 i32
   // 8 bits opcode
@@ -165,7 +165,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
   if (position >= 77 && position <= 83)
   {
     *its_a_jump = true;
-    for (u64 k = 0; k < op_size;  ++k)
+    for (u64 k = 0; k < (u64)op_list_size;  ++k)
     {
       if (strcmp(address_array[k], tokens_list[indice][1]) == 0)
       {
@@ -179,12 +179,12 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
   if (position == 91)
   {
     *parallel_on = true;
-    i64 out[3];
+    u64 out[3];
     get_threads_position(tokens_list,  indice,      op_name_list,
                          op_list_size, thread_rank, out);
-    immediate_value[0] = out[0];
-    immediate_value[1] = out[1];
-    immediate_value[2] = out[2];
+    immediate_value[0] = (i64)out[0];
+    immediate_value[1] = (i64)out[1];
+    immediate_value[2] = (i64)out[2];
     return;
   }
 
@@ -199,9 +199,9 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
     *thread_on = true;
     *imm       = true;
     // We give indices from 0 to 1
-    immediate_value[0] = *thread_adresse;
-    *thread_adresse    += get_number_of_one(tokens_list[indice][1]) - 1;
-    immediate_value[1] = *thread_adresse;
+    immediate_value[0] =  (i64)*thread_adresse;
+    *thread_adresse    += (u64)get_number_of_one(tokens_list[indice][1]) - 1;
+    immediate_value[1] =  (i64)*thread_adresse;
     *thread_adresse += 1;
     return;
   }
@@ -246,20 +246,20 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
      i32 j = 1;
      if (its_an_alias(tokens_list[indice][i], address_array, &j, address_size))
      {
-        immediate_value[0] = address_indices[j];
+        immediate_value[0] = (i64)address_indices[j];
         *imm = true;
         --register_indice;
         continue;
      }
 
       // If it's a register
-      char* str_tmp = calloc(tokens_sizes[indice] + 1, sizeof(char));
+      char* str_tmp = calloc((u64)(tokens_sizes[indice] + 1), sizeof(char));
       if (str_tmp == NULL)
       {
         perror("calloc in code_to_number");
         return;
       }
-      strncpy(str_tmp, tokens_list[indice][i]+1, tokens_sizes[indice]);
+      strncpy(str_tmp, tokens_list[indice][i]+1, (u64)tokens_sizes[indice]);
       *to_write += atoi(str_tmp) << (15 - 5 * register_indice);
       free(str_tmp);
       // fprintf(stderr, "instr: %d ; i: %d ; rind: %d\n", ((*to_write) >> 24), i, register_indice );
@@ -347,7 +347,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
         // fprintf(stderr, "%s\n", ascii_written[j]);
         if (strcmp(ascii_written[j], tokens_list[indice][i]+1) == 0)
         {
-          immediate_value[imm_indice++] = (ascii_address[i] + (header_size * sizeof(i64)));
+          immediate_value[imm_indice++] = (ascii_address[i] + (i64)(header_size * sizeof(i64)));
           break;
         }
       //   if (strcmp(tokens_list[j][1], tokens_list[indice][i]+1) == 0)
@@ -384,7 +384,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
 }
 
 
-i64 assemble_code(char***   tokens_list,
+u64 assemble_code(char***   tokens_list,
                   i32 const code_start,
                   i32 const tokens_size,   i32*   tokens_sizes,
                   char***   op_name_list,  i32    op_list_size,
@@ -394,11 +394,11 @@ i64 assemble_code(char***   tokens_list,
                   i64*      ascii_address, char** ascii_written,
                   u64*      taille_code,   i32    address_size,
                   i64*      thread_array,  i64*   thread_mask, i64* thread_number,
-                  i64*      thread_max,    i64    size_data)
+                  u64*      thread_max,    u64    size_data)
 {
   // We need to know on which line they are
   // address_array[i] <=> address_indices[i]
-  u64* address_indices = calloc(address_size + 2, sizeof(u64));
+  u64* address_indices = calloc((u64)(address_size + 2), sizeof(u64));
   u32 j                = 0;
   u32 l                = 0;
   u64 taille           = 0;
@@ -410,8 +410,8 @@ i64 assemble_code(char***   tokens_list,
   // address_indices[0] = 0;
   // for (u32 i = 0; i <address_size; ++i)
   //   fprintf(stderr, "%s\n", address_array[i]);
-  u64* where_to_write = calloc(tokens_size, sizeof(u64));
-  u64* what_to_write  = calloc(tokens_size, sizeof(u64));
+  u64* where_to_write = calloc((u64)tokens_size, sizeof(u64));
+  u64* what_to_write  = calloc((u64)tokens_size, sizeof(u64));
 
   for (i32 i = code_start + 1; i < tokens_size; ++i)
   {
@@ -419,7 +419,7 @@ i64 assemble_code(char***   tokens_list,
     // if (its_an_alias(code_array[i], address_array))
     if (tokens_list[i][0][strlen(tokens_list[i][0]) - 1] == 58)
     {
-      address_indices[j++] = htobe64(taille + size_data + header_size * sizeof(i64)); // Check indice
+      address_indices[j++] = htobe64(taille + size_data + header_size * sizeof(i64));
       // fprintf(stderr, "j = %d address_size = %d\n", j, address_size);
       continue;
     }
@@ -444,7 +444,7 @@ i64 assemble_code(char***   tokens_list,
                    ascii_address,   ascii_written, &thread_on,
                    &thread_adresse, address_size,  &thread_rank,
                    &parallel_on,    &parallel_off,
-                   &its_a_jump,     &indice_label, op_list_size);
+                   &its_a_jump,     &indice_label);
 //    printf("instr: %s ; imm: %d ; vec: %d\n", tokens_list[i][0], imm, vec);
     // fprintf(stderr, "instruction : %d immediate_values =", instr_to_write >> 24);
 
@@ -455,7 +455,7 @@ i64 assemble_code(char***   tokens_list,
       // fprintf(stderr, "%ld\n", indice_label);
       where_to_write[indice_adresse] = l;
       what_to_write[indice_adresse]  = indice_label;
-      imm_indice[l]                  = *taille_code;
+      imm_indice[l]                  = (i64)*taille_code;
       ++l;
       ++indice_adresse;
       taille += sizeof(i64);
@@ -466,9 +466,9 @@ i64 assemble_code(char***   tokens_list,
       // fprintf(stderr, "thread_number = %ld", *thread_number);
       i64 tmp_number           = *thread_number;
       *thread_number           = tmp_number;
-      thread_array[tmp_number] = htobe64(*taille_code);
-      thread_mask[tmp_number]  = htobe64(retreive_value(tokens_list[i][1]));
-      i64 max                  = get_max(tokens_list[i][1]);
+      thread_array[tmp_number] = (i64)htobe64(*taille_code);
+      thread_mask[tmp_number]  = (i64)htobe64(retreive_value(tokens_list[i][1]));
+      u64 max                  = get_max(tokens_list[i][1]);
       // fprintf(stderr, " ; max = %ld\n", max);
       if (max > *thread_max)
       {
@@ -484,9 +484,9 @@ i64 assemble_code(char***   tokens_list,
     {
       for (u64 k = 0; k < 3; ++k)
       {
-        imm_to_write[l] = htobe64(immediate_value[k]);
+        imm_to_write[l] = (i64)htobe64((u64)immediate_value[k]);
         // fprintf(stderr, " %ld", immediate_value[k]);
-        imm_indice[l]   = *taille_code;
+        imm_indice[l]   = (i64)*taille_code;
         thread_ind_addr = l;
         ++l;
         taille += sizeof(i64);  // Immediate value is 64 bits -> 8 bytes
@@ -496,7 +496,7 @@ i64 assemble_code(char***   tokens_list,
     // Handling parallel_off
     if (parallel_off == true)
     {
-      imm_to_write[thread_ind_addr] = *taille_code;
+      imm_to_write[thread_ind_addr] = (i64)*taille_code;
       // fprintf(stderr, " %ld", *taille_code);
       free(immediate_value);
       // fprintf(stderr, "\n");
@@ -518,15 +518,15 @@ i64 assemble_code(char***   tokens_list,
       // Storing immediates to write
       for (u64 k = 0; k < max; ++k)
       {
-        imm_to_write[l] = htobe64(immediate_value[k]);
+        imm_to_write[l] = (i64)htobe64((u64)immediate_value[k]);
         // fprintf(stderr, "l=%d imm=%ld\n", l, immediate_value[k]);
-        imm_indice[l]   = *taille_code;
+        imm_indice[l]   = (i64)*taille_code;
         ++l;
         taille += sizeof(i64);  // Immediate value is 64 bits -> 8 bytes
         // taille += sizeof(i64);
       }
     }
-    code_to_write[*taille_code] = htobe32(instr_to_write);
+    code_to_write[*taille_code] = (i32)htobe32((u32)instr_to_write);
     *taille_code                = *taille_code + 1;
     taille                      += sizeof(i32);
     // 1 i32 = 4 bytes
@@ -538,7 +538,7 @@ i64 assemble_code(char***   tokens_list,
 
   for (u64 i = 0; i < indice_adresse; ++i)
   {
-    imm_to_write[where_to_write[i]] = address_indices[what_to_write[i]];
+    imm_to_write[where_to_write[i]] = (i64)address_indices[what_to_write[i]];
     // fprintf(stderr, "%ld\n", what_to_write[i]);
   }
 
@@ -549,23 +549,23 @@ i64 assemble_code(char***   tokens_list,
 }
 
 
-i64 assemble_data(char*** tokens_list,   i32 const code_start,
+u64 assemble_data(char*** tokens_list,   i32 const code_start,
                   char**  data_to_write, i64*      nb_data_to_write,
                   i64*    ascii_address, char**    ascii_written)
 {
   i32 indice = 0;
-  i64 retour = 0;
+  u64 retour = 0;
   for (i32 i = 0; i < code_start; ++i)
   {
     if (strcmp(tokens_list[i][0], "ascii") == 0)
     {
       // taille is lenght of string including white space
-      i32 taille  = strlen(tokens_list[i][2]) + 1;
-      i32 taille2 = strlen(tokens_list[i][1]) + 1;
+      u64 taille  = strlen(tokens_list[i][2]) + 1;
+      u64 taille2 = strlen(tokens_list[i][1]) + 1;
 
       data_to_write[indice] = malloc(taille  * sizeof(char));
       ascii_written[indice] = malloc(taille2 * sizeof(char));
-      ascii_address[indice] = retour;
+      ascii_address[indice] = (i64)retour;
 
       memcpy(data_to_write[indice],   tokens_list[i][2], taille);
       memcpy(ascii_written[indice++], tokens_list[i][1], taille2);  // Retaining who we wrote
@@ -577,20 +577,24 @@ i64 assemble_data(char*** tokens_list,   i32 const code_start,
 }
 
 
-void write_header(FILE* fp, i64 size_data, i64 size_code, i64 thread_number, i64 max_thread)
+void write_header(FILE* fp, u64 size_data, u64 size_code, i64 thread_number, u64 max_thread)
 {
   i64 magic_number    = 0x4152434859302E30;
   i64 size_header     = header_size * sizeof(i64);
   i64 address_data    = size_header;
-  i64 address_code    = address_data + size_data;
-  i64 address_threads = address_code + size_code;
-  i64 size_threads    = thread_number * 2 * sizeof(i64);
+  i64 address_code    = address_data + (i64)size_data;
+  i64 address_threads = address_code + (i64)size_code;
+  i64 size_threads    = thread_number * 2 * (i64)sizeof(i64);
   i64 size_total      = address_threads + size_threads;
-  i64 to_write[header_size] = {htobe64(magic_number),    htobe64(size_header),
-                               htobe64(address_data),    htobe64(size_data),
-                               htobe64(address_code),    htobe64(size_code),
-                               htobe64(address_threads), htobe64(size_threads),
-                               htobe64(max_thread),      htobe64(size_total)};
+  i64 to_write[header_size] = {(i64)htobe64((u64)magic_number),
+                               (i64)htobe64((u64)size_header),
+                               (i64)htobe64((u64)address_data),
+                               (i64)htobe64((u64)size_data),
+                               (i64)htobe64((u64)address_code),
+                               (i64)htobe64((u64)size_code),
+                               (i64)htobe64((u64)address_threads),(i64)htobe64((u64)size_threads),
+                               (i64)htobe64((u64)max_thread),
+                               (i64)htobe64((u64)size_total)};
   if (fwrite(to_write, sizeof(i64), header_size, fp) == 0)
     {
       fprintf(stderr, "An error happened upon writing, exiting.\n");
@@ -699,29 +703,29 @@ void write_stuff(char*     path,
   }
 
   // Size will be big for the sake of simplicity
-  char** data_to_write = calloc(code_start,   sizeof(char*));
-  char** ascii_written = calloc(code_start,   sizeof(char*));
-  i64*   ascii_address = calloc(nb_tokens - code_start, sizeof(i64));
-  i32*   code_to_write = calloc(nb_tokens - data_start, sizeof(i32));
-  i64*   imm_to_write  = calloc(nb_tokens - data_start, sizeof(i64));
-  i64*   imm_indice    = calloc(nb_tokens - data_start, sizeof(i64));
-  i64*   thread_array  = calloc(nb_tokens - code_start, sizeof(i64));
-  i64*   thread_masks  = calloc(nb_tokens - code_start, sizeof(i64));
-  i64*   thread_on_addresses = calloc(nb_tokens - data_start, sizeof(i64));
-  i64*   thread_on_indices   = calloc(nb_tokens - data_start, sizeof(i64));
+  char** data_to_write = calloc((u64)code_start,   sizeof(char*));
+  char** ascii_written = calloc((u64)code_start,   sizeof(char*));
+  i64*   ascii_address = calloc((u64)(nb_tokens - code_start), sizeof(i64));
+  i32*   code_to_write = calloc((u64)(nb_tokens - data_start), sizeof(i32));
+  i64*   imm_to_write  = calloc((u64)(nb_tokens - data_start), sizeof(i64));
+  i64*   imm_indice    = calloc((u64)(nb_tokens - data_start), sizeof(i64));
+  i64*   thread_array  = calloc((u64)(nb_tokens - code_start), sizeof(i64));
+  i64*   thread_masks  = calloc((u64)(nb_tokens - code_start), sizeof(i64));
+  i64*   thread_on_addresses = calloc((u64)(nb_tokens - data_start), sizeof(i64));
+  i64*   thread_on_indices   = calloc((u64)(nb_tokens - data_start), sizeof(i64));
   i64    thread_number = 0;
-  i64    thread_max    = 1;
+  u64    thread_max    = 1;
 
   i64 nb_data_to_write            = 0;
   u64 taille_code                 = 0;
   for (i64 indice = 0; indice < nb_tokens - data_start; ++indice)
     imm_indice[indice] = -1;
 
-  i64 size_data = assemble_data(tokens_list, code_start, data_to_write,
+  u64 size_data = assemble_data(tokens_list, code_start, data_to_write,
                                 &nb_data_to_write,
                                 ascii_address, ascii_written);
 
-  i64 size_code = assemble_code(tokens_list,   code_start,
+  u64 size_code = assemble_code(tokens_list,   code_start,
                                 nb_tokens,     tokens_list_sizes,
                                 op_name_list,  op_size,
                                 register_list, register_size,

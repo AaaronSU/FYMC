@@ -16,12 +16,12 @@
 void remove_space(char const *str_in, char *str_out)
 {
   // Allocating memory and initialiazin looping elements
-  i32 taille_in  = (sizeof(char) * strlen(str_in))  + sizeof(char);
-  i32 taille_out = (sizeof(char) * strlen(str_out)) + sizeof(char);
+  u64 taille_in  = (sizeof(char) * strlen(str_in))  + sizeof(char);
+  u64 taille_out = (sizeof(char) * strlen(str_out)) + sizeof(char);
   char* str_tmp  = calloc(taille_out, sizeof(char));
 
-  i32 i = 0;
-  i32 j = 0;
+  u64 i = 0;
+  u64 j = 0;
 
   i32 quote_flag = false;
 
@@ -127,7 +127,7 @@ i32 make_tokens(char* line, char** out, u64 len)
   // indice_out is current indice in out list
   i32 indice_out   = 0;
   // current_size is size of current word
-  i32 current_size = 0;
+  u64 current_size = 0;
 
   char* tmp = calloc(++len, sizeof(char));
   if (tmp == NULL)
@@ -286,7 +286,7 @@ i32 tokenize(FILE* f, char*** out, i32* sizes)
   i32 make_tokens_return_value = 0;
 
   // Iterating on every line of the file
-  len = getline(&line, &buffer_size, f);
+  len = (u64)getline(&line, &buffer_size, f);
   for(i = 1; len != (u64)-1; ++i)
   {
     // Allocating memory
@@ -330,13 +330,13 @@ i32 tokenize(FILE* f, char*** out, i32* sizes)
       // Free malloc (will realloc it after)
       free(out[indice]);
       // Calculate len of next line and skip to next iteration
-      len = getline(&line, &buffer_size, f);
+      len = (u64)getline(&line, &buffer_size, f);
       continue;
     }
 
     // Store number of tokens and go to next iteration
     sizes[indice] = make_tokens_return_value;
-    len           = getline(&line, &buffer_size, f);
+    len           = (u64)getline(&line, &buffer_size, f);
     ++indice;
   }
 

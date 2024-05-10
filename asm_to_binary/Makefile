@@ -7,7 +7,7 @@ all: fymcc
 # fymcc: main.o tools/tools.o parse/parse.o parse_code.o parse_data.o assembly/assembly.o
 # 	$(CC) $(CFLAGS) -O3 $^ -o $@
 fymcc: main.o tools/tools.c parse/parse.c parse/parse_code/parse_code.c parse/parse_data/parse_data.c assembly/assembly.c
-	$(CC) $(CFLAGS) -O3 $^ -o $@
+	$(CC) $(CFLAGS) -O3 -Wall -Wextra -Wconversion $^ -o $@
 # 	$(CC) $(CFLAGS) -O3 -fsanitize=leak $^ -o $@
 # NOTE : Il faut compiler le main avec TOUS les fichiers .o du programme, sinon le linker trépasse.
 

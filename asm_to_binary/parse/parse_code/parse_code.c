@@ -30,11 +30,11 @@ i32 good_opcode(char* in, char*** opcodes, i32 len_op)
 /// Checks if in is a correct register
 bool good_register(char* in, char*** registers, i32 len_registers, char letter)
 {
-  i32 return_value;
+  bool return_value;
 
   // Checks if number is correct
-  i32 len = strlen(in);
-  for (i32 i = 1; i < len; ++i)
+  u64 len = strlen(in);
+  for (u64 i = 1; i < len; ++i)
   {
     if (isdigit(in[i]) == 0)
     {
@@ -78,7 +78,7 @@ i32 label_present(char* str, char** list, i32 list_size,
                   bool remove_label_sign)
 {
   i32 value;
-  i32 taille;
+  u64 taille;
   char* tmp;
   if (remove_label_sign == true)
   {

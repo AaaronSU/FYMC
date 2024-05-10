@@ -33,7 +33,7 @@ i32 size_without_chara(const char* str, i32 const taille, i32 const chara)
   {
     if (str[i] == chara)
     {
-      taille_out -= sizeof(char);
+      taille_out -= (i32)sizeof(char);
     }
   }
   return taille_out;
@@ -43,10 +43,10 @@ i32 size_without_chara(const char* str, i32 const taille, i32 const chara)
 // Detects if arg is in string AND before any ""
 bool is_in_string(char* string, char* arg)
 {
-  i32 taille_arg    = strlen(arg);
-  i32 taille_string = strlen(string);  // To not get out of range
+  u64 taille_arg    = strlen(arg);
+  u64 taille_string = strlen(string);  // To not get out of range
   bool im_readin_it = false;
-  i32 j = 0;
+  u64 j = 0;
   if (!strstr(string, arg))
   {
     return false;
@@ -55,7 +55,7 @@ bool is_in_string(char* string, char* arg)
   {
     return true;
   }
-  for (i32 i = 0; i < taille_string; ++i)
+  for (u64 i = 0; i < taille_string; ++i)
   {
     if (im_readin_it)
     {
@@ -87,8 +87,8 @@ bool is_in_string(char* string, char* arg)
 // Returns arg position in string AND if before any "", or -1 if not there
 i32 where_in_string(char* string, char* arg)
 {
-  i32 taille_arg    = strlen(arg);
-  i32 taille_string = strlen(string);  // To not get out of range
+  i32 taille_arg    = (i32)strlen(arg);
+  i32 taille_string = (i32)strlen(string);  // To not get out of range
   bool im_readin_it = false;
   bool im_in_quote  = false;
   i32 j             = 0;
@@ -179,7 +179,7 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
             }
           }
           // Else
-          i32 taille = strlen(in[indice_in][0]);
+          u64 taille = strlen(in[indice_in][0]);
           // labels = realloc(labels, *indice_labels + 1);
           labels[*indice_labels] = calloc(taille, sizeof(char));
           if (labels[*indice_labels] == NULL)
@@ -620,7 +620,7 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
           // Masks are in the form 0bxxx with xxx 0 or 1
           if (in[indice_in][i][0] == '0' && in[indice_in][i][1] == 'b')
           {
-            i32 taille = strlen(in[indice_in][i]) - 1;
+            u64 taille = strlen(in[indice_in][i]) - 1;
             char* tmp = malloc(taille * sizeof(char));
             memcpy(tmp, in[indice_in][i]+2, taille);
             if (good_integer(tmp, false) == true)
