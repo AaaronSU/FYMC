@@ -77,46 +77,6 @@ bool file_verification(i32 const argc, char** const argv)
 }
 
 
-
-/// @brief Function used to load in memory a file. This is practical performance wise.
-/// @param filename Name of the file to load in memory
-/// @return A string containing the whole file
-char* load_file(char* const filename)
-{
-  i32   file_size; //Size of the file, used for malloc
-  FILE* fileptr = fopen(filename, "r"); //Pointer of the file
-
-  //We go to the end of the file
-  fseek(fileptr, 0L, SEEK_END);
-
-  //Now we retreive where we are (eq. the size of the file)
-  file_size = ftell(fileptr);
-
-  //Now we just copy the whole file into a buffer
-  char* buffer = (char*)malloc(sizeof(char) * (file_size + 1)); //Setting up the buffer, +1 for \0 just to be sure.
-  rewind(fileptr); //Going back to the beginning of our stream
-  fread(buffer, sizeof(char), file_size, fileptr);
-  buffer[file_size + 1] = '\0';
-
-  return buffer;
-}
-
-
-
-/// @brief Function used to print a file loaded in memory (mostly for debug purposes)
-/// @param Pointer of the file loaded in memory
-void print_file(char* const file)
-{
-  i32 i = 0;
-  while(file[i] != '\0')
-  {
-    printf("%c", file[i]);
-    i++;
-  }
-}
-
-
-
 /// @brief print tokens list (print each char* until NULL is read, will also print the separators)
 /// @param tokens List of tokens
 /// @param separator separator used to retreive tokens, will also be printed back

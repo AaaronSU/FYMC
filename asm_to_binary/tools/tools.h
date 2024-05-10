@@ -7,8 +7,6 @@
 
 void remove_space     (const char* str_in, char* str_out);
 bool file_verification(i32 const,          char** const);
-char* load_file(char* const);
-void print_file(char* const);
 void print_tokens_line(char** const, i32);
 char** retreive_token (char* line,   char const separator);
 i32 make_tokens(char*, char**,  u64);
