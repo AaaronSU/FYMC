@@ -115,6 +115,29 @@ void addu(core_t *core)
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
+void subu(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    DEBUG_PRINT("--------Avant Soustraction--------\n");
+    DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n",
+                instruction.register_1, core->U[instruction.register_1],
+                instruction.register_2, core->U[instruction.register_2],
+                instruction.register_3, core->U[instruction.register_3]);
+    core->U[instruction.register_1] = core->U[instruction.register_2] - core->U[instruction.register_3];
+    DEBUG_PRINT("--------Après Soustraction--------\n");
+    DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n\n",
+                instruction.register_1, core->U[instruction.register_1],
+                instruction.register_2, core->U[instruction.register_2],
+                instruction.register_3, core->U[instruction.register_3]);
+    core->CF[1] = (core->U[instruction.register_2] < core->U[instruction.register_3]) ? true : false;
+    DEBUG_PRINT("Compare Flag 1 a pour valeur %d\n", core->CF[1]);
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
 void mulu(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
@@ -133,6 +156,36 @@ void mulu(core_t *core)
                 instruction.register_1, core->U[instruction.register_1],
                 instruction.register_2, core->U[instruction.register_2],
                 instruction.register_3, core->U[instruction.register_3]);
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void divu(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    DEBUG_PRINT("--------Avant Division--------\n");
+    DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n",
+                instruction.register_1, core->U[instruction.register_1],
+                instruction.register_2, core->U[instruction.register_2],
+                instruction.register_3, core->U[instruction.register_3]);
+
+    // TODO : si division par 0 alors u0 = 0 mais est-ce qu'on mets pas plutôt une erreur ?
+    core->CF[1] = (core->U[instruction.register_3] == 0) ? true : false;
+
+    core->U[instruction.register_1] = (core->CF[1] == true) ? 0 : (core->U[instruction.register_2] / core->U[instruction.register_3]);
+
+    core->CF[0] = (core->U[instruction.register_1] == 0) ? true : false;
+
+    DEBUG_PRINT("--------Après Division--------\n");
+    DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n\n",
+                instruction.register_1, core->U[instruction.register_1],
+                instruction.register_2, core->U[instruction.register_2],
+                instruction.register_3, core->U[instruction.register_3]);
+    DEBUG_PRINT("Compare Flag 0 a pour valeur %d\n", core->CF[0]);
+    DEBUG_PRINT("Compare Flag 1 a pour valeur %d\n", core->CF[1]);
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
@@ -258,7 +311,9 @@ void set_up_instruction_set()
     instruction_set[13] = movu;
     instruction_set[19] = movui;
     instruction_set[31] = addu;
+    instruction_set[32] = subu;
     instruction_set[33] = mulu;
+    instruction_set[34] = divu;
     instruction_set[36] = fmau;
     instruction_set[39] = incu;
 

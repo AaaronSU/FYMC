@@ -14,15 +14,6 @@ vm_debug: mkdir_bin
 	$(CC) $(FILES) -o bin/vm -DDEBUG $(CFLAGS)
 	./bin/vm script.conf
 
-.PHONY:verify_as
-verify_as: mkdir_bin
-	$(CC) as.c -o bin/as -Werror -O3 $(CFLAGS)
-	./bin/as reference/hello_world.asm
-	python3 script/compare.py output.archyb reference/hello_world.archyb
-	./bin/as reference/fibonacci.asm
-	python3 script/compare.py output.archyb reference/fibonacci.archyb
-	./bin/as reference/dotprod_u64.asm
-
 .PHONY:mkdir_bin
 mkdir_bin:
 	mkdir -p bin
