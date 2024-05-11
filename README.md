@@ -136,7 +136,7 @@ utilisés par l\'instruction.
    |--------|-------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
    | storeu | (U0, U1 \[, OFFSET\]), U2    | Stocke la valeur scalaire non-signée (ou 8 caractères ASCII) contenue dans le registre **U2** vers la mémoire située en **U0 + U1 + OFFSET**. |
    | stores | (U0, U1 \[, OFFSET\]), S0    | Stocke la valeur scalaire signée contenue dans le registre **S0** vers la mémoire située en **U0 + U1 + OFFSET**.              |
-   | stores | (U0, U1 \[, OFFSET\]), F0    | Stocke la valeur scalaire flottante contenue dans le registre **F0** vers la mémoire située en **U0 + U1 + OFFSET**.          |
+   | storef | (U0, U1 \[, OFFSET\]), F0    | Stocke la valeur scalaire flottante contenue dans le registre **F0** vers la mémoire située en **U0 + U1 + OFFSET**.          |
 
 2. **Vector**
 

@@ -6,10 +6,6 @@ data:
 
 	# The code section
 code:
-<<<<<<< HEAD
-	movui u0, @msg 
-=======
 	movui u0, @msg
->>>>>>> a32ac885c0d21877b8f50c17b48c44458a59f483
 	outb u0
 	hlt

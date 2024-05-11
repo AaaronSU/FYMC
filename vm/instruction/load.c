@@ -25,3 +25,35 @@ void loadu(core_t *core)
                 *(u64 *)&(core->memory[core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset]));
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
+
+void loads(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    core->S[instruction.register_1] = *(i64 *)&(core->memory[core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset]);
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void loadf(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    DEBUG_PRINT("--------Avant LOADF--------\n");
+    DEBUG_PRINT("Le registre %d a pour valeur %f\n"
+                "Le registre %d a pour valeur %f\n"
+                "Le registre %d a pour valeur %f\n"
+                "core->memory[**address**] a pour valeur %f\n",
+                instruction.register_1, core->F[instruction.register_1],
+                instruction.register_2, core->F[instruction.register_2],
+                instruction.register_3, core->F[instruction.register_3],
+                *(double *)&(core->memory[core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset]));
+    core->F[instruction.register_1] = *(double *)&(core->memory[core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset]);
+    DEBUG_PRINT("--------Après LOADF--------\n");
+    DEBUG_PRINT("Le registre %d a pour valeur %f\n"
+                "Le registre %d a pour valeur %f\n"
+                "Le registre %d a pour valeur %f\n"
+                "core->memory[**address**] a pour valeur %f\n\n",
+                instruction.register_1, core->F[instruction.register_1],
+                instruction.register_2, core->F[instruction.register_2],
+                instruction.register_3, core->F[instruction.register_3],
+                *(double *)&(core->memory[core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset]));
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
