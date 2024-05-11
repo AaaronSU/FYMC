@@ -286,6 +286,55 @@ static void test_addu(void **state)
 }
 
 //
+static void test_subu(void **state)
+{
+    size_t size_file = sizeof(u32);
+
+    core_t *core = core_init();
+    u8 *file_buffer = (u8 *)malloc(size_file);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", size_file);
+        core_drop(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    for (int i = 0; i < MAX_INTERATION; ++i)
+    {
+        u8 r1 = random() % 10;      // 0 à 9
+        u8 r2 = 10 + random() % 10; // 10 à 19
+        u8 r3 = 20 + random() % 12; // 20 à 31
+
+        u64 v2 = random();
+        u64 v3 = random();
+
+        core->U[r2] = v2;
+        core->U[r3] = v3;
+
+        u32 *ptr = (u32 *)(core->file_buffer + core->IP);
+        *ptr = create_instruction(0, 0, r1, r2, r3);
+
+        subu(core);
+        core->IP = 0;
+
+        if (v2 < v3)
+        {
+            assert_true(core->CF[1]);
+        }
+        // CF[0] = 1 si opération = 0
+        if (core->U[r1] == 0)
+        {
+            assert_true(core->CF[0]);
+        }
+
+        assert_int_equal(core->U[r1], (v2 - v3));
+    }
+    core_drop(core);
+}
+
+//
 static void test_mulu(void **state)
 {
     size_t size_file = sizeof(u32);
@@ -326,6 +375,62 @@ static void test_mulu(void **state)
         else
         {
             assert_int_equal(core->U[r1], (v2 * v3));
+        }
+
+        // CF[0] = 1 si opération = 0
+        if (core->U[r1] == 0)
+        {
+            assert_true(core->CF[0]);
+        }
+    }
+    core_drop(core);
+}
+
+//
+static void test_divu(void **state)
+{
+    size_t size_file = sizeof(u32);
+
+    core_t *core = core_init();
+    u8 *file_buffer = (u8 *)malloc(size_file);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", size_file);
+        core_drop(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    u32 rd = 1000;
+
+    for (int i = 0; i < MAX_INTERATION; ++i)
+    {
+        u8 r1 = random() % 10;      // 0 à 9
+        u8 r2 = 10 + random() % 10; // 10 à 19
+        u8 r3 = 20 + random() % 12; // 20 à 31
+
+        u64 v2 = random();
+        u64 v3 = random() % rd;
+
+        core->U[r2] = v2;
+        core->U[r3] = v3;
+
+        u32 *ptr = (u32 *)(core->file_buffer + core->IP);
+        *ptr = create_instruction(0, 0, r1, r2, r3);
+
+        divu(core);
+        core->IP = 0;
+
+        if (v3 == 0)
+        {
+            // TODO : pour l'instant
+            assert_int_equal(core->U[r1], 0);
+            assert_true(core->CF[1]);
+        }
+        else
+        {
+            assert_int_equal(core->U[r1], (v2 / v3));
         }
 
         // CF[0] = 1 si opération = 0
@@ -561,7 +666,9 @@ int main(void)
         cmocka_unit_test(test_movu),
         cmocka_unit_test(test_movui),
         cmocka_unit_test(test_addu),
+        cmocka_unit_test(test_subu),
         cmocka_unit_test(test_mulu),
+        cmocka_unit_test(test_divu),
         cmocka_unit_test(test_fmau),
         cmocka_unit_test(test_incu),
         cmocka_unit_test(test_cmpu),
