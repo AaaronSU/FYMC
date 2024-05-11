@@ -10,11 +10,11 @@
 #define MAX_SAMPLES 5
 #define ITERATION 50
 
-typedef struct
+typedef struct opcode_s
 {
     void (*opcode)(core_t *);
     u8 *name;
-} Opcode;
+} opcode_t;
 
 //
 static core_t *core_init()
@@ -190,7 +190,7 @@ void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *titl
 //
 int main()
 {
-    Opcode opcode_tobench[] =
+    opcode_t opcode_tobench[] =
         {
             {loadu, "loadu"},
             {storeu, "storeu"},
