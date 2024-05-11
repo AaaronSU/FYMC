@@ -275,7 +275,6 @@ i32 tokenize(FILE* f, char*** out, i32* sizes)
   u64   len;
   u64   buffer_size;
   char* line;
-  u32   i;
 
   line         = NULL;
   buffer_size  = 0;
@@ -287,7 +286,7 @@ i32 tokenize(FILE* f, char*** out, i32* sizes)
 
   // Iterating on every line of the file
   len = (u64)getline(&line, &buffer_size, f);
-  for(i = 1; len != (u64)-1; ++i)
+  while(len != (u64)-1)
   {
     // Allocating memory
     out[indice] = malloc(buffer_size * sizeof(char*));
