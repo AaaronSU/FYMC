@@ -19,13 +19,13 @@ mkdir_bin:
 	mkdir -p bin
 
 .PHONY:bench
-bench: bench.c
-	$(CC) $(FILES) bench.c -o bin/bench -lm -g -O3
+bench: mkdir_bin bench.c
+	$(CC) $(FILES) bench.c -o bin/bench -g -O3
 	./bin/bench 
 
 .PHONY:test
-test: test.c
-	$(CC) test.c $(FILES) -o bin/test -lcmocka -lm -g3 -O3 $(CFLAGS)
+test: mkdir_bin test.c
+	$(CC) test.c $(FILES) -o bin/test -lcmocka -g3 -O3 $(CFLAGS)
 	./bin/test 
 
 .PHONY:clean

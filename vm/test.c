@@ -108,6 +108,65 @@ static void test_loadu(void **state)
     core_drop(core);
 }
 
+// instruction_set[1] = loads;
+
+// f1 = memory(u2 + u3 + offset)
+static void test_loadf(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+
+    core->file_buffer = file_buffer;
+
+    u8 *memory = (u8 *)malloc(MEMORY_SIZE);
+    if (memory == NULL)
+    {
+        printf("failed to allocate memory of size %u bytes", MEMORY_SIZE);
+        free(file_buffer);
+        free(core);
+        exit(1);
+    }
+
+    core->memory = memory;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        // intialisation des registres
+        u8 r1 = (u8)(rand() % 32);        // entre 0 et 32
+        u8 r2 = (u8)((rand() % 15));      // entre 0 et 14
+        u8 r3 = (u8)(15 + (rand() % 17)); // entre 15 et 31
+
+        core->U[r2] = (u64)(rand() % (MEMORY_SIZE / 3));
+        core->U[r3] = (u64)(rand() % (MEMORY_SIZE / 3));
+        u8 offset = (u8)rand();
+
+        u32 *ptr = (u32 *)(core->file_buffer);
+        *ptr = create_instruction(0, offset, r1, r2, r3);
+
+        f64 value = (f64)(rand() / 2.2814);
+        u64 indice = core->U[r2] + core->U[r3] + offset;
+
+        *(f64 *)(core->memory + indice) = value;
+
+        loadf(core);
+        core->IP = 0;
+
+        assert_float_equal(core->F[r1], value, 0.0001);
+    }
+
+    core_drop(core);
+}
+
 // memory(u1 + u2 + offset) = u3
 static void test_storeu(void **state)
 {
@@ -164,13 +223,73 @@ static void test_storeu(void **state)
     core_drop(core);
 }
 
+// instruction_set[7] = stores;
+
+// memory(u1 + u2 + offset) = f3
+static void test_storef(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+
+    core->file_buffer = file_buffer;
+
+    u8 *memory = (u8 *)malloc(MEMORY_SIZE);
+    if (memory == NULL)
+    {
+        printf("failed to allocate memory of size %u bytes", MEMORY_SIZE);
+        free(core);
+        free(memory);
+        exit(1);
+    }
+
+    core->memory = memory;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        // intialisation des registres
+        u8 r1 = (u8)(rand() % 15);          // entre 0 et 14
+        u8 r2 = (u8)(15 + (rand() % 17));   // entre 15 et 31
+        u8 r3 = (u8)(rand() % 32);          // entre 0 et 31
+
+        // indice
+        core->U[r1] = (u64)(rand() % (MEMORY_SIZE / 3));
+        core->U[r2] = (u64)(rand() % (MEMORY_SIZE / 3));
+        u8 offset = (u8)rand();
+
+        // value (taille de la mémoire doit au moins être 8 octets)
+        core->F[r3] = (f64)(rand() / 2.1541);
+
+        u32 *ptr = (u32 *)(core->file_buffer);
+        *ptr = create_instruction(0, offset, r1, r2, r3);
+
+        u64 indice = core->U[r1] + core->U[r2] + offset;
+
+        storef(core);
+        core->IP = 0;
+
+        assert_float_equal(core->F[r3], *(f64 *)(core->memory + indice), 0.0001);
+    }
+
+    core_drop(core);
+}
+
 // u1 = u2
 static void test_movu(void **state)
 {
     (void)state;
     core_t *core = core_init();
 
-    size_t file_size = sizeof(u32) * 100;
+    size_t file_size = sizeof(u32);
     char *file_buffer = (char *)malloc(file_size);
 
     if (file_buffer == NULL)
@@ -186,20 +305,68 @@ static void test_movu(void **state)
         u8 r1 = (u8)(random() % 15); // Entre 0 et 14
         u8 r2 = (u8)(15 + random() % 17); // Entre 15 et 31
 
+        u64 v1 = (u64)((rand() % (RAND_MAX / 2)) + (RAND_MAX / 2));
+        u64 v2 = (u64)(rand() % (RAND_MAX / 2));
+
+        core->U[r1] = v1;
+        core->U[r2] = v2;
 
         u32 *ptr = (u32 *)(core->file_buffer);
         *ptr = create_instruction(0, 0, r1, r2, 0);
 
-        u64 val_r2 = 5;
-        core->U[r2] = val_r2;
-
-        assert_int_not_equal(core->U[r1], core->U[r2]);
+        assert_int_not_equal(v1, v2);
 
         movu(core);
         core->IP = 0;
 
         assert_int_equal(core->U[r1], core->U[r2]);
-        assert_int_equal(val_r2, core->U[r2]);
+        assert_int_equal(v2, core->U[r2]);
+    }
+
+    // cas extreme des u64 ?
+
+    // cas ou c'est pas des u64 ?
+    free(file_buffer);
+    free(core);
+}
+
+// f1 = f2
+static void test_movf(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+
+    for (int i = 0; i < 1; ++i)
+    {
+        u8 r1 = (u8)(random() % 15);      // Entre 0 et 14
+        u8 r2 = (u8)(15 + random() % 17); // Entre 15 et 31
+
+        f64 v1 = (f64)((rand() % (RAND_MAX / 2)) + (RAND_MAX / 2)) / 0.2156;
+        f64 v2 = (f64)(rand() % (RAND_MAX / 2));
+
+        core->F[r1] = v1;
+        core->F[r2] = v2;
+
+        u32 *ptr = (u32 *)(core->file_buffer);
+        *ptr = create_instruction(0, 0, r1, r2, 0);
+
+        assert_float_not_equal(v1, v2, 0.0001);
+
+        movf(core);
+        core->IP = 0;
+
+        assert_float_equal(core->F[r1], core->F[r2], 0.0001);
+        assert_float_equal(v2, core->F[r2], 0.0001);
     }
 
     // cas extreme des u64 ?
@@ -243,6 +410,46 @@ static void test_movui(void **state)
         core->IP = 0;
         
         assert_int_equal(core->U[r1], imm);
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
+// f1 = imm1
+static void test_movfi(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32) + sizeof(u64);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+
+    core->file_buffer = file_buffer;
+
+    // U[r1] = imm (test quand U[r1] = 0 et U[r1] =! 0 si MAX_ITERATION grand)
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        u8 r1 = (u8)(random() % 32);
+        f64 imm = (f64)(rand() / 2.2554);
+
+        u32 *ptr_inst = (u32 *)(core->file_buffer);
+        f64 *ptr_imm = (f64 *)(core->file_buffer + sizeof(u32));
+
+        *ptr_inst = create_instruction(0, 0, r1, 0, 0);
+        *ptr_imm = imm;
+
+        movfi(core);
+        core->IP = 0;
+
+        //assert_float_equal(core->F[r1], imm, 0.0001);
     }
 
     free(file_buffer);
@@ -729,9 +936,13 @@ int main(void)
     int result = 0;
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_loadu),
+        cmocka_unit_test(test_loadf),
         cmocka_unit_test(test_storeu),
+        cmocka_unit_test(test_storef),
         cmocka_unit_test(test_movu),
+        cmocka_unit_test(test_movf),
         cmocka_unit_test(test_movui),
+        cmocka_unit_test(test_movfi),
         cmocka_unit_test(test_addu),
         cmocka_unit_test(test_subu),
         cmocka_unit_test(test_mulu),
