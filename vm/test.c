@@ -300,8 +300,10 @@ static void test_movu(void **state)
         exit(1);
     }
 
+    core->file_buffer = file_buffer;
+
     // U[r1] = U[r2]
-    for (int i = 0; i < 1; ++i)
+    for (int i = 0; i < MAX_ITERATION; ++i)
     {
         u8 r1 = (u8)(random() % 15); // Entre 0 et 14
         u8 r2 = (u8)(15 + random() % 17); // Entre 15 et 31
@@ -346,6 +348,8 @@ static void test_movf(void **state)
         free(core);
         exit(1);
     }
+
+    core->file_buffer = file_buffer;
 
     for (int i = 0; i < 1; ++i)
     {
@@ -439,7 +443,7 @@ static void test_movfi(void **state)
     for (int i = 0; i < MAX_ITERATION; ++i)
     {
         u8 r1 = 2;
-        f64 imm = 125.2;
+        f64 imm = 1;
 
         u32 *ptr_inst = (u32 *)(core->file_buffer);
         f64 *ptr_imm = (f64 *)(core->file_buffer + sizeof(u32));
@@ -447,7 +451,6 @@ static void test_movfi(void **state)
         *ptr_inst = create_instruction(0, 0, r1, 0, 0);
         *ptr_imm = imm;
 
-        core->F[2] = 11.0;
         movfi(core);
         core->IP = 0;
 
@@ -974,6 +977,55 @@ static void test_decu(void **state)
     free(core);
 }
 
+// u1 = u2 & u3
+static void test_andu(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        u8 r1 = (u8)(random() % 32);
+        u8 r2 = (u8)(random() % 15);
+        u8 r3 = (u8)(15 + random() % 17);
+
+        u64 v2 = (u64)random();
+        u64 v3 = (u64)random();
+
+        core->U[r2] = v2;
+        core->U[r3] = v3;
+
+        u32 *ptr = (u32 *)(core->file_buffer);
+        *ptr = create_instruction(0, 0, r1, r2, r3);
+
+        u64 expected_result = v2 & v3;
+
+        andu(core);
+        core->IP = 0;
+
+        if (core->U[r1] == 0)
+        {
+            assert_true(core->CF[0]);
+        }
+
+        assert_int_equal(core->U[r1], expected_result);
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
 // comparaison unisgned int
 static void test_cmpu(void **state)
 {
@@ -1150,6 +1202,7 @@ int main(void)
         cmocka_unit_test(test_logu),
         cmocka_unit_test(test_incu),
         cmocka_unit_test(test_decu),
+        cmocka_unit_test(test_andu),
         cmocka_unit_test(test_cmpu),
         cmocka_unit_test(test_jl),
         // cmocka_unit_test(test_outu),

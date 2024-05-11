@@ -22,6 +22,7 @@ void addu(core_t *core)
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
+//
 void subu(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
@@ -49,6 +50,7 @@ void subu(core_t *core)
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
+//
 void mulu(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
@@ -70,6 +72,7 @@ void mulu(core_t *core)
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
+//
 void divu(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
@@ -100,6 +103,7 @@ void divu(core_t *core)
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
+//
 void modu(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
@@ -130,6 +134,7 @@ void modu(core_t *core)
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
+//
 void fmau(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
@@ -151,6 +156,7 @@ void fmau(core_t *core)
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
+//
 void sqrtu(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
@@ -245,6 +251,63 @@ void decu(core_t *core)
 
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
+
+//
+void andu(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    DEBUG_PRINT("--------Avant ANDU--------\n");
+    DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n",
+                instruction.register_1, core->U[instruction.register_1],
+                instruction.register_2, core->U[instruction.register_2],
+                instruction.register_3, core->U[instruction.register_3]);
+
+    core->U[instruction.register_1] = (core->U[instruction.register_2] & core->U[instruction.register_3]);
+    DEBUG_PRINT("--------Après ANDU--------\n");
+    DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n\n",
+                instruction.register_1, core->U[instruction.register_1],
+                instruction.register_2, core->U[instruction.register_2],
+                instruction.register_3, core->U[instruction.register_3]);
+
+    core->CF[0] = (core->U[instruction.register_1] == 0) ? true : false;
+
+    DEBUG_PRINT("Compare Flag 0 a pour valeur %d\n", core->CF[0]);
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+//
+
+/* void oru(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    DEBUG_PRINT("--------Avant ORU--------\n");
+    DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n",
+                instruction.register_1, core->U[instruction.register_1],
+                instruction.register_2, core->U[instruction.register_2],
+                instruction.register_3, core->U[instruction.register_3]);
+
+    core->U[instruction.register_1] = (core->U[instruction.register_2] | core->U[instruction.register_3]);
+    DEBUG_PRINT("--------Après ORU--------\n");
+    DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n"
+                "Le registre %d a pour valeur %ld\n\n",
+                instruction.register_1, core->U[instruction.register_1],
+                instruction.register_2, core->U[instruction.register_2],
+                instruction.register_3, core->U[instruction.register_3]);
+
+    core->CF[0] = (core->U[instruction.register_1] == 0) ? true : false;
+
+    DEBUG_PRINT("Compare Flag 0 a pour valeur %d\n", core->CF[0]);
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+} */
 
 //
 void cmpu(core_t *core)
