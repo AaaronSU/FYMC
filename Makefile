@@ -13,7 +13,7 @@ verify_as:
 
 	./asm_to_binary/fymcc reference/fibonacci.asm && python3 script/compare.py a.archy reference/fibonacci.archyb
 
-	./asm_to_binary/fymcc reference/dotprod_s64.asm dotprod_s64.archyb
+	./asm_to_binary/fymcc reference/dotprod_s64.asm && python3 script/compare.py a.archy reference/dotprod_s64.archyb
 
-	rm ./op_codes ./register_list
+	rm ./op_codes ./register_list ./a.archy
 	cd asm_to_binary && make clean && cd ..
