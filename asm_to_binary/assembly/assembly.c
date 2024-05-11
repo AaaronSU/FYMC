@@ -303,7 +303,11 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
       if (toupper(tokens_list[indice][0][strlen(tokens_list[indice][0]) - 2]) == 'F'
           || toupper(tokens_list[indice][0][strlen(tokens_list[indice][0]) - 2]) == 'G')
       {
-        immediate_value[imm_indice++] = (i64)atof(tokens_list[indice][i]);
+        double tmp = atof(tokens_list[indice][i]);
+        #pragma GCC diagnostic push
+        #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+        immediate_value[imm_indice++] = *(i64*)&tmp;
+        #pragma GCC diagnostic pop
       }
       else
       {
@@ -323,7 +327,15 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
           if (strcasecmp(tokens_list[j][0], "u64") == 0 || strcasecmp(tokens_list[j][0], "s64") == 0)
             immediate_value[imm_indice++] = atoi(tokens_list[j][2]);
           else if (strcasecmp(tokens_list[j][0], "f64") == 0)
-            immediate_value[imm_indice++] = (i64)atof(tokens_list[j][2]);
+          {
+            double tmp = atof(tokens_list[j][2]);
+            #pragma GCC diagnostic push
+            #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+            immediate_value[imm_indice++] = *(i64*)&tmp;
+            #pragma GCC diagnostic pop
+            // fprintf(stderr, "%lf\n", tmp);
+          }
+
           break;
         }
       }
