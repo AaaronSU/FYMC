@@ -5,7 +5,7 @@ verify_as:
 
 	./asm_to_binary/fymcc reference/dotprod_u64.asm && python3 script/compare.py a.archy reference/dotprod_u64.archyb
 
-	# ./asm_to_binary/fymcc reference/dotprod.asm && python3 script/compare.py a.archy reference/dotprod.archyb
+	./asm_to_binary/fymcc reference/dotprod.asm && python3 script/compare.py a.archy reference/dotprod.archyb
 
 	./asm_to_binary/fymcc reference/hello_world.asm && python3 script/compare.py a.archy reference/hello_world.archyb
 
@@ -13,7 +13,8 @@ verify_as:
 
 	./asm_to_binary/fymcc reference/fibonacci.asm && python3 script/compare.py a.archy reference/fibonacci.archyb
 
-	./asm_to_binary/fymcc reference/dotprod.asm
+	./asm_to_binary/fymcc reference/dotprod_s64.asm dotprod_s64.archyb
 
-	rm ./op_codes ./register_list ./a.archy
+	rm ./op_codes ./register_list 
 	cd asm_to_binary && make clean && cd ..
+
