@@ -31,7 +31,7 @@ void subu(core_t *core)
                 instruction.register_1, core->U[instruction.register_1],
                 instruction.register_2, core->U[instruction.register_2],
                 instruction.register_3, core->U[instruction.register_3]);
-    core->U[instruction.register_1] = core->U[instruction.register_2] - core->U[instruction.register_3];
+    core->U[instruction.register_1] = (core->U[instruction.register_2] - core->U[instruction.register_3]);
     DEBUG_PRINT("--------Après Soustraction--------\n");
     DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
                 "Le registre %d a pour valeur %ld\n"
@@ -39,7 +39,11 @@ void subu(core_t *core)
                 instruction.register_1, core->U[instruction.register_1],
                 instruction.register_2, core->U[instruction.register_2],
                 instruction.register_3, core->U[instruction.register_3]);
+
     core->CF[1] = (core->U[instruction.register_2] < core->U[instruction.register_3]) ? true : false;
+    core->CF[0] = (core->U[instruction.register_1] == 0) ? true : false;
+    
+    DEBUG_PRINT("Compare Flag 0 a pour valeur %d\n", core->CF[0]);
     DEBUG_PRINT("Compare Flag 1 a pour valeur %d\n", core->CF[1]);
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
