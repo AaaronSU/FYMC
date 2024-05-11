@@ -14,6 +14,7 @@
 #include <sys/wait.h>
 
 #include "vm.h"
+#include "instruction.h"
 
 #define MAX_INTERATION 1000
 
