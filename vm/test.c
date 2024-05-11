@@ -66,7 +66,7 @@ static void test_loadu(void **state)
         free(core);
         exit(1);
     }
-    
+
     core->file_buffer = file_buffer;
 
     u8 *memory = (u8 *)malloc(MEMORY_SIZE);
@@ -408,7 +408,7 @@ static void test_movui(void **state)
 
         movui(core);
         core->IP = 0;
-        
+
         assert_int_equal(core->U[r1], imm);
     }
 
@@ -567,8 +567,8 @@ static void test_subu(void **state)
         {
             assert_int_equal(core->U[r1], (v2 - v3));
         }
-        
-        
+
+
     }
     free(file_buffer);
     free(core);
@@ -777,7 +777,7 @@ static void test_incu(void **state)
     free(core);
 }
 
-// comparaison unisgned int 
+// comparaison unisgned int
 static void test_cmpu(void **state)
 {
     (void)state;
@@ -927,7 +927,7 @@ static void test_jl(void **state)
 
     close(out);
 
-    core_drop(core); 
+    core_drop(core);
 } */
 
 //

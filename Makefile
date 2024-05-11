@@ -15,6 +15,5 @@ verify_as:
 
 	./asm_to_binary/fymcc reference/dotprod_s64.asm dotprod_s64.archyb
 
-	rm ./op_codes ./register_list 
+	rm ./op_codes ./register_list
 	cd asm_to_binary && make clean && cd ..
-

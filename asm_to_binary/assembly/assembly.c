@@ -16,6 +16,90 @@
 
 #define header_size 10
 
+bool is_signing_symbol(char c)
+{
+  if (c == '-' || c == '+')
+    return true;
+  return false;
+}
+
+i32 to_digit(char c)
+{
+  return c - '0';
+}
+
+i64 str_to_double(char* str, u64 limit)
+{
+  double l = 0.0;
+  double r = 0.0;
+  double d = 10.0;
+  u64    i = 0;
+
+  // Creating upper part
+  while (i < limit && str[i] && isdigit(str[i]))
+  {
+    l *= 10.0;
+    l += (double)to_digit(str[i]);
+    ++i;
+  }
+
+  if (str[i] != '.' && str[i] != ',')
+  {
+    // TODO handle error
+    if (i != limit)
+      return 0;
+  }
+  ++i;
+
+  // Creating lower part
+  while (i < limit && str[i] && isdigit(str[i]))
+  {
+    r += (double)to_digit(str[i]) / d;
+    d *= 10.0;
+    ++i;
+  }
+
+  double return_value = l + r;
+  #pragma GCC diagnostic push
+  #pragma GCC diagnostic ignored "-Wstrict-aliasing"
+  return *(i64*)&return_value;
+  #pragma GCC diagnostic pop
+}
+
+
+
+i64 str_to_integer(char* str, u64 limit)
+{
+  i64 l = 0.0;
+  u64 i = 0;
+  bool is_negative = false;
+
+
+  if (str[i] == '-')
+  {
+    is_negative = true;
+    ++i;
+  }
+  else if (str[i] == '+')
+  {
+    ++i;
+  }
+
+  while (i < limit && str[i] && isdigit(str[i]))
+  {
+    l *= 10;
+    l += (i64)to_digit(str[i]);
+    ++i;
+  }
+
+  if (is_negative == true)
+    l = l * -1;
+
+  return l;
+}
+
+
+
 i64 get_number_of_one(char* mask)
 {
   u64 taille = strlen(mask);
@@ -290,7 +374,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
     }
 
     // Handling immediate values
-    else if (isdigit(tokens_list[indice][i][0]))
+    else if (isdigit(tokens_list[indice][i][0]) || is_signing_symbol(tokens_list[indice][i][0]))
     {
       if (*imm == true)
       {
@@ -303,15 +387,13 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
       if (toupper(tokens_list[indice][0][strlen(tokens_list[indice][0]) - 2]) == 'F'
           || toupper(tokens_list[indice][0][strlen(tokens_list[indice][0]) - 2]) == 'G')
       {
-        double tmp = atof(tokens_list[indice][i]);
-        #pragma GCC diagnostic push
-        #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-        immediate_value[imm_indice++] = *(i64*)&tmp;
-        #pragma GCC diagnostic pop
+        immediate_value[imm_indice++] = str_to_double(tokens_list[indice][i], strlen(tokens_list[indice][i]) + 1);
+        // fprintf(stderr, "%lf\n", *(double*)&immediate_value[imm_indice - 1]);
       }
       else
       {
-        immediate_value[imm_indice++] = atoll(tokens_list[indice][i]);
+        immediate_value[imm_indice++] = str_to_integer(tokens_list[indice][i], strlen(tokens_list[indice][i]) + 1);
+        // fprintf(stderr, "HELP ME ERIN'%s'\n", tokens_list[indice][i]);
       }
       // *to_write += 1 << (15);
       // *to_write += immediate_value[imm_indice++] << (15);
@@ -325,14 +407,13 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
         if (strcmp(tokens_list[j][1], tokens_list[indice][i]+1) == 0)
         {
           if (strcasecmp(tokens_list[j][0], "u64") == 0 || strcasecmp(tokens_list[j][0], "s64") == 0)
-            immediate_value[imm_indice++] = atoll(tokens_list[j][2]);
+          {
+            immediate_value[imm_indice++] = str_to_integer(tokens_list[j][2], strlen(tokens_list[j][2]) + 1);
+            // fprintf(stderr, "%ld\n", immediate_value[imm_indice - 1]);
+          }
           else if (strcasecmp(tokens_list[j][0], "f64") == 0)
           {
-            double tmp = atof(tokens_list[j][2]);
-            #pragma GCC diagnostic push
-            #pragma GCC diagnostic ignored "-Wstrict-aliasing"
-            immediate_value[imm_indice++] = *(i64*)&tmp;
-            #pragma GCC diagnostic pop
+            immediate_value[imm_indice++] = str_to_double(tokens_list[j][2], strlen(tokens_list[j][2]) + 1);
             // fprintf(stderr, "%lf\n", tmp);
           }
 
