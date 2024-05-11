@@ -311,7 +311,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
       }
       else
       {
-        immediate_value[imm_indice++] = atoi(tokens_list[indice][i]);
+        immediate_value[imm_indice++] = atoll(tokens_list[indice][i]);
       }
       // *to_write += 1 << (15);
       // *to_write += immediate_value[imm_indice++] << (15);
@@ -325,7 +325,7 @@ void code_to_number(char*** tokens_list,    i32* tokens_sizes,
         if (strcmp(tokens_list[j][1], tokens_list[indice][i]+1) == 0)
         {
           if (strcasecmp(tokens_list[j][0], "u64") == 0 || strcasecmp(tokens_list[j][0], "s64") == 0)
-            immediate_value[imm_indice++] = atoi(tokens_list[j][2]);
+            immediate_value[imm_indice++] = atoll(tokens_list[j][2]);
           else if (strcasecmp(tokens_list[j][0], "f64") == 0)
           {
             double tmp = atof(tokens_list[j][2]);
