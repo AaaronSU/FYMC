@@ -6,12 +6,12 @@ all: run_par
 
 .PHONY:run_par
 run_par: mkdir_bin
-	$(CC) $(FILES) main.c  -o bin/vm $(CFLAGS)
+	$(CC) $(FILES) main.c  -o bin/vm $(CFLAGS) -lm
 	./bin/vm script.conf
 
 .PHONY:vm_debug
 vm_debug: mkdir_bin
-	$(CC) $(FILES) main.c -o bin/vm -DDEBUG $(CFLAGS)
+	$(CC) $(FILES) main.c -o bin/vm -DDEBUG $(CFLAGS) -lm
 	./bin/vm script.conf
 
 .PHONY:mkdir_bin
@@ -25,7 +25,7 @@ bench: mkdir_bin bench.c
 
 .PHONY:test
 test: mkdir_bin test.c
-	$(CC) test.c $(FILES) -o bin/test -lcmocka -g3 -O3 $(CFLAGS)
+	$(CC) test.c $(FILES) -o bin/test -lcmocka -g3 -O3 $(CFLAGS) -lm -DDEBUG
 	./bin/test 
 
 .PHONY:clean

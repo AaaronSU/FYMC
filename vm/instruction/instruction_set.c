@@ -46,12 +46,12 @@ void set_up_instruction_set()
     instruction_set[32] = subu;
     instruction_set[33] = mulu;
     instruction_set[34] = divu;
-    // instruction_set[35] = modu;
+    instruction_set[35] = modu;
     instruction_set[36] = fmau;
-    // instruction_set[37] = sqrtu;
-    // instruction_set[38] = logu;
+    instruction_set[37] = sqrtu;
+    instruction_set[38] = logu;
     instruction_set[39] = incu;
-    // instruction_set[40] = decu;
+    instruction_set[40] = decu;
     // instruction_set[41] = andu;
     // instruction_set[42] = oru;
     // instruction_set[43] = xoru;
