@@ -200,10 +200,10 @@ i32 main(i32 argc, char** argv)
   {
     for (i32 j = 0; j < tokens_list_sizes[i]; ++j)
     {
-//      printf("'%s' ", tokens_list[i][j]);
+     // printf("'%s' ", tokens_list[i][j]);
       free(tokens_list[i][j]);
     }
-//    printf("\n");
+   // printf("\n");
     free(tokens_list[i]);
   }
   free(tokens_list);
