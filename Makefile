@@ -17,4 +17,3 @@ verify_as:
 
 	rm ./op_codes ./register_list 
 	cd asm_to_binary && make clean && cd ..
-
