@@ -1,5 +1,6 @@
 #include "../vm.h"
 #include "../instruction.h"
+#include <math.h>
 
 void adds(core_t *core)
 {
@@ -165,7 +166,7 @@ void sqrts(core_t *core)
                 instruction.register_1, core->S[instruction.register_1],
                 instruction.register_2, core->S[instruction.register_2]);
 
-    core->S[instruction.register_1] = (u64)sqrt((f64)core->S[instruction.register_2]);
+    core->S[instruction.register_1] = (i64)sqrt((f64)core->S[instruction.register_2]);
 
     core->CF[0] = (core->S[instruction.register_1] == 0) ? true : false;
 
@@ -194,7 +195,7 @@ void logs(core_t *core)
         exit(EXIT_FAILURE);
     }
 
-    core->S[instruction.register_1] = (u64)log10((f64)core->S[instruction.register_2]);
+    core->S[instruction.register_1] = (i64)log10((f64)core->S[instruction.register_2]);
 
     core->CF[0] = (core->S[instruction.register_1] == 0) ? true : false;
 
