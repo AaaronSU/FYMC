@@ -88,11 +88,11 @@ void set_up_instruction_set()
     instruction_set[74] = cmpu;
     instruction_set[75] = cmps;
     instruction_set[76] = cmpf;
-    // instruction_set[77] = je;
-    // instruction_set[78] = jne;
-    // instruction_set[79] = jge;
+    instruction_set[77] = je;
+    instruction_set[78] = jne;
+    instruction_set[79] = jge;
     instruction_set[80] = jl;
-    // instruction_set[81] = jle;
+    instruction_set[81] = jle;
     // instruction_set[82] = jz;
     // instruction_set[83] = jnz;
     instruction_set[84] = outu;
