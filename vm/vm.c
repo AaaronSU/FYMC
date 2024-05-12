@@ -39,6 +39,15 @@ core_t *core_new(char *buffer, u16 id)
         core->S[i] = 0;
         core->F[i] = 0.0;
     }
+    for (int i = 0; i < NUMBER_VECTOR_REGISTER; i++)
+    {
+        for (int j = 0; j < NUMBER_SCALAR_IN_VECTOR_REGISTER; j++)
+        {
+            core->V[i][j] = 0;
+            core->T[i][j] = 0;
+            core->G[i][j] = 0.0;
+        }
+    }
     for (int i = 0; i < 8; i++)
     {
         core->CF[i] = false;

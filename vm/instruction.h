@@ -98,6 +98,11 @@ extern void outa(core_t *core);
 extern void outb(core_t *core);
 extern void outx(core_t *core);
 extern void hlt(core_t *core);
+extern void mulg(core_t *core);
+extern void addg(core_t *core);
+extern void outg(core_t *core);
+extern void sumg(core_t *core);
+extern void fmag(core_t *core);
 
 extern void undefined_instruction(core_t *core);
 

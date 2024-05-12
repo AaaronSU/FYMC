@@ -22,10 +22,10 @@ void set_up_instruction_set()
     instruction_set[8] = storef;
     // instruction_set[9] = storev;
     // instruction_set[10] = storet;
-    // instruction_set[11] = storeg;
+    instruction_set[11] = storeg;
     // instruction_set[12] = mov;
     instruction_set[13] = movu;
-    // instruction_set[14] = movs;
+    instruction_set[14] = movs;
     instruction_set[15] = movf;
     // instruction_set[16] = movv;
     // instruction_set[17] = movt;
@@ -35,7 +35,7 @@ void set_up_instruction_set()
     instruction_set[21] = movfi;
     // instruction_set[22] = movvi;
     // instruction_set[23] = movti;
-    // instruction_set[24] = movgi;
+    instruction_set[24] = movgi;
     // instruction_set[25] = cvtus;
     // instruction_set[26] = cvtsu;
     // instruction_set[27] = cvtuf;
@@ -53,8 +53,8 @@ void set_up_instruction_set()
     instruction_set[39] = incu;
     instruction_set[40] = decu;
     instruction_set[41] = andu;
-    // instruction_set[42] = oru;
-    // instruction_set[43] = xoru;
+    instruction_set[42] = oru;
+    instruction_set[43] = xoru;
     // instruction_set[44] = shlu;
     // instruction_set[45] = shru;
     // instruction_set[46] = rolu;
@@ -86,8 +86,8 @@ void set_up_instruction_set()
     // instruction_set[72] = sqrtf_;
     // instruction_set[73] = logf_;
     instruction_set[74] = cmpu;
-    // instruction_set[75] = cmps;
-    // instruction_set[76] = cmpf;
+    instruction_set[75] = cmps;
+    instruction_set[76] = cmpf;
     // instruction_set[77] = je;
     // instruction_set[78] = jne;
     // instruction_set[79] = jge;
@@ -102,4 +102,11 @@ void set_up_instruction_set()
     instruction_set[88] = outb;
     // instruction_set[89] = outx;
     instruction_set[90] = hlt;
+
+    // 91 to 97 is reserved to parallel section
+    // instruction_set[98] = mulg;
+    // instruction_set[99] = addg;
+    instruction_set[100] = outg;
+    instruction_set[101] = sumg;
+    instruction_set[102] = fmag;
 }

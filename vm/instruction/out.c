@@ -37,3 +37,10 @@ void outb(core_t *core)
     }
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
+
+void outg(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    printf("%f\n", core->G[instruction.register_1][0]);
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}

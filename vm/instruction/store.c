@@ -69,3 +69,17 @@ void storef(core_t *core)
                 *(f64 *)&(core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset]));
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
+
+void storeg(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    memcpy(&core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset], &core->G[instruction.register_3], sizeof(double) * 8);
+
+    for (u16 indice = 0; indice < NUMBER_SCALAR_IN_VECTOR_REGISTER; indice++)
+    {
+        printf("%f\n", core->G[instruction.register_3][indice]);
+    }
+    printf("\n");
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}

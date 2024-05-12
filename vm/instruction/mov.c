@@ -84,8 +84,23 @@ void movfi(core_t *core)
                 core->F[instruction.register_1]);
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
     u64 immediate = get_immediate(core);
-    core->F[instruction.register_1] = *(f64 *)&immediate;
+    f64 immediate_value;
+    memcpy(&immediate_value, &immediate, sizeof(f64));
+    core->F[instruction.register_1] = immediate_value;
     DEBUG_PRINT("--------Après MOVFI--------\n");
     DEBUG_PRINT("Le registre %d a pour valeur %lf\n\n", instruction.register_1,
                 core->F[instruction.register_1]);
+}
+
+void movgi(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+    for (u8 indice = 0; indice < NUMBER_SCALAR_IN_VECTOR_REGISTER; indice++)
+    {
+        u64 immediate = get_immediate(core);
+        f64 immediate_value;
+        memcpy(&immediate_value, &immediate, sizeof(f64));
+        core->G[instruction.register_1][indice] = immediate_value;
+    }
 }
