@@ -15,7 +15,7 @@ verify_as:
 
 	./asm_to_binary/fymcc reference/dotprod_s64.asm && python3 script/compare.py a.archy reference/dotprod_s64.archyb
 
-	./asm_to_binary/fymcc reference/dotprod_g64.asm dotprod_g64.archyb
+	./asm_to_binary/fymcc reference/dotprod_g64.asm && python3 script/compare.py a.archy reference/dotprod_g64.archyb
 
 	rm ./op_codes ./register_list ./a.archy
 	cd asm_to_binary && make clean && cd ..

@@ -16,7 +16,7 @@ void set_up_instruction_set()
     instruction_set[2] = loadf;
     // instruction_set[3] = loadv;
     // instruction_set[4] = loadt;
-    // instruction_set[5] = loadg;
+    instruction_set[5] = loadg;
     instruction_set[6] = storeu;
     instruction_set[7] = stores;
     instruction_set[8] = storef;

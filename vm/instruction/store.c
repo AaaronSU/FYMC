@@ -78,8 +78,8 @@ void storeg(core_t *core)
 
     for (u16 indice = 0; indice < NUMBER_SCALAR_IN_VECTOR_REGISTER; indice++)
     {
-        printf("%f\n", core->G[instruction.register_3][indice]);
+        DEBUG_PRINT("%f\n", core->G[instruction.register_3][indice]);
     }
-    printf("\n");
+    DEBUG_PRINT("%s", "\n");
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
