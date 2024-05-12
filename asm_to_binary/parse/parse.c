@@ -148,6 +148,7 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
 {
   i32 return_value;
   i32 opcode = good_opcode(in[indice_in][0], opcodes, len_op);
+  // fprintf(stderr, "%s %d\n", in[indice_in][0], opcode);
   if (opcode == -1)
   {
     // Handling addresses
@@ -236,7 +237,7 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
     }
     *parallel_on = false;
   }
-  if (opcode > 92)
+  if (opcode > 92 && opcode < 98)
   {
     if (*parallel_on == false)
     {
