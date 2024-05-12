@@ -532,6 +532,7 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
         else if (strcasecmp(opcodes[opcode][indice_opcode], "imf")     == 0
                  || (strcasecmp(opcodes[opcode][indice_opcode], "img") == 0))
         {
+
           if (good_float(in[indice_in][i]) == true)
           {
             return_value = true;
@@ -560,7 +561,7 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
                 if (strcmp(var_tmp, in[k][1]) == 0
                     || strcmp(var_tmp, in[k][1]) == 0)
                 {
-                  printf("good\n");
+                  // printf("good\n");
                   if (strcmp(in[k][0], "u64") == 0
                       || strcmp(in[k][0], "ascii") == 0)
                   {
@@ -625,7 +626,6 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
             memcpy(tmp, in[indice_in][i]+2, taille);
             if (good_integer(tmp, false) == true)
             {
-
               free(tmp);
               return_value = true;
               ++indice_opcode;
@@ -644,8 +644,8 @@ i32 good_instruction(char*** in,         i32* len_in, i32 indice_in, char*** opc
                 || (opcodes[opcode][indice_opcode][0] == ')'
                   && in[indice_in][i][0] == ')')
                 || (opcodes[opcode][indice_opcode][0] == '{'
-                  && in[indice_in][i][0] == '}')
-                || (opcodes[opcode][indice_opcode][0] == '{'
+                  && in[indice_in][i][0] == '{')
+                || (opcodes[opcode][indice_opcode][0] == '}'
                   && in[indice_in][i][0] == '}'))
         {
           return_value = true;

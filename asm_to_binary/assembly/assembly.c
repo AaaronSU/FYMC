@@ -795,23 +795,24 @@ void write_stuff(char*     path,
     return;
   }
 
+#define SIZE_MULTIPLIER 12
   // Size will be big for the sake of simplicity
-  char** data_to_write = calloc((u64)code_start,   sizeof(char*));
-  char** ascii_written = calloc((u64)code_start,   sizeof(char*));
-  i64*   ascii_address = calloc((u64)(nb_tokens - code_start), sizeof(i64));
-  i32*   code_to_write = calloc((u64)(nb_tokens - data_start), sizeof(i32));
-  i64*   imm_to_write  = calloc((u64)(nb_tokens - data_start), sizeof(i64));
-  i64*   imm_indice    = calloc((u64)(nb_tokens - data_start), sizeof(i64));
-  i64*   thread_array  = calloc((u64)(nb_tokens - code_start), sizeof(i64));
-  i64*   thread_masks  = calloc((u64)(nb_tokens - code_start), sizeof(i64));
-  i64*   thread_on_addresses = calloc((u64)(nb_tokens - data_start), sizeof(i64));
-  i64*   thread_on_indices   = calloc((u64)(nb_tokens - data_start), sizeof(i64));
+  char** data_to_write = calloc((u64)code_start * SIZE_MULTIPLIER, sizeof(char*));
+  char** ascii_written = calloc((u64)code_start * SIZE_MULTIPLIER, sizeof(char*));
+  i64*   ascii_address = calloc((u64)(nb_tokens - code_start) * SIZE_MULTIPLIER, sizeof(i64));
+  i32*   code_to_write = calloc((u64)(nb_tokens - data_start) * SIZE_MULTIPLIER, sizeof(i32));
+  i64*   imm_to_write  = calloc((u64)(nb_tokens - data_start) * SIZE_MULTIPLIER, sizeof(i64));
+  i64*   imm_indice    = calloc((u64)(nb_tokens - data_start) * SIZE_MULTIPLIER, sizeof(i64));
+  i64*   thread_array  = calloc((u64)(nb_tokens - code_start) * SIZE_MULTIPLIER, sizeof(i64));
+  i64*   thread_masks  = calloc((u64)(nb_tokens - code_start) * SIZE_MULTIPLIER, sizeof(i64));
+  i64*   thread_on_addresses = calloc((u64)(nb_tokens - data_start) * SIZE_MULTIPLIER, sizeof(i64));
+  i64*   thread_on_indices   = calloc((u64)(nb_tokens - data_start) * SIZE_MULTIPLIER, sizeof(i64));
   i64    thread_number = 0;
   u64    thread_max    = 1;
 
   i64 nb_data_to_write            = 0;
   u64 taille_code                 = 0;
-  for (i64 indice = 0; indice < nb_tokens - data_start; ++indice)
+  for (i64 indice = 0; indice < (nb_tokens - data_start) * SIZE_MULTIPLIER; ++indice)
     imm_indice[indice] = -1;
 
   u64 size_data = assemble_data(tokens_list, code_start, data_to_write,

@@ -186,7 +186,6 @@ i32 main(i32 argc, char** argv)
                 registers,    len_register,
                 requested_labels, indice_req);
   }
-
   else if (result == -2)
   {
     printf("Invalid syntax.\n");
@@ -196,6 +195,7 @@ i32 main(i32 argc, char** argv)
   {
     printf("Invalid syntax.\n");
   }
+
   for (i32 i = 0; i < nb_tokens; ++i)
   {
     for (i32 j = 0; j < tokens_list_sizes[i]; ++j)
