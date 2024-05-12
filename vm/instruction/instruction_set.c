@@ -63,7 +63,7 @@ void set_up_instruction_set()
     // instruction_set[49] = lmbu;
     // instruction_set[50] = adds;
     // instruction_set[51] = subs;
-    // instruction_set[52] = muls;
+    instruction_set[52] = muls;
     // instruction_set[53] = divs;
     // instruction_set[54] = mods;
     instruction_set[55] = fmas;
