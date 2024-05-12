@@ -20,9 +20,9 @@ MOVG 2 2 G G
 MOVUI 2 2 U imu
 MOVSI 2 2 S ims
 MOVFI 2 2 F imf
-MOVVI 10 10 V { imu imu imu imu imu imu imu imu }
-MOVTI 10 10 T { ims ims ims ims ims ims ims ims }
-MOVGI 10 10 G { imf imf imf imf imf imf imf imf }
+MOVVI 11 11 V { imu imu imu imu imu imu imu imu }
+MOVTI 11 11 T { ims ims ims ims ims ims ims ims }
+MOVGI 11 11 G { imf imf imf imf imf imf imf imf }
 CVTUS 2 2 S U
 CVTSU 2 2 U S
 CVTUF 2 2 F U

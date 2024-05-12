@@ -35,6 +35,7 @@ int main(int argc, char *argv[])
     for (u16 i = 0; i < n; i++)
     {
         pthread_join(tds[i].tid, NULL);
+        free(tds[i].file_buffer);
         printf("The thread %2d successful executed at core_id: %2d on numa_id: %d\n", tds[i].index, tds[i].core_id, tds[i].numa_id);
     }
 
