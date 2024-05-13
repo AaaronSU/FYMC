@@ -104,6 +104,11 @@ void set_up_instruction_set()
     instruction_set[90] = hlt;
 
     // 91 to 97 is reserved to parallel section
+    instruction_set[91] = par_on;
+    instruction_set[94] = th_off;
+    instruction_set[95] = lock_on;
+    instruction_set[96] = lock_off;
+    instruction_set[97] = get_core;
     // instruction_set[98] = mulg;
     // instruction_set[99] = addg;
     instruction_set[100] = outg;

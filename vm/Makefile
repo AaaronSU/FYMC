@@ -7,7 +7,6 @@ all: run_par
 .PHONY:run_par
 run_par: mkdir_bin
 	$(CC) $(FILES) main.c  -o bin/vm $(CFLAGS) -lm
-	./bin/vm script.conf
 
 .PHONY:vm_debug
 vm_debug: mkdir_bin
