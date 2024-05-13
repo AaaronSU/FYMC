@@ -5,6 +5,7 @@
 #include <string.h>
 #include <libgen.h>
 #include <errno.h>
+#include <pthread.h>
 #include "vm.h"
 
 extern void (*instruction_set[MAX_INSTRUCTION_NUMBER])(core_t *);
@@ -21,7 +22,7 @@ instruction_t instruction_new(u32 instruction)
     };
 }
 
-core_t *core_new(char *buffer, u16 id)
+core_t *core_new(program_thread_data_t* args)
 {
     core_t *core = (core_t *)malloc(sizeof(core_t)); // Allocate memory for the core
     if (core == NULL)
@@ -29,33 +30,78 @@ core_t *core_new(char *buffer, u16 id)
         error("failed to allocate core of size %zu bytes", sizeof(core_t));
         exit(EXIT_FAILURE);
     }
-    core->file_buffer = buffer;
+    core->file_buffer = args->file_buffer;
 
-    core->id = id;
-    core->type = 0;
-    for (int i = 0; i < NUMBER_SCALAR_REGISTER; i++)
+    core->id       = args->core_id + args->core_offset;
+    core->type     = args->management;
+    core->offset   = args->core_offset;
+    core->given_id = args->given_id;
+
+    u8 *memory;
+
+    // If management core
+    if (core->type)
     {
-        core->U[i] = 0;
-        core->S[i] = 0;
-        core->F[i] = 0.0;
-    }
-    for (int i = 0; i < NUMBER_VECTOR_REGISTER; i++)
-    {
-        for (int j = 0; j < NUMBER_SCALAR_IN_VECTOR_REGISTER; j++)
+        core->mutex = malloc(MAX_MUTEX * sizeof(pthread_mutex_t));
+        for (u16 k = 0; k < MAX_MUTEX; ++k)
+            pthread_mutex_init(&core->mutex[k], NULL);
+
+        for (int i = 0; i < NUMBER_SCALAR_REGISTER; i++)
         {
-            core->V[i][j] = 0;
-            core->T[i][j] = 0;
-            core->G[i][j] = 0.0;
+            core->U[i] = 0;
+            core->S[i] = 0;
+            core->F[i] = 0.0;
         }
-    }
-    for (int i = 0; i < 8; i++)
-    {
-        core->CF[i] = false;
-    }
-    core->IP = 0;
+        for (int i = 0; i < NUMBER_VECTOR_REGISTER; i++)
+        {
+            for (int j = 0; j < NUMBER_SCALAR_IN_VECTOR_REGISTER; j++)
+            {
+                core->V[i][j] = 0;
+                core->T[i][j] = 0;
+                core->G[i][j] = 0.0;
+            }
+        }
+        for (int i = 0; i < 8; i++)
+        {
+            core->CF[i] = false;
+        }
 
-    u8 *memory = (u8 *)malloc(MAX_MEMORY_SIZE);
-    memset(memory, 0, MAX_MEMORY_SIZE);
+        header_t header = *(header_t *)(core->file_buffer);
+        core->IP = htobe64(header.address_code);
+
+        memory = (u8 *)malloc(MAX_MEMORY_SIZE);
+        memset(memory, 0, MAX_MEMORY_SIZE);
+    }
+    else
+    {
+        // TODO only cpy what's important (cf instruction/par.c)
+        for (int i = 0; i < NUMBER_SCALAR_REGISTER; i++)
+        {
+            core->U[i] = args->registers->U[i];
+            core->S[i] = args->registers->S[i];
+            core->F[i] = args->registers->F[i];
+        }
+        for (int i = 0; i < NUMBER_VECTOR_REGISTER; i++)
+        {
+            for (int j = 0; j < NUMBER_SCALAR_IN_VECTOR_REGISTER; j++)
+            {
+                core->V[i][j] = args->registers->V[i][j];
+                core->T[i][j] = args->registers->T[i][j];
+                core->G[i][j] = args->registers->G[i][j];
+            }
+        }
+        for (int i = 0; i < 8; i++)
+        {
+            core->CF[i] = args->registers->CF[i];
+        }
+
+
+        memcpy(core->CF, args->registers->CF, 8);
+        memory      = args->memory_address;
+        core->IP    = args->IP;
+        core->mutex = args->mutex;
+    }
+
     if (memory == NULL)
     {
         free(core);
@@ -112,7 +158,7 @@ void core_execute(core_t *self)
         header.size_total // Size total);
     );
 
-    self->IP = header.address_code;
+    // self->IP = header.address_code;
 
     while (self->IP < header.size_total)
     {
@@ -121,14 +167,20 @@ void core_execute(core_t *self)
     }
 }
 
+// NOTE: file_buffer are freed after VM execution to avoid double free issues
 void core_drop(core_t *self)
 {
     if (NULL != self)
     {
-        if (NULL != self->memory)
-            free(self->memory);
-        if (NULL != self->file_buffer)
-            free(self->file_buffer);
+        if (self->type)
+        {
+            if (NULL != self->memory)
+                free(self->memory);
+        // if (NULL != self->file_buffer)
+        //     free(self->file_buffer);
+            if (self->mutex)
+                free(self->mutex);
+        }
         free(self);
     }
 }
@@ -209,7 +261,7 @@ void *execute_program_thread(void *args)
 {
     program_thread_data_t *td = (program_thread_data_t *)args;
     getcpu(&td->core_id, &td->numa_id);
-    core_t *core = core_new(td->file_buffer, td->index);
+    core_t *core = core_new(td);
     core_execute(core);
     core_drop(core);
     return args;

@@ -23,11 +23,21 @@ int main(int argc, char *argv[])
     set_up_instruction_set();
     CPU_ZERO(&cpuset);
 
+    u64 offset = 0;
+
     for (u16 i = 0; i < n; i++)
     {
-        CPU_SET(i, &cpuset);
-        tds[i].index = i;
+        // TODO Check that core_number is not too big
+        header_t header = *(header_t *)(file_buffer_list[i]);
+        CPU_SET(i + offset, &cpuset);
+
         tds[i].file_buffer = file_buffer_list[i];
+        tds[i].core_offset = (u32)offset;
+        tds[i].management  = true;
+        tds[i].given_id = 0;
+        tds[i].index = i;
+        offset += htobe64(header.core_number);
+
         pthread_create(&tds[i].tid, NULL, execute_program_thread, &tds[i]);
         pthread_setaffinity_np(tds[i].tid, sizeof(cpuset), &cpuset);
     }
@@ -35,8 +45,11 @@ int main(int argc, char *argv[])
     for (u16 i = 0; i < n; i++)
     {
         pthread_join(tds[i].tid, NULL);
+        free(tds[i].file_buffer);
         printf("The thread %2d successful executed at core_id: %2d on numa_id: %d\n", tds[i].index, tds[i].core_id, tds[i].numa_id);
     }
+
+    free(tds);
 
     return 0;
 }

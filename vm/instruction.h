@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 #include "vm.h"
 
 #ifndef INSTRUCTION_H
@@ -103,6 +104,11 @@ extern void addg(core_t *core);
 extern void outg(core_t *core);
 extern void sumg(core_t *core);
 extern void fmag(core_t *core);
+extern void par_on(core_t *core);
+extern void th_off(core_t *core);
+extern void lock_on(core_t *core);
+extern void lock_off(core_t *core);
+extern void get_core(core_t *core);
 
 extern void undefined_instruction(core_t *core);
 
