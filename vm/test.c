@@ -1070,7 +1070,7 @@ static void test_logu(void **state)
         u8 r1 = (u8)(random() % 32);
         u8 r2 = (u8)(random() % 32);
 
-        u64 v2 = (u64)random();
+        u64 v2 = 1 + ((u64)random() % (RAND_MAX - 1));
         core->U[r2] = v2;
 
         u32 *ptr = (u32 *)(core->file_buffer);

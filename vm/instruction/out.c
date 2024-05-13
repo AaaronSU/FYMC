@@ -22,6 +22,14 @@ void outf(core_t *core)
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
+void outa(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    char ascii_value = *(char *)((&core->U[instruction.register_1])[7]);
+    printf("%c\n", ascii_value);
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
 void outb(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
@@ -35,6 +43,13 @@ void outb(core_t *core)
         i++;
         address_value = *(u8 *)&(core->file_buffer[address + (u64)i]);
     }
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void outx(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    printf("%lx\n", core->U[instruction.register_1]);
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 

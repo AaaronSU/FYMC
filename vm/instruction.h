@@ -106,7 +106,7 @@ extern void sumg(core_t *core);
 extern void fmag(core_t *core);
 extern void par_on(core_t *core);
 extern void th_off(core_t *core);
-extern void lock_off(core_t *core);
+extern void lock_on(core_t *core);
 extern void lock_off(core_t *core);
 extern void get_core(core_t *core);
 

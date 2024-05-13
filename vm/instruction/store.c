@@ -70,6 +70,34 @@ void storef(core_t *core)
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
+void storev(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    memcpy(&core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset], &core->V[instruction.register_3], sizeof(u64) * 8);
+
+    for (u16 indice = 0; indice < NUMBER_SCALAR_IN_VECTOR_REGISTER; indice++)
+    {
+        DEBUG_PRINT("%ld\n", core->V[instruction.register_3][indice]);
+    }
+    DEBUG_PRINT("%s", "\n");
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void storet(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    memcpy(&core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset], &core->T[instruction.register_3], sizeof(i64) * 8);
+
+    for (u16 indice = 0; indice < NUMBER_SCALAR_IN_VECTOR_REGISTER; indice++)
+    {
+        DEBUG_PRINT("%ld\n", core->T[instruction.register_3][indice]);
+    }
+    DEBUG_PRINT("%s", "\n");
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
 void storeg(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));

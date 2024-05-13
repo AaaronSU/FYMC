@@ -55,3 +55,25 @@ void jle(core_t *core)
     DEBUG_PRINT("--------Après JLE--------\n");
     DEBUG_PRINT("Instruction Pointer a pour valeur %ld\n\n", core->IP);
 }
+
+void jz(core_t *core)
+{
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+    u64 immediate = get_immediate(core);
+    DEBUG_PRINT("--------Avant JLE--------\n");
+    DEBUG_PRINT("Instruction Pointer a pour valeur %ld\n", core->IP);
+    core->IP = core->CF[0] ? immediate : core->IP;
+    DEBUG_PRINT("--------Après JLE--------\n");
+    DEBUG_PRINT("Instruction Pointer a pour valeur %ld\n\n", core->IP);
+}
+
+void jnz(core_t *core)
+{
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+    u64 immediate = get_immediate(core);
+    DEBUG_PRINT("--------Avant JLE--------\n");
+    DEBUG_PRINT("Instruction Pointer a pour valeur %ld\n", core->IP);
+    core->IP = !core->CF[0] ? immediate : core->IP;
+    DEBUG_PRINT("--------Après JLE--------\n");
+    DEBUG_PRINT("Instruction Pointer a pour valeur %ld\n\n", core->IP);
+}

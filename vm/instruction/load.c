@@ -57,6 +57,20 @@ void loadf(core_t *core)
                 *(double *)&(core->memory[core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset]));
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
+void loadv(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    memcpy(&core->V[instruction.register_1], &core->memory[core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset], sizeof(u64) * 8);
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+void loadt(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    memcpy(&core->T[instruction.register_1], &core->memory[core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset], sizeof(i64) * 8);
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
 
 void loadg(core_t *core)
 {

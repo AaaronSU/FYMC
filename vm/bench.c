@@ -26,6 +26,7 @@ static core_t *core_init()
         exit(1);
     }
     u8 *memory = (u8 *)malloc(MAX_MEMORY_SIZE);
+
     if (memory == NULL)
     {
         printf("failed to allocate memory of size %u bytes", MAX_MEMORY_SIZE);
@@ -46,14 +47,14 @@ static core_t *core_init()
 
     for (int i = 0; i < NUMBER_SCALAR_REGISTER; ++i)
     {
-        core->U[i] = (rand() % (MAX_MEMORY_SIZE / 3)); // pour les déplacements mémoires
-        core->S[i] = (i64)rand();
-        core->F[i] = (f64)rand();
+        core->U[i] = (1 + rand() % (MAX_MEMORY_SIZE / 4)); // pour les déplacements mémoires
+        core->S[i] = (i64)(1 + rand() % (MAX_MEMORY_SIZE / 4));
+        core->F[i] = (f64)(1 + rand() % (MAX_MEMORY_SIZE / 4));
     }
 
     for (int i = 0; i < 8; i++)
     {
-        core->CF[i] = false;
+        core->CF[i] = true;
     }
 
     core->IP = 0;
@@ -136,9 +137,8 @@ void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *titl
         // initialisation de l'instruction
         u8 r1 = rand() % 32;
         u8 r2 = rand() % 32;
-        // u8 r2 = (temp == r1) ? (r1 + 1) % 32 : temp;
         u8 r3 = rand() % 32;
-        u16 offset = 0; // pour l'instant parce que flemme de calculer
+        u16 offset = 0;
 
         u32 *ptr_inst = (u32 *)(core->file_buffer + core->IP);
         u64 *ptr_imm = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
@@ -146,11 +146,9 @@ void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *titl
         *ptr_inst = create_instruction(0, offset, r1, r2, r3);
         *ptr_imm = htobe64((rand() % size_file_buffer)); // pour les sauts d'adresse mémoire
 
-        core->U[r1] = 0;
-        core->U[r2] = 0;
-        core->U[r3] = 0;
-
-        // printf("r1: %u\tr2: %u\tr3: %u\tu_r1: %lu\tu_r2: %lu\tu_r3: %lu\n", r1, r2, r3, core->U[r1], core->U[r2], core->U[r3]);
+        core->U[r1] = 1 + (rand() % (RAND_MAX - 1));
+        core->U[r2] = 1 + (rand() % (RAND_MAX - 1));
+        core->U[r3] = 1 + (rand() % (RAND_MAX - 1));
 
         clock_gettime(CLOCK_MONOTONIC_RAW, &t1);
         for (int j = 0; j < ITERATION; ++j)
@@ -160,7 +158,7 @@ void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *titl
         }
         clock_gettime(CLOCK_MONOTONIC_RAW, &t2);
 
-        elapsed = (f64)(t2.tv_nsec - t1.tv_nsec) / (f64)r;
+        elapsed = (f64)(t2.tv_nsec - t1.tv_nsec) / (f64)ITERATION;
         samples[i] = elapsed;
     }
 
@@ -172,13 +170,10 @@ void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *titl
     f64 mean = mean_f64(samples, r);
     f64 dev = stddev_f64(samples, r);
     f64 opns = (f64)(r * ITERATION) / mean;
-    // f64 mbps = size_mib / (mean / 1e9);
-    // f64 size_b = 0;
-    // f64 mbps = 0;
 
-    printf("%10s; %10lu; %15.3lf; %15.3lf; %15.3lf; %15.3lf (%6.3lf %%); %10.3lf;\n",
+    printf("%10s; %10lu; %15.3lf; %15.3lf; %15.2lf; %15.3lf (%6.1lf %%); %16.2lf;\n",
            title,
-           r,
+           r * ITERATION,
            min,
            mean,
            max,
@@ -192,26 +187,99 @@ int main()
 {
     opcode_t opcode_tobench[] =
         {
-            {loadu, "loadu"},
-            {storeu, "storeu"},
+            //{loadu, "loadu"},
+            //{loads, "loads"},
+            //{loadf, "loadf"},
+            //{loadv, "loadv"},
+            //{loadt, "loadt"},
+            //{loadg, "loadg"},
+            //{storeu, "storeu"},
+            //{stores, "stores"},
+            //{storef, "storef"},
+            //{storev, "storev"},
+            //{storet, "storet"},
+            //{storeg, "storeg"},
+            //{mov, "mov"},
             {movu, "movu"},
+            {movs, "movs"},
+            {movf, "movf"},
+            //{movv, "movv"},
+            //{movt, "movt"},
+            //{movg, "movg"},
             {movui, "movui"},
+            {movsi, "movsi"},
+            {movfi, "movfi"},
+            //{movvi, "movvi"},
+            //{movti, "movti"},
+            //{movgi, "movgi"},
+            //{cvtus, "cvtus"},
+            //{cvtsu, "cvtsu"},
+            //{cvtuf, "cvtuf"},
+            //{cvtfu, "cvtfu"},
+            //{cvtsf, "cvtsf"},
+            //{cvtfs, "cvtfs"},
             {addu, "addu"},
+            {subu, "subu"},
             {mulu, "mulu"},
+            {divu, "divu"},
+            {modu, "modu"},
             {fmau, "fmau"},
+            {sqrtu, "sqrtu"},
+            //{logu, "logu"},
             {incu, "incu"},
+            {decu, "decu"},
+            {andu, "andu"},
+            {oru, "oru"},
+            {xoru, "xoru"},
+            //{shlu, "shlu"},
+            //{shru, "shru"},
+            //{rolu, "rolu"},
+            //{roru, "roru"},
+            //{popcntu, "popcntu"},
+            //{lmbu, "lmbu"},
+            {adds, "adds"},
+            {subs, "subs"},
+            {muls, "muls"},
+            {divs, "divs"},
+            {mods, "mods"},
+            {fmas, "fmas"},
+            {sqrts, "sqrts"},
+            //{logs, "logs"},
+            {ands, "ands"},
+            {ors, "ors"},
+            {xors, "xors"},
+            //{shls, "shls"},
+            //{shrs, "shrs"},
+            //{rols, "rols"},
+            //{rors, "rors"},
+            //{popcnts, "popcnts"},
+            //{lmbs, "lmbs"},
+            {addf, "addf"},
+            {subf, "subf"},
+            {mulf, "mulf"},
+            {divf, "divf"},
+            {fmaf_, "fmaf_"},
+            {sqrtf_, "sqrtf_"},
+            //{logf_, "logf_"},
             {cmpu, "cmpu"},
+            {cmps, "cmps"},
+            {cmpf, "cmpf"},
+            {je, "je"},
+            {jne, "jne"},
+            {jge, "jge"},
             {jl, "jl"},
-        };
+            {jle, "jle"},
+            {jz, "jz"},
+            {jnz, "jnz"}};
 
     // print header
-    printf("%10s; %10s; %15s; %15s; %15s; %26s; %10s;\n",
+    printf("%10s; %10s; %15s; %15s; %15s; %25s; %18s;\n",
            "opcode",
            "r", "min (ns)", "mean (ns)", "max (ns)", "stddev (%)", "opération/ns");
 
     u64 r = 1000;
 
-    for (int i = 0; i < 10; ++i)
+    for (int i = 0; i < 44; ++i)
     {
         mesure_performance_scalaire(opcode_tobench[i].opcode, r, opcode_tobench[i].name);
     }
