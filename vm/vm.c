@@ -22,7 +22,7 @@ instruction_t instruction_new(u32 instruction)
     };
 }
 
-core_t *core_new(program_thread_data_t* args)
+core_t *core_new(program_thread_data_t *args)
 {
     core_t *core = (core_t *)malloc(sizeof(core_t)); // Allocate memory for the core
     if (core == NULL)
@@ -30,11 +30,39 @@ core_t *core_new(program_thread_data_t* args)
         error("failed to allocate core of size %zu bytes", sizeof(core_t));
         exit(EXIT_FAILURE);
     }
-    core->file_buffer = args->file_buffer;
 
-    core->id       = args->core_id + args->core_offset;
-    core->type     = args->management;
-    core->offset   = args->core_offset;
+    char *config_file_line = args->file_buffer;
+    struct stat st;
+
+    if (stat(config_file_line, &st) != 0)
+    {
+        error("File not found or error accessing file %s.\n", config_file_line);
+        exit(EXIT_FAILURE);
+    }
+    FILE *file = fopen(args->file_buffer, "rb");
+    uint64_t total_size = (uint64_t)st.st_size;
+
+    char *buffer = malloc(total_size);
+    if (buffer == NULL)
+    {
+        error("File not found or error accessing file %s.\n", config_file_line);
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
+    if (fread(buffer, 1, total_size, file) != total_size)
+    {
+        fprintf(stderr, "Erreur lors du chargement de données dans le buffer.\n");
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+    fclose(file);
+
+    core->file_buffer = buffer;
+
+    core->id = args->core_id + args->core_offset;
+    core->type = args->management;
+    core->offset = args->core_offset;
     core->given_id = args->given_id;
 
     u8 *memory;
@@ -95,10 +123,9 @@ core_t *core_new(program_thread_data_t* args)
             core->CF[i] = args->registers->CF[i];
         }
 
-
         memcpy(core->CF, args->registers->CF, 8);
-        memory      = args->memory_address;
-        core->IP    = args->IP;
+        memory = args->memory_address;
+        core->IP = args->IP;
         core->mutex = args->mutex;
     }
 
@@ -176,8 +203,8 @@ void core_drop(core_t *self)
         {
             if (NULL != self->memory)
                 free(self->memory);
-        // if (NULL != self->file_buffer)
-        //     free(self->file_buffer);
+            if (NULL != self->file_buffer)
+                free(self->file_buffer);
             if (self->mutex)
                 free(self->mutex);
         }
@@ -189,7 +216,6 @@ void read_config(char *config_file_name, char **file_buffer_list, u16 *number_of
 {
     FILE *config_file;
     char config_file_line[256];
-    char full_path[256];
     u16 i = 0;
     i64 number_of_thread = 0;
 
@@ -222,34 +248,19 @@ void read_config(char *config_file_name, char **file_buffer_list, u16 *number_of
     {
         // printf("config_file_line: %s\n", config_file_line); // Afficher la config_file_line lue
         struct stat st;
-        snprintf(full_path, sizeof(full_path), "%s", config_file_line);
-        // printf("full path: %s\n", full_path);
+        file_buffer_list[i] = (char *)malloc(sizeof(char) * 256);
+        char *full_path = file_buffer_list[i];
+        snprintf(full_path, sizeof(config_file_line), "%s", config_file_line);
+
         if (stat(full_path, &st) != 0)
         {
             error("File not found or error accessing file %s.\n", config_file_line);
             fclose(config_file);
             exit(EXIT_FAILURE);
         }
-        FILE *file = fopen(config_file_line, "rb");
-        uint64_t total_size = (uint64_t)st.st_size;
+        // printf("full path: %s\n", full_path);
 
-        char *buffer = malloc(total_size);
-        if (buffer == NULL)
-        {
-            error("File not found or error accessing file %s.\n", config_file_line);
-            fclose(file);
-            exit(EXIT_FAILURE);
-        }
-
-        if (fread(buffer, 1, total_size, file) != total_size)
-        {
-            fprintf(stderr, "Erreur lors du chargement de données dans le buffer.\n");
-            fclose(file);
-            exit(EXIT_FAILURE);
-        }
-        file_buffer_list[i] = buffer;
         i++;
-        fclose(file);
     }
 
     // Fermer le config_file

@@ -1,0 +1,8 @@
+7
+../reference/hello_world.archyb
+../reference/dotprod_u64.archyb
+../reference/dotprod_s64.archyb
+../reference/dotprod.archyb
+../reference/dotprod_g64.archyb
+../reference/reduce_sum_u64.archyb
+../reference/fibonacci.archyb

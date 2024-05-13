@@ -15,7 +15,7 @@
 #define SIZE_INSTRUCTION_IN_BYTE SIZE_INSTRUCTION / 8
 #define SIZE_IMMEDIATE_IN_BYTE 8
 #define MAX_INSTRUCTION_NUMBER 256
-#define MAX_MEMORY_SIZE 1024 * 1024 * 1024
+#define MAX_MEMORY_SIZE 1024 * 1024
 #define MAX_FILE_BUFFER_SIZE 256
 // IF YOU CHANGE MAX_FILE_NAME_SIZE,
 // YOU NEED TO CHANGE ARGUMENTS OF FSCANF IN READ_CONFIG FUNCTION,
@@ -83,14 +83,13 @@ typedef struct core_s
     u32 id;
     u32 given_id;
     u32 offset;
-    bool type; // coretype, 0 = compute, 1 = management
-    pthread_mutex_t* mutex;// mutex
+    bool type;              // coretype, 0 = compute, 1 = management
+    pthread_mutex_t *mutex; // mutex
     // pthread_mutex_t mutex_tab[MAX_MUTEX_PER_CORE];
 
     // Pointer to the execution function
     // void (*insn_exec)(...);
 } core_t;
-
 
 typedef struct to_send_registers_s
 {
@@ -106,8 +105,7 @@ typedef struct to_send_registers_s
 
     // comparaison flag register
     bool CF[8];
-}  to_send_registers_t;
-
+} to_send_registers_t;
 
 #pragma pack(1)
 typedef struct program_thread_data_s
@@ -120,17 +118,16 @@ typedef struct program_thread_data_s
     u32 core_offset;
     u32 numa_id;
     u32 memory_size;
-    u8* memory_address;
+    u8 *memory_address;
     bool management;
     u64 IP;
-    pthread_mutex_t* mutex;
+    pthread_mutex_t *mutex;
 
-    to_send_registers_t* registers;
+    to_send_registers_t *registers;
 
 } program_thread_data_t;
 
-
-core_t *core_new(program_thread_data_t* args);
+core_t *core_new(program_thread_data_t *args);
 
 u64 get_immediate(core_t *core);
 
