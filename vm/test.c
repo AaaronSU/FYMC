@@ -443,7 +443,7 @@ static void test_movfi(void **state)
     for (int i = 0; i < MAX_ITERATION; ++i)
     {
         u8 r1 = 2;
-        f64 imm = 1;
+        f64 imm = 1.0;
 
         u32 *ptr_inst = (u32 *)(core->file_buffer);
         f64 *ptr_imm = (f64 *)(core->file_buffer + sizeof(u32));
@@ -1345,27 +1345,26 @@ static void test_sumg(void **state)
     for (int i = 0; i < MAX_ITERATION; ++i)
     {
         u8 r1 = (u8)(random() % 32);
-        u8 r2 = (u8)(random() % 32);
-        u8 r3 = (u8)(random() % 32);
 
         for (int i = 0; i < 8; ++i)
         {
-            core->G[r2][i] = (f64)random();
-            core->G[r3][i] = (f64)random();
+            core->G[r1][i] = (f64)random();
         }
 
         u32 *ptr = (u32 *)(core->file_buffer + core->IP);
-        *ptr = create_instruction(0, 0, r1, r2, r3);
+        *ptr = create_instruction(0, 0, r1, 0, 0);
 
-        sumg(core);
-        core->IP = 0;
-
+        f64 sum = 0;
         for (int i = 0; i < 8; ++i)
         {
-            assert_int_equal(core->G[r1][i], core->G[r2][i] + core->G[r3][i]);
+            sum += core->G[r1][i];
         }
-
+        sumg(core);
+        core->IP = 0;
+        assert_float_equal(core->G[r1][0], sum, 0.0001);
+    
     }
+
     free(file_buffer);
     free(core);
 }
