@@ -169,7 +169,7 @@ void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *titl
     f64 max = samples[r - 1];
     f64 mean = mean_f64(samples, r);
     f64 dev = stddev_f64(samples, r);
-    f64 opns = (f64)(r * ITERATION) / mean;
+    f64 opns = (1 / mean) * pow(10, 9);
 
     printf("%10s; %10lu; %15.3lf; %15.3lf; %15.2lf; %15.3lf (%6.1lf %%); %16.2lf;\n",
            title,
@@ -275,7 +275,7 @@ int main()
     // print header
     printf("%10s; %10s; %15s; %15s; %15s; %25s; %18s;\n",
            "opcode",
-           "r", "min (ns)", "mean (ns)", "max (ns)", "stddev (%)", "opération/ns");
+           "r", "min (ns)", "mean (ns)", "max (ns)", "stddev (%)", "opération/s");
 
     u64 r = 1000;
 
