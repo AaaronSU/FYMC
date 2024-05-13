@@ -4,6 +4,13 @@
 void storeu(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    u64 adresse = core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset;
+    if (adresse > MAX_MEMORY_SIZE)
+    {
+        printf("Dépassement mémoire!\n");
+        exit(EXIT_FAILURE);
+    }
+
     DEBUG_PRINT("--------Avant STOREU--------\n");
     DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
                 "Le registre %d a pour valeur %ld\n"
@@ -14,9 +21,9 @@ void storeu(core_t *core)
                 instruction.register_2, core->U[instruction.register_2],
                 instruction.register_3, core->U[instruction.register_3],
                 instruction.offset,
-                *(u64 *)&(core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset]));
+                *(u64 *)&(core->memory[adresse]));
 
-    memcpy(&core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset], &core->U[instruction.register_3], 64);
+    memcpy(&core->memory[adresse], &core->U[instruction.register_3], 64);
 
     DEBUG_PRINT("--------Après STOREU--------\n");
     DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
@@ -28,20 +35,32 @@ void storeu(core_t *core)
                 instruction.register_2, core->U[instruction.register_2],
                 instruction.register_3, core->U[instruction.register_3],
                 instruction.offset,
-                *(u64 *)&(core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset]));
+                *(u64 *)&(core->memory[adresse]));
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
 void stores(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
-    memcpy(&core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset], &core->S[instruction.register_3], 64);
+    u64 adresse = core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset;
+    if (adresse > MAX_MEMORY_SIZE)
+    {
+        printf("Dépassement mémoire!\n");
+        exit(EXIT_FAILURE);
+    }
+    memcpy(&core->memory[adresse], &core->S[instruction.register_3], 64);
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
 void storef(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+    u64 adresse = core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset;
+    if (adresse > MAX_MEMORY_SIZE)
+    {
+        printf("Dépassement mémoire!\n");
+        exit(EXIT_FAILURE);
+    }
     DEBUG_PRINT("--------Avant STOREF--------\n");
     DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
                 "Le registre %d a pour valeur %ld\n"
@@ -52,9 +71,9 @@ void storef(core_t *core)
                 instruction.register_2, core->U[instruction.register_2],
                 instruction.register_3, core->F[instruction.register_3],
                 instruction.offset,
-                *(f64 *)&(core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset]));
+                *(f64 *)&(core->memory[adresse]));
 
-    memcpy(&core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset], &core->F[instruction.register_3], 64);
+    memcpy(&core->memory[adresse], &core->F[instruction.register_3], 64);
 
     DEBUG_PRINT("--------Après STOREF--------\n");
     DEBUG_PRINT("Le registre %d a pour valeur %ld\n"
@@ -66,15 +85,20 @@ void storef(core_t *core)
                 instruction.register_2, core->U[instruction.register_2],
                 instruction.register_3, core->F[instruction.register_3],
                 instruction.offset,
-                *(f64 *)&(core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset]));
+                *(f64 *)&(core->memory[adresse]));
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
 
 void storev(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
-
-    memcpy(&core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset], &core->V[instruction.register_3], sizeof(u64) * 8);
+    u64 adresse = core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset;
+    if (adresse > MAX_MEMORY_SIZE)
+    {
+        printf("Dépassement mémoire!\n");
+        exit(EXIT_FAILURE);
+    }
+    memcpy(&core->memory[adresse], &core->V[instruction.register_3], sizeof(u64) * 8);
 
     for (u16 indice = 0; indice < NUMBER_SCALAR_IN_VECTOR_REGISTER; indice++)
     {
@@ -87,8 +111,13 @@ void storev(core_t *core)
 void storet(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
-
-    memcpy(&core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset], &core->T[instruction.register_3], sizeof(i64) * 8);
+    u64 adresse = core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset;
+    if (adresse > MAX_MEMORY_SIZE)
+    {
+        printf("Dépassement mémoire!\n");
+        exit(EXIT_FAILURE);
+    }
+    memcpy(&core->memory[adresse], &core->T[instruction.register_3], sizeof(i64) * 8);
 
     for (u16 indice = 0; indice < NUMBER_SCALAR_IN_VECTOR_REGISTER; indice++)
     {
@@ -101,8 +130,13 @@ void storet(core_t *core)
 void storeg(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
-
-    memcpy(&core->memory[core->U[instruction.register_1] + core->U[instruction.register_2] + instruction.offset], &core->G[instruction.register_3], sizeof(double) * 8);
+    u64 adresse = core->U[instruction.register_2] + core->U[instruction.register_3] + instruction.offset;
+    if (adresse > MAX_MEMORY_SIZE)
+    {
+        printf("Dépassement mémoire!\n");
+        exit(EXIT_FAILURE);
+    }
+    memcpy(&core->memory[adresse], &core->G[instruction.register_3], sizeof(double) * 8);
 
     for (u16 indice = 0; indice < NUMBER_SCALAR_IN_VECTOR_REGISTER; indice++)
     {
