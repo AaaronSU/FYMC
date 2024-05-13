@@ -10,7 +10,7 @@ code:
     movui u1, 10000     # Number of array elements boundary
     movui u2, 8         # sizeof(f64)
     mulu  u1, u1, u2    # Array size in bytes (loop boundary)
-    movfi f0, 0.0       # Accumulator
+    movfi f0, 1.0       # Accumulator
 
     movui u3, $a
     movui u4, $b
