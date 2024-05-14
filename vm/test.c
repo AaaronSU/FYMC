@@ -3492,6 +3492,7 @@ static void test_sumg(void **state)
     free(core);
 }
 
+//
 int main(void)
 {
     int result = 0;
