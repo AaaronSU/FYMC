@@ -3011,6 +3011,201 @@ static void test_cmpu(void **state)
     free(core);
 }
 
+/*
+instruction_set[78] = jne;
+    instruction_set[79] = jge;
+    instruction_set[80] = jl;
+    instruction_set[81] = jle;
+    instruction_set[82] = jz;
+    instruction_set[83] = jnz;
+
+*/
+
+// jump if equal
+static void test_je(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t rd = 100;
+    size_t file_size = (sizeof(u32) + sizeof(u64)) * rd;
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    // dépassement ?
+    // A GERER ==> DONNE PROBLEME MALLOC DEVRAIT GERER LE FAIT DE DEPASSER, MESSAGE DERREUR??
+
+    // Test sans dépassement
+    // Doit jumper
+    core->CF[7] = true;
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        je(core);
+
+        assert_int_equal(core->IP, size);
+    }
+
+    // Ne doit pas jumper
+    core->CF[7] = false;
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        je(core);
+
+        assert_int_equal(core->IP, 12);
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
+// jump if not equal
+static void test_jne(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t rd = 100;
+    size_t file_size = (sizeof(u32) + sizeof(u64)) * rd;
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    // dépassement ?
+    // A GERER ==> DONNE PROBLEME MALLOC DEVRAIT GERER LE FAIT DE DEPASSER, MESSAGE DERREUR??
+
+    // Test sans dépassement
+
+    // Doit jumper
+    core->CF[6] = true;
+
+    // doit jumper
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        jne(core);
+
+        assert_int_equal(core->IP, size);
+    }
+
+    // Ne doit pas jumper
+    core->CF[6] = false;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        jne(core);
+
+        assert_int_equal(core->IP, 12);
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
+// jump
+static void test_jge(void **state)
+{
+
+    (void)state;
+    core_t *core = core_init();
+
+    size_t rd = 100;
+    size_t file_size = (sizeof(u32) + sizeof(u64)) * rd;
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    // dépassement ?
+    // A GERER ==> DONNE PROBLEME MALLOC DEVRAIT GERER LE FAIT DE DEPASSER, MESSAGE DERREUR??
+
+    // Test sans dépassement
+
+    // Doit jumper
+    core->CF[4] = true;
+
+    // doit jumper
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        jge(core);
+
+        assert_int_equal(core->IP, size);
+    }
+
+    // Ne doit pas jumper
+    core->CF[4] = false;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        jge(core);
+
+        assert_int_equal(core->IP, 12);
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
 // jump if lower
 static void test_jl(void **state)
 {
@@ -3061,6 +3256,180 @@ static void test_jl(void **state)
         *ptr_addr = htobe64(size);
 
         jl(core);
+
+        assert_int_equal(core->IP, 12);
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
+// 
+static void test_jle(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t rd = 100;
+    size_t file_size = (sizeof(u32) + sizeof(u64)) * rd;
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    // dépassement ?
+    // A GERER ==> DONNE PROBLEME MALLOC DEVRAIT GERER LE FAIT DE DEPASSER, MESSAGE DERREUR??
+
+    // Test sans dépassement
+    // Doit jumper
+    core->CF[2] = true;
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        jle(core);
+
+        assert_int_equal(core->IP, size);
+    }
+
+    // Ne doit pas jumper
+    core->CF[2] = false;
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        jle(core);
+
+        assert_int_equal(core->IP, 12);
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
+// 
+static void test_jz(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t rd = 100;
+    size_t file_size = (sizeof(u32) + sizeof(u64)) * rd;
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    // dépassement ?
+    // A GERER ==> DONNE PROBLEME MALLOC DEVRAIT GERER LE FAIT DE DEPASSER, MESSAGE DERREUR??
+
+    // Test sans dépassement
+    // Doit jumper
+    core->CF[0] = true;
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        jz(core);
+
+        assert_int_equal(core->IP, size);
+    }
+
+    // Ne doit pas jumper
+    core->CF[0] = false;
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        jz(core);
+
+        assert_int_equal(core->IP, 12);
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
+// 
+static void test_jnz(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t rd = 100;
+    size_t file_size = (sizeof(u32) + sizeof(u64)) * rd;
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    // dépassement ?
+    // A GERER ==> DONNE PROBLEME MALLOC DEVRAIT GERER LE FAIT DE DEPASSER, MESSAGE DERREUR??
+
+    // Test sans dépassement
+    // Doit jumper
+    core->CF[0] = false;
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        jnz(core);
+
+        assert_int_equal(core->IP, size);
+    }
+
+    // Ne doit pas jumper
+    core->CF[0] = true;
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        core->IP = 0;
+        // TODO : vérifier que ça dépasse vraiment pas la taille du buffer
+        u8 size = (u8)(rand() % (int)file_size);
+        u64 *ptr_addr = (u64 *)(core->file_buffer + core->IP + sizeof(u32));
+        *ptr_addr = htobe64(size);
+
+        jnz(core);
 
         assert_int_equal(core->IP, 12);
     }
@@ -3193,7 +3562,13 @@ int main(void)
         cmocka_unit_test(test_sqrtf_),
         cmocka_unit_test(test_logf_),
         cmocka_unit_test(test_cmpu),
+        cmocka_unit_test(test_je),
+        cmocka_unit_test(test_jne),
+        cmocka_unit_test(test_jge),
         cmocka_unit_test(test_jl),
+        cmocka_unit_test(test_jle),
+        cmocka_unit_test(test_jz),
+        cmocka_unit_test(test_jnz),
         cmocka_unit_test(test_sumg),
         // cmocka_unit_test(test_outu),
     };
