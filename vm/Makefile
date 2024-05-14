@@ -2,14 +2,14 @@ CC = gcc
 CFLAGS = -Wall -Wconversion -Wextra -g3
 FILES = instruction/*.c instruction.h vm.c vm.h
 
-all: compile execute
+all: compile
 
 .PHONY:compile
 compile: mkdir_bin
 	$(CC) $(FILES) main.c  -o bin/vm $(CFLAGS) -lm
-	
-.PHONY:execute
-execute: mkdir_bin
+
+.PHONY:run
+run: mkdir_bin
 	./bin/vm script.conf
 
 .PHONY:vm_debug
@@ -24,12 +24,12 @@ mkdir_bin:
 .PHONY:bench
 bench: mkdir_bin bench.c
 	$(CC) $(FILES) bench.c -o bin/bench -g -O3 -lm
-	./bin/bench 
+	./bin/bench
 
 .PHONY:test
 test: mkdir_bin test.c
 	$(CC) test.c $(FILES) -o bin/test -lcmocka -g3 -O3 $(CFLAGS) -lm
-	./bin/test 
+	./bin/test
 
 .PHONY:clean
 clean:

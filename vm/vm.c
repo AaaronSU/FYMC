@@ -187,7 +187,7 @@ void core_execute(core_t *self)
 
     // self->IP = header.address_code;
 
-    while (self->IP < header.size_total)
+    while (self->IP < header.address_parallel_on)
     {
         u8 opcode = *(u8 *)&(self->file_buffer[self->IP]);
         instruction_set[opcode](self);

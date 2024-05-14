@@ -7,8 +7,8 @@
 #include "vm.h"
 #include "instruction.h"
 
-#define MAX_SAMPLES 5
-#define ITERATION 50
+#define MAX_SAMPLES 33
+#define ITERATION 500
 
 typedef struct opcode_s
 {
@@ -125,11 +125,11 @@ void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *titl
         exit(1);
     }
 
-    core->file_buffer = file_buffer;
+    core->file_buffer = (char*)file_buffer;
 
     f64 elapsed = 0.0;
     struct timespec t1, t2;
-    f64 samples[r];
+    f64* samples = malloc(r * sizeof(f64));
 
     for (int i = 0; i < r; ++i)
     {
@@ -158,7 +158,10 @@ void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *titl
         samples[i] = elapsed;
     }
 
-    core_drop(core);
+    // core_drop(core);
+    free(core->memory);
+    free(core);
+    free(file_buffer);
 
     sort_f64(samples, r);
     f64 min = samples[0];
@@ -166,6 +169,8 @@ void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *titl
     f64 mean = mean_f64(samples, r);
     f64 dev = stddev_f64(samples, r);
     f64 opns = (1 / mean) * pow(10, 9);
+
+    free(samples);
 
     printf("%10s; %10lu; %15.3lf; %15.3lf; %15.2lf; %15.3lf (%6.1lf %%); %16.2lf;\n",
            title,
