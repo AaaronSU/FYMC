@@ -110,23 +110,9 @@ f64 stddev_f64(f64 *restrict a, u64 n)
 }
 
 //
-void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *title)
+void mesure_performance_scalaire(core_t* core, size_t size_file_buffer, void (*opcode)(core_t *), u64 r, const u8 *title)
 {
-    core_t *core = core_init();
-
-    size_t size_file_buffer = (sizeof(u32) + sizeof(u64)) * r; // bon peut-etre un peu bete (marche que scalaire, c'est pour les jump)
-    // mais allocation mémoire assez grande
-    u8 *file_buffer = (u8 *)malloc(size_file_buffer);
-
-    if (file_buffer == NULL)
-    {
-        printf("failed to allocate file buffer of size %lu bytes", size_file_buffer);
-        core_drop(core);
-        exit(1);
-    }
-
-    core->file_buffer = (char*)file_buffer;
-
+    
     f64 elapsed = 0.0;
     struct timespec t1, t2;
     f64* samples = malloc(r * sizeof(f64));
@@ -157,12 +143,7 @@ void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *titl
         elapsed = (f64)(t2.tv_nsec - t1.tv_nsec) / (f64)ITERATION;
         samples[i] = elapsed;
     }
-
-    // core_drop(core);
-    free(core->memory);
-    free(core);
-    free(file_buffer);
-
+    
     sort_f64(samples, r);
     f64 min = samples[0];
     f64 max = samples[r - 1];
@@ -273,17 +254,36 @@ int main()
             {jz, "jz"},
             {jnz, "jnz"}};
 
+    core_t *core = core_init();
+
+    u64 r = 1000;
+
+    size_t size_file_buffer = (sizeof(u32) + sizeof(u64)) * r; // bon peut-etre un peu bete (marche que scalaire, c'est pour les jump)
+    // mais allocation mémoire assez grande
+    u8 *file_buffer = (u8 *)malloc(size_file_buffer);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", size_file_buffer);
+        core_drop(core);
+        exit(1);
+    }
+
+    core->file_buffer = (char *)file_buffer;
+
     // print header
     printf("%10s; %10s; %15s; %15s; %15s; %25s; %18s;\n",
            "opcode",
            "r", "min (ns)", "mean (ns)", "max (ns)", "stddev (%)", "opération/s");
 
-    u64 r = 1000;
-
     for (int i = 0; i < 44; ++i)
     {
-        mesure_performance_scalaire(opcode_tobench[i].opcode, r, opcode_tobench[i].name);
+        mesure_performance_scalaire(core, size_file_buffer, opcode_tobench[i].opcode, r, opcode_tobench[i].name);
     }
+
+    free(core->memory);
+    free(core);
+    free(file_buffer);
 
     return 0;
 }
