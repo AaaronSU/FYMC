@@ -323,7 +323,6 @@ Un fichier assembleur est constitué de deux sections : la section
 
 3.  Règles supplémentaires :
 
-    -   @ : symbole pour demander l\'adresse d\'une variable
     -   \$ : symbole pour demander la valeur d\'une variable
     -   \# : symbole de commentaire ; ce qui le suit sera ignoré
         jusqu\'à la fin de la ligne
