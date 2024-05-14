@@ -2,7 +2,7 @@ import subprocess
 
 def verify_output(command, expected_output):
     try:
-        output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT).decode()
+        output = subprocess.check_output(command, shell=True, stderr=subprocess.STDOUT).decode().strip()
         data_is_valid = output == expected_output
         return data_is_valid, output
     except subprocess.CalledProcessError as e:
@@ -30,15 +30,17 @@ def verify_program_output(tests):
             print(f"[  FAILED  ] {command}")
 
 list_command = [
-    ("vm/bin/vm config_file/hello.conf", "Hello, World!\n"),
-    ("vm/bin/vm config_file/fibonacci.conf", "2\n3\n5\n8\n13\n21\n34\n55\n89\n144\n"),
-    ("vm/bin/vm config_file/dotprod.conf", "0.000000\n"),
-    ("vm/bin/vm config_file/dotprod_u64.conf", "0\n"),
-    ("vm/bin/vm config_file/dotprod_s64.conf", "0\n"),
-    ("vm/bin/vm config_file/dotprod_g64.conf", "0.000000\n"),
-    ("vm/bin/vm config_file/dotprod.conf", "0.000000\n"),
-    ("vm/bin/vm config_file/reduce_sum_u64.conf", "256000\n"),
+    ("vm/bin/vm config_file/hello.conf", "Hello, World!"),
+    ("vm/bin/vm config_file/fibonacci.conf", "2\n3\n5\n8\n13\n21\n34\n55\n89\n144"),
+    ("vm/bin/vm config_file/dotprod.conf", "24.200000"),
+    ("vm/bin/vm config_file/dotprod_u64.conf", "20"),
+    ("vm/bin/vm config_file/dotprod_s64.conf", "-20"),
+    ("vm/bin/vm config_file/dotprod_g64.conf", "38.720000"),
+    ("vm/bin/vm config_file/dotprod.conf", "24.200000"),
+    ("vm/bin/vm config_file/reduce_sum_u64.conf", "1000"),
 ]
 
 if __name__ == "__main__":
+    subprocess.check_output("cd vm && make compile && cd ..", shell=True, stderr=subprocess.STDOUT)
     verify_program_output(list_command)
+    subprocess.check_output("cd vm && make clean && cd ..", shell=True, stderr=subprocess.STDOUT)
