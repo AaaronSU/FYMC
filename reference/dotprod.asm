@@ -2,15 +2,15 @@
 data:
 	u64 a 0 	 # Memory address of array a
 	u64 b 200000	 # Memory address of array b
-	
-code:	
+
+code:
 	movui u0, 0 	 # Array index
-	movui u1, 10	 # Number of array elements boundary
+	movui u1, 10000	 # Number of array elements boundary
 	movui u2, 8	 # sizeof(f64)
 	mulu  u1, u1, u2 # Array size in bytes (loop boundary)
 	movfi f0, 0.0	 # Accumulator
 
-	movui u3, $a	
+	movui u3, $a
 	movui u4, $b
 
 	movfi f1, 1.1	 # Initializer for a
