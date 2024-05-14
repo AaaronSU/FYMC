@@ -146,10 +146,6 @@ void mesure_performance_scalaire(void (*opcode)(core_t *), u64 r, const u8 *titl
         *ptr_inst = create_instruction(0, offset, r1, r2, r3);
         *ptr_imm = htobe64((rand() % size_file_buffer)); // pour les sauts d'adresse mémoire
 
-        core->U[r1] = 1 + (rand() % (RAND_MAX - 1));
-        core->U[r2] = 1 + (rand() % (RAND_MAX - 1));
-        core->U[r3] = 1 + (rand() % (RAND_MAX - 1));
-
         clock_gettime(CLOCK_MONOTONIC_RAW, &t1);
         for (int j = 0; j < ITERATION; ++j)
         {

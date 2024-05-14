@@ -33,7 +33,7 @@ int main(int argc, char *argv[])
 
         tds[i].file_buffer = file_buffer_list[i];
         tds[i].core_offset = (u32)offset;
-        tds[i].management  = true;
+        tds[i].management = true;
         tds[i].given_id = 0;
         tds[i].index = i;
         offset += htobe64(header.core_number);
@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     {
         pthread_join(tds[i].tid, NULL);
         free(tds[i].file_buffer);
-        printf("The thread %2d successful executed at core_id: %2d on numa_id: %d\n", tds[i].index, tds[i].core_id, tds[i].numa_id);
+        // printf("The thread %2d successful executed at core_id: %2d on numa_id: %d\n", tds[i].index, tds[i].core_id, tds[i].numa_id);
     }
 
     free(tds);

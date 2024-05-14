@@ -2,11 +2,15 @@ CC = gcc
 CFLAGS = -Wall -Wconversion -Wextra -g3
 FILES = instruction/*.c instruction.h vm.c vm.h
 
-all: run_par
+all: compile execute
 
-.PHONY:run_par
-run_par: mkdir_bin
+.PHONY:compile
+compile: mkdir_bin
 	$(CC) $(FILES) main.c  -o bin/vm $(CFLAGS) -lm
+	
+.PHONY:execute
+execute: mkdir_bin
+	./bin/vm script.conf
 
 .PHONY:vm_debug
 vm_debug: mkdir_bin

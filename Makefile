@@ -1,23 +1,22 @@
+all:run_program
+config_file := config.txt
+
+.PHONY: run_program
+run_program:
+	script/run_program.sh $(config_file)
+
+.PHONY:verify_as
 verify_as:
-	cd asm_to_binary && make && cd ..
+	script/verify_as.sh
 
-	cp ./asm_to_binary/op_codes ./asm_to_binary/register_list .
+.PHONY:test_function
+test_function:
+	script/test_function.sh
 
-	./asm_to_binary/fymcc reference/dotprod_u64.asm && python3 script/compare.py a.archy reference/dotprod_u64.archyb
+.PHONY:test_program
+test_program:
+	python3 script/test_program.py
 
-	./asm_to_binary/fymcc reference/dotprod.asm && python3 script/compare.py a.archy reference/dotprod.archyb
-
-	./asm_to_binary/fymcc reference/hello_world.asm && python3 script/compare.py a.archy reference/hello_world.archyb
-
-	./asm_to_binary/fymcc reference/reduce_sum_u64.asm && python3 script/compare.py a.archy reference/reduce_sum_u64.archyb
-
-	./asm_to_binary/fymcc reference/fibonacci.asm && python3 script/compare.py a.archy reference/fibonacci.archyb
-
-	./asm_to_binary/fymcc reference/dotprod_s64.asm && python3 script/compare.py a.archy reference/dotprod_s64.archyb
-
-	./asm_to_binary/fymcc reference/dotprod_g64.asm && python3 script/compare.py a.archy reference/dotprod_g64.archyb
-
-	rm ./op_codes ./register_list ./a.archy
-	cd asm_to_binary && make clean && cd ..
-
-	cd vm && make && cd ..
+.PHONY:bench_function
+bench_function:
+	script/run_bench.sh
