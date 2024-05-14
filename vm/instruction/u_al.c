@@ -335,3 +335,81 @@ void xoru(core_t *core)
 
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
+
+void shlu(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    core->U[instruction.register_1] = (core->U[instruction.register_2] << core->U[instruction.register_3]);
+    core->CF[0] = (core->U[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void shru(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    core->U[instruction.register_1] = (core->U[instruction.register_2] >> core->U[instruction.register_3]);
+    core->CF[0] = (core->U[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void rolu(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    core->U[instruction.register_1] = (core->U[instruction.register_2] << core->U[instruction.register_3]) |
+                                      (core->U[instruction.register_2] >> core->U[instruction.register_3]);
+    core->CF[0] = (core->U[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void roru(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    core->U[instruction.register_1] = (core->U[instruction.register_2] >> core->U[instruction.register_3]) |
+                                      (core->U[instruction.register_2] << core->U[instruction.register_3]);
+    core->CF[0] = (core->U[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void popcntu(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    u64 count = 0;
+    u64 value = core->U[instruction.register_2];
+    while (value != 0)
+    {
+        count += value & 1;
+        value >>= 1;
+    }
+    core->U[instruction.register_1] = count;
+
+    core->CF[0] = (core->U[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void lmbu(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    u64 position = 0;
+    u64 value = core->U[instruction.register_2];
+    while (value != 0)
+    {
+        position++;
+        value >>= 1;
+    }
+    core->U[instruction.register_1] = position;
+
+    core->CF[0] = (core->U[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}

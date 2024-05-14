@@ -1,6 +1,10 @@
 #include "../vm.h"
 #include "../instruction.h"
 
+void mov(core_t *core)
+{
+}
+
 void movu(core_t *core)
 {
     instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));

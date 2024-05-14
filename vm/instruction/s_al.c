@@ -291,3 +291,81 @@ void xors(core_t *core)
 
     core->IP += SIZE_INSTRUCTION_IN_BYTE;
 }
+
+void shls(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    core->S[instruction.register_1] = (core->S[instruction.register_2] << core->S[instruction.register_3]);
+    core->CF[0] = (core->S[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void shrs(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    core->S[instruction.register_1] = (core->S[instruction.register_2] >> core->S[instruction.register_3]);
+    core->CF[0] = (core->S[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void rols(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    core->S[instruction.register_1] = (core->S[instruction.register_2] << core->S[instruction.register_3]) |
+                                      (core->S[instruction.register_2] >> core->S[instruction.register_3]);
+    core->CF[0] = (core->S[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void rors(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    core->S[instruction.register_1] = (core->S[instruction.register_2] >> core->S[instruction.register_3]) |
+                                      (core->S[instruction.register_2] << core->S[instruction.register_3]);
+    core->CF[0] = (core->S[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void popcnts(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    i64 count = 0;
+    i64 value = core->S[instruction.register_2];
+    while (value != 0)
+    {
+        count += value & 1;
+        value >>= 1;
+    }
+    core->S[instruction.register_1] = count;
+
+    core->CF[0] = (core->S[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
+
+void lmbs(core_t *core)
+{
+    instruction_t instruction = instruction_new(*(u32 *)&(core->file_buffer[core->IP]));
+
+    i64 position = 0;
+    i64 value = core->S[instruction.register_2];
+    while (value != 0)
+    {
+        position++;
+        value >>= 1;
+    }
+    core->S[instruction.register_1] = position;
+
+    core->CF[0] = (core->S[instruction.register_1] == 0) ? true : false;
+
+    core->IP += SIZE_INSTRUCTION_IN_BYTE;
+}
