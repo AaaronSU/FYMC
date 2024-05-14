@@ -32,11 +32,10 @@ def verify_program_output(tests):
 list_command = [
     ("vm/bin/vm config_file/hello.conf", "Hello, World!"),
     ("vm/bin/vm config_file/fibonacci.conf", "2\n3\n5\n8\n13\n21\n34\n55\n89\n144"),
-    ("vm/bin/vm config_file/dotprod.conf", "24.200000"),
+    ("vm/bin/vm config_file/dotprod.conf", "24200.000000"),
     ("vm/bin/vm config_file/dotprod_u64.conf", "20"),
     ("vm/bin/vm config_file/dotprod_s64.conf", "-20"),
     ("vm/bin/vm config_file/dotprod_g64.conf", "38.720000"),
-    ("vm/bin/vm config_file/dotprod.conf", "24.200000"),
     ("vm/bin/vm config_file/reduce_sum_u64.conf", "1000"),
 ]
 
