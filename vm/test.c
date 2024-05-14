@@ -2561,6 +2561,381 @@ static void test_xors(void **state)
     free(core);
 }
 
+// f1 = f2 + f3
+static void test_addf(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        u8 r1 = (u8)(random() % 32);
+        u8 r2 = (u8)(random() % 32);
+        u8 r3 = (u8)(random() % 32);
+
+        f64 v2 = (f64)random();
+        f64 v3 = (f64)random();
+
+        core->F[r2] = v2;
+        core->F[r3] = v3;
+
+        u32 *ptr = (u32 *)(core->file_buffer + core->IP);
+        *ptr = create_instruction(0, 0, r1, r2, r3);
+
+        addf(core);
+        core->IP = 0;
+
+        if (r2 == r3)
+        {
+            assert_float_equal(core->F[r1], (v3 + v3), 0.0001);
+        }
+        else
+        {
+            assert_float_equal(core->F[r1], (v2 + v3), 0.0001);
+        }
+
+        // CF[0] = 1 si opération = 0
+        if (core->F[r1] == 0)
+        {
+            assert_true(core->CF[0]);
+        }
+    }
+    free(file_buffer);
+    free(core);
+}
+
+// f1 = f2 - f3
+static void test_subf(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        u8 r1 = (u8)(rand() % 10);        // entre 0 et 9
+        u8 r2 = (u8)(10 + (rand() % 10)); // entre 10 et 19
+        u8 r3 = (u8)(20 + (rand() % 12)); // entre 20 et 31
+
+        f64 v2 = (f64)random();
+        f64 v3 = (f64)random();
+
+        core->F[r2] = v2;
+        core->F[r3] = v3;
+
+        u32 *ptr = (u32 *)(core->file_buffer + core->IP);
+        *ptr = create_instruction(0, 0, r1, r2, r3);
+
+        core->CF[1] = false;
+        core->CF[0] = false;
+
+        subf(core);
+        core->IP = 0;
+
+        if (v2 < v3)
+        {
+            assert_true(core->CF[1]);
+        }
+
+        // CF[0] = 1 si opération = 0
+        if (core->F[r1] == 0)
+        {
+            assert_true(core->CF[0]);
+        }
+
+        if (r2 == r3)
+        {
+            assert_float_equal(core->F[r1], (v3 - v3), 0.0001);
+        }
+        else
+        {
+            assert_float_equal(core->F[r1], (v2 - v3), 0.0001);
+        }
+    }
+    free(file_buffer);
+    free(core);
+}
+
+// f1 = f2 * f3
+static void test_mulf(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        u8 r1 = (u8)(random() % 32);
+        u8 r2 = (u8)(random() % 32);
+        u8 r3 = (u8)(random() % 32);
+
+        f64 v2 = (f64)random();
+        f64 v3 = (f64)random();
+
+        core->F[r2] = v2;
+        core->F[r3] = v3;
+
+        u32 *ptr = (u32 *)(core->file_buffer + core->IP);
+        *ptr = create_instruction(0, 0, r1, r2, r3);
+
+        mulf(core);
+        core->IP = 0;
+
+        if (r2 == r3)
+        {
+            assert_float_equal(core->F[r1], (v3 * v3), 0.0001);
+        }
+        else
+        {
+            assert_float_equal(core->F[r1], (v2 * v3), 0.0001);
+        }
+
+        // CF[0] = 1 si opération = 0
+        if (core->F[r1] == 0)
+        {
+            assert_true(core->CF[0]);
+        }
+    }
+    free(file_buffer);
+    free(core);
+}
+
+// f1 = f2 / f3
+static void test_divf(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    i64 rd = 1000;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        u8 r1 = (u8)(random() % 32);
+        u8 r2 = (u8)(random() % 15);      // 0 à 14
+        u8 r3 = (u8)(15 + random() % 17); // 15 à 31
+
+        f64 v2 = (f64)random();
+        f64 v3 = (f64)(random() % rd);
+
+        core->F[r2] = v2;
+        core->F[r3] = v3;
+
+        u32 *ptr = (u32 *)(core->file_buffer);
+        *ptr = create_instruction(0, 0, r1, r2, r3);
+
+        core->CF[0] = false;
+        core->CF[1] = false;
+
+        divf(core);
+        core->IP = 0;
+
+        if (v3 == 0)
+        {
+            // TODO : pour l'instant
+            assert_float_equal(core->F[r1], 0, 0.0001);
+            assert_true(core->CF[1]);
+        }
+        else if (v3 != 0)
+        {
+            assert_float_equal(core->F[r1], (v2 / v3), 0.0001);
+        }
+
+        // CF[0] = 1 si opération = 0
+        if (core->F[r1] == 0)
+        {
+            assert_true(core->CF[0]);
+        }
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
+// f1 += f2 * f3
+static void test_fmaf_(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        u8 r1 = (u8)(random() % 10);
+        u8 r2 = (u8)(10 + random() % 10);
+        u8 r3 = (u8)(20 + random() % 12);
+
+        f64 v1 = (f64)random();
+        f64 v2 = (f64)random();
+        f64 v3 = (f64)random();
+
+        core->F[r1] = v1;
+        core->F[r2] = v2;
+        core->F[r3] = v3;
+
+        u32 *ptr = (u32 *)(core->file_buffer + core->IP);
+        *ptr = create_instruction(0, 0, r1, r2, r3);
+
+        fmaf_(core);
+        core->IP = 0;
+
+        assert_float_equal(core->F[r1], (v1 + (v2 * v3)), 0.00001);
+
+        // CF[0] = 1 si opération = 0
+        if (core->F[r1] == 0)
+        {
+            assert_true(core->CF[0]);
+        }
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
+// f1 = sqrt(f2)
+static void test_sqrtf_(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        u8 r1 = (u8)(random() % 32);
+        u8 r2 = (u8)(random() % 32);
+
+        f64 v2 = (f64)random();
+        core->F[r2] = v2;
+
+        u32 *ptr = (u32 *)(core->file_buffer);
+        *ptr = create_instruction(0, 0, r1, r2, 0);
+
+        sqrtf_(core);
+        core->IP = 0;
+
+        assert_float_equal(core->F[r1], sqrt(v2), 0.0001);
+
+        // CF[0] = 1 si opération = 0
+        if (core->F[r1] == 0)
+        {
+            assert_true(core->CF[0]);
+        }
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
+// f1 = log(f2)
+static void test_logf_(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+    core->file_buffer = file_buffer;
+
+    // manque le cas où random = 0;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        u8 r1 = (u8)(random() % 32);
+        u8 r2 = (u8)(random() % 32);
+
+        f64 v2 = (f64)(1 + (random() % (RAND_MAX - 1))) / 2.453541;
+        core->F[r2] = v2;
+
+        u32 *ptr = (u32 *)(core->file_buffer);
+        *ptr = create_instruction(0, 0, r1, r2, 0);
+
+        logf_(core);
+        core->IP = 0;
+
+        if (v2 != 0)
+        {
+            assert_float_equal(core->F[r1], log10(v2), 0.0001);
+        }
+
+        // CF[0] = 1 si opération = 0
+        if (core->F[r1] == 0)
+        {
+            assert_true(core->CF[0]);
+        }
+    }
+
+    free(file_buffer);
+    free(core);
+}
+
 // comparaison unisgned int
 static void test_cmpu(void **state)
 {
@@ -2810,6 +3185,13 @@ int main(void)
         cmocka_unit_test(test_ands),
         cmocka_unit_test(test_ors),
         cmocka_unit_test(test_xors),
+        cmocka_unit_test(test_addf),
+        cmocka_unit_test(test_subf),
+        cmocka_unit_test(test_mulf),
+        cmocka_unit_test(test_divf),
+        cmocka_unit_test(test_fmaf_),
+        cmocka_unit_test(test_sqrtf_),
+        cmocka_unit_test(test_logf_),
         cmocka_unit_test(test_cmpu),
         cmocka_unit_test(test_jl),
         cmocka_unit_test(test_sumg),
