@@ -3011,16 +3011,6 @@ static void test_cmpu(void **state)
     free(core);
 }
 
-/*
-instruction_set[78] = jne;
-    instruction_set[79] = jge;
-    instruction_set[80] = jl;
-    instruction_set[81] = jle;
-    instruction_set[82] = jz;
-    instruction_set[83] = jnz;
-
-*/
-
 // jump if equal
 static void test_je(void **state)
 {

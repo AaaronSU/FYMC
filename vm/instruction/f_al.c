@@ -137,7 +137,7 @@ void sqrtf_(core_t *core)
                 instruction.register_1, core->F[instruction.register_1],
                 instruction.register_2, core->F[instruction.register_2]);
 
-    core->F[instruction.register_1] = (u64)sqrt((f64)core->F[instruction.register_2]);
+    core->F[instruction.register_1] = sqrt(core->F[instruction.register_2]);
 
     core->CF[0] = (core->F[instruction.register_1] == 0) ? true : false;
 
@@ -166,7 +166,7 @@ void logf_(core_t *core)
         exit(EXIT_FAILURE);
     }
 
-    core->F[instruction.register_1] = (u64)log10((f64)core->F[instruction.register_2]);
+    core->F[instruction.register_1] = log10(core->F[instruction.register_2]);
 
     core->CF[0] = (core->F[instruction.register_1] == 0) ? true : false;
 
