@@ -582,6 +582,192 @@ static void test_storef(void **state)
     core_drop(core);
 }
 
+//  memory(u1 + u2 + offset) = v3
+static void test_storev(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+
+    core->file_buffer = file_buffer;
+
+    u8 *memory = (u8 *)malloc(MEMORY_SIZE);
+    if (memory == NULL)
+    {
+        printf("failed to allocate memory of size %u bytes", MEMORY_SIZE);
+        free(file_buffer);
+        free(core);
+        exit(1);
+    }
+
+    core->memory = memory;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        // intialisation des registres
+        u8 r1 = (u8)(rand() % 10);        // entre 0 et 9
+        u8 r2 = (u8)(10 + (rand() % 10)); // entre 10 et 19
+        u8 r3 = (u8)(20 + (rand() % 12)); // entre 20 et 31
+        // indice
+        core->U[r1] = (u64)(rand() % (MEMORY_SIZE / 3));
+        core->U[r2] = (u64)(rand() % (MEMORY_SIZE / 3));
+        u8 offset = (u8)rand();
+
+        u32 *ptr = (u32 *)(core->file_buffer + core->IP);
+        *ptr = create_instruction(0, offset, r1, r2, r3);
+
+        u64 indice = core->U[r1] + core->U[r2] + offset;
+
+        for (u64 i = 0; i < NUMBER_SCALAR_IN_VECTOR_REGISTER; ++i)
+        {
+            core->V[r3][i] = (u64)(rand() % (MEMORY_SIZE / 3));
+        }
+
+        storev(core);
+        core->IP = 0;
+
+        for (u64 i = 0; i < NUMBER_SCALAR_IN_VECTOR_REGISTER; ++i)
+        {
+            assert_int_equal(core->V[r3][i], *(u64 *)(core->memory + indice + (i * sizeof(u64))));
+        }
+    }
+
+    core_drop(core);
+}
+
+// memory(u1 + u2 + offset) = t3
+static void test_storet(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+
+    core->file_buffer = file_buffer;
+
+    u8 *memory = (u8 *)malloc(MEMORY_SIZE);
+    if (memory == NULL)
+    {
+        printf("failed to allocate memory of size %u bytes", MEMORY_SIZE);
+        free(file_buffer);
+        free(core);
+        exit(1);
+    }
+
+    core->memory = memory;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        // intialisation des registres
+        u8 r1 = (u8)(rand() % 10);        // entre 0 et 9
+        u8 r2 = (u8)(10 + (rand() % 10)); // entre 10 et 19
+        u8 r3 = (u8)(20 + (rand() % 12)); // entre 20 et 31
+        // indice
+        core->U[r1] = (u64)(rand() % (MEMORY_SIZE / 3));
+        core->U[r2] = (u64)(rand() % (MEMORY_SIZE / 3));
+        u8 offset = (u8)rand();
+
+        u32 *ptr = (u32 *)(core->file_buffer + core->IP);
+        *ptr = create_instruction(0, offset, r1, r2, r3);
+
+        u64 indice = core->U[r1] + core->U[r2] + offset;
+
+        for (u64 i = 0; i < NUMBER_SCALAR_IN_VECTOR_REGISTER; ++i)
+        {
+            core->T[r3][i] = (i64)(rand() % (MEMORY_SIZE / 3));
+        }
+
+        storet(core);
+        core->IP = 0;
+
+        for (u64 i = 0; i < NUMBER_SCALAR_IN_VECTOR_REGISTER; ++i)
+        {
+            assert_int_equal(core->T[r3][i], *(i64 *)(core->memory + indice + (i * sizeof(i64))));
+        }
+    }
+
+    core_drop(core);
+}
+
+// memory(u1 + u2 + offset) = g3
+static void test_storeg(void **state)
+{
+    (void)state;
+    core_t *core = core_init();
+
+    size_t file_size = sizeof(u32);
+    char *file_buffer = (char *)malloc(file_size);
+
+    if (file_buffer == NULL)
+    {
+        printf("failed to allocate file buffer of size %lu bytes", file_size);
+        free(core);
+        exit(1);
+    }
+
+    core->file_buffer = file_buffer;
+
+    u8 *memory = (u8 *)malloc(MEMORY_SIZE);
+    if (memory == NULL)
+    {
+        printf("failed to allocate memory of size %u bytes", MEMORY_SIZE);
+        free(file_buffer);
+        free(core);
+        exit(1);
+    }
+
+    core->memory = memory;
+
+    for (int i = 0; i < MAX_ITERATION; ++i)
+    {
+        // intialisation des registres
+        u8 r1 = (u8)(rand() % 10);        // entre 0 et 9
+        u8 r2 = (u8)(10 + (rand() % 10)); // entre 10 et 19
+        u8 r3 = (u8)(20 + (rand() % 12)); // entre 20 et 31
+        // indice
+        core->U[r1] = (u64)(rand() % (MEMORY_SIZE / 3));
+        core->U[r2] = (u64)(rand() % (MEMORY_SIZE / 3));
+        u8 offset = (u8)rand();
+
+        u32 *ptr = (u32 *)(core->file_buffer + core->IP);
+        *ptr = create_instruction(0, offset, r1, r2, r3);
+
+        u64 indice = core->U[r1] + core->U[r2] + offset;
+
+        for (u64 i = 0; i < NUMBER_SCALAR_IN_VECTOR_REGISTER; ++i)
+        {
+            core->G[r3][i] = (f64)(rand() % (MEMORY_SIZE / 3));
+        }
+
+        storeg(core);
+        core->IP = 0;
+
+        for (u64 i = 0; i < NUMBER_SCALAR_IN_VECTOR_REGISTER; ++i)
+        {
+            assert_int_equal(core->G[r3][i], *(f64 *)(core->memory + indice + (i * sizeof(f64))));
+        }
+    }
+
+    core_drop(core);
+}
+
 // u1 = u2
 static void test_movu(void **state)
 {
@@ -1680,6 +1866,9 @@ int main(void)
         cmocka_unit_test(test_storeu),
         cmocka_unit_test(test_stores),
         cmocka_unit_test(test_storef),
+        cmocka_unit_test(test_storeg),
+        cmocka_unit_test(test_storev),
+        cmocka_unit_test(test_storet),
         cmocka_unit_test(test_movu),
         cmocka_unit_test(test_movf),
         cmocka_unit_test(test_movui),
